@@ -1,0 +1,23 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== CUSTOM SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 6px; /* độ dày thanh cuộn */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* nền */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1; /* màu nút kéo */
+  border-radius: 10px; /* bo tròn */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8; /* khi hover */
+}
