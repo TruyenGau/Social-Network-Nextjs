@@ -115,7 +115,7 @@ export default function Sidebar(props: IProps) {
               <ListItemButton
                 sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#fff3e0" } }}
                 component="a"
-                href="#"
+                href="/chat"
               >
                 <ListItemIcon>
                   <Person sx={{ color: "#795548" }} />
@@ -132,7 +132,7 @@ export default function Sidebar(props: IProps) {
                 <ListItemIcon>
                   <Settings sx={{ color: "#e91e63" }} />
                 </ListItemIcon>
-                <ListItemText primary="Cài Đặt" />
+                <ListItemText primary="Cài đặt" />
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
