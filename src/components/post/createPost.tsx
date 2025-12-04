@@ -189,9 +189,9 @@ export default function PostForm(props: IProps) {
             py: 0.5,
             fontSize: "0.85rem",
             height: "36px",
-            backgroundColor: "#4dce57ff",
+            backgroundColor: "#1877F2",
             "&:hover": {
-              backgroundColor: "#4dce57ff !important", // giữ nguyên 👈
+              backgroundColor: "#1877F2 !important", // giữ nguyên 👈
             },
             borderRadius: "16px",
           }}
