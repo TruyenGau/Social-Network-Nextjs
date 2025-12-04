@@ -103,7 +103,7 @@ export default function Sidebar(props: IProps) {
               <ListItemButton
                 sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#e8f5e9" } }}
                 component="a"
-                href="#"
+                href="/community"
               >
                 <ListItemIcon>
                   <Group sx={{ color: "#4caf50" }} />
