@@ -59,6 +59,7 @@ export const sendRequestFile = async <T>(props: IRequest) => {
     body: body ? body : null,
     ...nextOption,
   };
+
   if (useCredentials) options.credentials = "include";
 
   if (queryParams) {

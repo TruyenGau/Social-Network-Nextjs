@@ -200,18 +200,23 @@ const PostList = ({ session, initPostId }: IProps) => {
             avatar={
               <Link href={`/profile/${post.userId._id}`}>
                 <Avatar
-                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post.userId.avatar}`}
+                  src={
+                    post.userId.avatar
+                      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post.userId.avatar}`
+                      : "/user/default-user.png"
+                  }
                   sx={{ cursor: "pointer" }} // 👈 THÊM ĐỂ BIẾT LÀ CLICK ĐƯỢC
                 />
               </Link>
             }
             action={
-              <IconButton onClick={handleProfileMenuOpen}>
-                <MoreVert
-                  onClick={(e) => {
-                    setSelectedPostIdForMenu(post._id);
-                  }}
-                />
+              <IconButton
+                onClick={(e) => {
+                  handleProfileMenuOpen(e);
+                  setSelectedPostIdForMenu(post._id);
+                }}
+              >
+                <MoreVert />
               </IconButton>
             }
             title={

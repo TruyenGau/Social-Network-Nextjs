@@ -19,15 +19,10 @@ export default function RootLayout({
         justifyContent="space-between"
         sx={{ mt: 4, px: 2 }}
       >
-        {/* LEFT: SIDEBAR 20% */}
         <Box sx={{ flexBasis: "20%", flexShrink: 0 }}>
           <SideBar />
         </Box>
-
-        {/* CENTER: NỘI DUNG POST 60% */}
         <Box sx={{ flexBasis: "50%" }}>{children}</Box>
-
-        {/* RIGHT: RIGHTBAR 20% */}
         <Box sx={{ flexBasis: "30%", flexShrink: 0 }}>
           <RightBar />
         </Box>

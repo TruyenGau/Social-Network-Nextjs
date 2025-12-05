@@ -45,7 +45,11 @@ const ProfileCard = ({
 
       <Box sx={{ display: "flex", justifyContent: "center", mt: -3 }}>
         <Avatar
-          src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${avatarUrl}`}
+          src={
+            avatarUrl
+              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${avatarUrl}`
+              : "/user/default-user.png"
+          }
           sx={{ width: 55, height: 55, border: "2px solid white" }}
         />
       </Box>

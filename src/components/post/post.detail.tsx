@@ -110,7 +110,11 @@ export default function PostDetailModal({
         <Box sx={{ display: "flex", alignItems: "flex-start" }}>
           <Avatar
             sx={{ mr: 2, width: 34, height: 34 }}
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${c.user.avatar}`}
+            src={
+              c.user.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${c.user.avatar}`
+                : "/user/default-user.png"
+            }
           ></Avatar>
 
           <Box sx={{ flex: 1 }}>
@@ -228,8 +232,12 @@ export default function PostDetailModal({
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Avatar
             sx={{ bgcolor: "#c0c9d3ff" }}
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post?.author.avatar}`}
-          ></Avatar>
+            src={
+              post?.author?.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post.author.avatar}`
+                : "user/default-avatar.png"
+            }
+          />
 
           <Typography variant="h6" fontWeight="bold">
             {post?.author?.name || "User Name"}
@@ -306,7 +314,11 @@ export default function PostDetailModal({
         >
           <Avatar
             sx={{ mr: 1 }}
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${session.user.avatar}`}
+            src={
+              session.user.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${session.user.avatar}`
+                : "/user/default-user.png"
+            }
           ></Avatar>
 
           <TextField

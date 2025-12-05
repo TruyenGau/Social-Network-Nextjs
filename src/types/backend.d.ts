@@ -72,6 +72,8 @@ declare global {
   export interface IUserRef {
     _id: string;
     email: string;
+    name: string;
+    avatar: string;
   }
 
   export interface IComment {
@@ -135,5 +137,23 @@ declare global {
     _id: string;
     name: string;
     avatar: string;
+  }
+
+  interface IGroups {
+    _id: string;
+    name: string;
+    description: string;
+    members: IUserRef[];
+    admins: IUserRef[];
+    membersCount: number;
+    postsCount: number;
+    avatar: string;
+    coverPhoto: string;
+    isDeleted: boolean;
+    deletedAt: string | null;
+    createdAt: string;
+    updatedAt: string;
+    posts: IPost[];
+    isJoined: boolean;
   }
 }

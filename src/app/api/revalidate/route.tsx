@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   const secret = request.nextUrl.searchParams.get("secret");
 
   if (secret !== process.env.REVALIDATE_SECRET) {
-    NextResponse.json({
+    return NextResponse.json({
       revalidated: false,
       now: Date.now(),
       message: "Missing secret to revalidate",

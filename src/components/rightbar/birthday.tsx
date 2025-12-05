@@ -57,7 +57,11 @@ const BirthdayUser = () => {
             {/* LEFT */}
             <Box display="flex" alignItems="center" gap={1.2}>
               <Avatar
-                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${birthdays[0].avatar}`}
+                src={
+                  birthdays[0].avatar
+                    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${birthdays[0].avatar}`
+                    : "/user/default-user.png"
+                }
                 sx={{ width: 40, height: 40 }}
               />
               <Typography fontWeight={600} fontSize={15}>

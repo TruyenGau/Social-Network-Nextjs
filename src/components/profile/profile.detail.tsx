@@ -19,7 +19,11 @@ const ProfileDetail = (props: IProps) => {
   const userId = props.userId;
   const route = useRouter();
   const { userInfoId, setUserInfoId } = useContext(UserContext) as IContext;
-  setUserInfoId(userId);
+
+  useEffect(() => {
+    setUserInfoId(userId);
+  }, [userId]);
+
   const user = props.users;
   const posts = props.posts;
 
@@ -48,7 +52,11 @@ const ProfileDetail = (props: IProps) => {
 
         {/* AVATAR */}
         <Avatar
-          src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${user.avatar}`}
+          src={
+            user?.avatar
+              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${user.avatar}`
+              : "/user/default-user.png"
+          }
           sx={{
             width: 128,
             height: 128,
