@@ -38,6 +38,7 @@ const SuggestionsFriend = ({ suggesionFriend }: IProps) => {
       });
       route.refresh();
       setList((prev) => prev.filter((u) => u._id !== id));
+      window.dispatchEvent(new Event("story-follow-updated"));
     } catch (err) {
       console.log("Follow Error:", err);
     }

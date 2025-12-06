@@ -60,15 +60,15 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
       method: "POST",
       headers: { Authorization: `Bearer ${session?.access_token}` },
     });
-    // await sendRequest<IBackendRes<any>>({
-    //   url: "/api/revalidate",
-    //   method: "POST",
-    //   queryParams: {
-    //     tag: "fetch-groups",
-    //     secret: "levantruyen",
-    //   },
-    // });
-    // route.refresh();
+    await sendRequest<IBackendRes<any>>({
+      url: "/api/revalidate",
+      method: "POST",
+      queryParams: {
+        tag: "fetch-groups",
+        secret: "levantruyen",
+      },
+    });
+    route.refresh();
     if (res.data) {
       fetchGroup(); // 👉 cập nhật UI ngay
     } else {
@@ -82,15 +82,15 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
       method: "POST",
       headers: { Authorization: `Bearer ${session?.access_token}` },
     });
-    // await sendRequest<IBackendRes<any>>({
-    //   url: "/api/revalidate",
-    //   method: "POST",
-    //   queryParams: {
-    //     tag: "fetch-groups",
-    //     secret: "levantruyen",
-    //   },
-    // });
-    // route.refresh();
+    await sendRequest<IBackendRes<any>>({
+      url: "/api/revalidate",
+      method: "POST",
+      queryParams: {
+        tag: "fetch-groups",
+        secret: "levantruyen",
+      },
+    });
+    route.refresh();
     if (res.data) {
       fetchGroup(); // 👉 cập nhật UI ngay
     } else {

@@ -1,11 +1,9 @@
-import AppFooter from "@/components/footer/app.footer";
 import AppHeader from "@/components/header/app.header";
 import { Box, Stack } from "@mui/material";
+import SideBar from "../(user)/sidebar";
+import RightBar from "../(user)/rightbar";
 
-import SideBar from "./sidebar";
-import RightBar from "./rightbar";
-
-export default function RootLayout({
+export default function UserLayout({
   children,
 }: {
   children: React.ReactNode;

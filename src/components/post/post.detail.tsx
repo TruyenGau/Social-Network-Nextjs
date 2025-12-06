@@ -12,16 +12,17 @@ import {
   Button,
   Checkbox,
 } from "@mui/material";
+
 import CloseIcon from "@mui/icons-material/Close";
 import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
 import Favorite from "@mui/icons-material/Favorite";
 import Comment from "@mui/icons-material/Comment";
 import Share from "@mui/icons-material/Share";
 import SendIcon from "@mui/icons-material/Send";
+
 import { useEffect, useState } from "react";
 import { sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 
 export default function PostDetailModal({
   postId,
@@ -32,7 +33,6 @@ export default function PostDetailModal({
   const [commentText, setCommentText] = useState("");
   const [post, setPost] = useState<IPostDetail | null>(null);
 
-  // ==== THÊM STATE MỚI CHO REPLY COMMENT =====
   const [replyText, setReplyText] = useState("");
   const [replyToCommentId, setReplyToCommentId] = useState<string | null>(null);
 
@@ -49,16 +49,29 @@ export default function PostDetailModal({
         next: { tags: ["fetch-post"] },
       },
     });
-    if (data?.data) {
-      setPost(data?.data);
-    }
+
+    if (data?.data) setPost(data?.data);
   };
 
   useEffect(() => {
     fetchData();
-  }, [postId]); // (giữ code cũ nguyên vẹn)
+  }, [postId]);
 
-  // ===== GỬI COMMENT THƯỜNG =====
+  // ========== DELETE COMMENT ==========
+  const handleDeleteComment = async (commentId: string) => {
+    if (!confirm("Bạn chắc chắn muốn xoá bình luận này?")) return;
+
+    await sendRequest({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/comments/${commentId}`,
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
+
+    fetchData();
+    refresh();
+  };
+
+  // ========== COMMENT CẤP 1 ==========
   const handlePostComment = async () => {
     if (!session) return alert("Bạn phải đăng nhập!");
     if (!commentText.trim()) return;
@@ -67,43 +80,54 @@ export default function PostDetailModal({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/comments`,
       method: "POST",
       headers: { Authorization: `Bearer ${session?.access_token}` },
-      body: { content: commentText, postId: postId },
+      body: { content: commentText, postId },
     });
+
     setCommentText("");
     fetchData();
     refresh();
   };
 
-  // ===== GỬI REPLY COMMENT =====
+  // ========== REPLY COMMENT ==========
   const handleReplyComment = async (parentId: string) => {
-    if (!session) return alert("Bạn phải đăng nhập!");
     if (!replyText.trim()) return;
 
     await sendRequest({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/comments`,
       method: "POST",
       headers: { Authorization: `Bearer ${session?.access_token}` },
-      body: { postId: postId, content: replyText, parentId },
+      body: { content: replyText, postId, parentId },
     });
 
     setReplyText("");
     setReplyToCommentId(null);
-    fetchData(); // load lại comment mới
+    fetchData();
     refresh();
   };
 
-  // ===== RECURSIVE HIỂN THỊ COMMENT LÙI VÀO =====
-  // ===== RECURSIVE HIỂN THỊ COMMENT LÙI VÀO =====
-  const renderComments = (comments: IComment[], level = 0) => {
-    return comments.map((c: IComment, idx: number) => (
+  // ========== LIKE ==========
+  const handleLikes = async () => {
+    await sendRequest({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/likes/${post?._id}/toggle`,
+      method: "POST",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
+
+    fetchData();
+    refresh();
+  };
+
+  // ========== RENDER COMMENTS ==========
+  const renderComments = (comments: IComment[], level = 0) =>
+    comments.map((c: IComment) => (
       <Box
-        key={idx}
+        key={c._id}
         sx={{
           ml: level * 3,
           mb: 2,
           p: 1.2,
           borderRadius: 2,
-          backgroundColor: level === 0 ? "#f9f9f9" : "#fafafaff", // cấp 1 màu nhạt, cấp 2 nhạt hơn
+          backgroundColor: level === 0 ? "#f9f9f9" : "#fafafa",
           border: "1px solid #e0e0e0",
         }}
       >
@@ -115,7 +139,7 @@ export default function PostDetailModal({
                 ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${c.user.avatar}`
                 : "/user/default-user.png"
             }
-          ></Avatar>
+          />
 
           <Box sx={{ flex: 1 }}>
             <Typography fontWeight="bold" sx={{ fontSize: "0.9rem" }}>
@@ -126,7 +150,6 @@ export default function PostDetailModal({
               {c.content}
             </Typography>
 
-            {/* NHÓM BUTTON BÊN DƯỚI */}
             <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
               <Button
                 size="small"
@@ -140,9 +163,26 @@ export default function PostDetailModal({
               >
                 Reply
               </Button>
+
+              {/* === DELETE COMMENT BUTTON === */}
+              {(session.user._id === c.userId ||
+                session.user._id === post?.author?._id) && (
+                <Button
+                  size="small"
+                  sx={{
+                    textTransform: "none",
+                    fontSize: "0.75rem",
+                    color: "#d32f2f",
+                    ml: 1,
+                    "&:hover": { textDecoration: "underline" },
+                  }}
+                  onClick={() => handleDeleteComment(c._id)}
+                >
+                  Delete
+                </Button>
+              )}
             </Box>
 
-            {/* Ô NHẬP REPLY COMMENT */}
             {replyToCommentId === c._id && (
               <Box sx={{ display: "flex", mt: 1 }}>
                 <TextField
@@ -168,33 +208,18 @@ export default function PostDetailModal({
           </Box>
         </Box>
 
-        {/* COMMENT CON RECURSION */}
         {c.children &&
           c.children.length > 0 &&
           renderComments(c.children, level + 1)}
       </Box>
     ));
-  };
-
-  // ===== LIKE POST =====
-  const handleLikes = async () => {
-    if (!session) return alert("Bạn cần đăng nhập!");
-    await sendRequest({
-      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/likes/${post?._id}/toggle`,
-      method: "POST",
-      headers: { Authorization: `Bearer ${session?.access_token}` },
-    });
-    fetchData();
-    refresh();
-  };
-  console.log("check post ", post);
 
   return (
     <Modal
       open={!!post}
       onClose={() => {
-        onClose(); // đóng modal
-        router.replace("/", { scroll: false }); // xoá /?post=xxxx
+        onClose();
+        router.replace("/", { scroll: false });
       }}
       sx={{
         backdropFilter: "blur(3px)",
@@ -217,46 +242,39 @@ export default function PostDetailModal({
           overflowY: "auto",
         }}
       >
-        {/* ===== HEADER ===== */}
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
           <IconButton
             onClick={() => {
               onClose();
-              router.replace("/", { scroll: false }); // ⬅ xoá /?post=123
+              router.replace("/", { scroll: false });
             }}
           >
             <CloseIcon />
           </IconButton>
         </Box>
-
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Avatar
             sx={{ bgcolor: "#c0c9d3ff" }}
             src={
               post?.author?.avatar
                 ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post.author.avatar}`
-                : "user/default-avatar.png"
+                : "/user/default-user.png"
             }
           />
 
           <Typography variant="h6" fontWeight="bold">
-            {post?.author?.name || "User Name"}
+            {post?.author?.name}
           </Typography>
         </Box>
-
         <Typography variant="body2" color="text.secondary">
           {new Date(post?.createdAt + "").toLocaleString()}
         </Typography>
-
         <Divider sx={{ my: 1 }} />
-
         {/* ===== HÌNH POST ===== */}
         {Array.isArray(post?.images) && post.images.length > 0 && (
           <CardMedia
             component="img"
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${
-              post?.images?.[0] ?? ""
-            }`}
+            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${post?.images?.[0]}`}
             sx={{
               width: "100%",
               borderRadius: 2,
@@ -264,21 +282,24 @@ export default function PostDetailModal({
               objectFit: "cover",
             }}
           />
+        )}{" "}
+        {/* ===== HÌNH POST ===== */}
+        {Array.isArray(post?.videos) && post.videos.length > 0 && (
+          <video
+            controls
+            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/videos/${post?.videos?.[0]}`}
+            style={{ width: "100%", maxHeight: "600px", borderRadius: "8px" }}
+          />
         )}
-
-        {/* ===== NỘI DUNG ===== */}
         <Typography variant="h6" sx={{ mt: 2 }}>
           {post?.namePost}
         </Typography>
-        <Typography variant="body1">{post?.content}</Typography>
-
+        <Typography>{post?.content}</Typography>
         <Divider sx={{ my: 2 }} />
-
-        {/* ===== LIKE / COMMENT / SHARE ===== */}
         <Box sx={{ display: "flex", justifyContent: "space-around", mb: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Checkbox
-              onClick={() => handleLikes()}
+              onClick={handleLikes}
               icon={<FavoriteBorder />}
               checkedIcon={<Favorite sx={{ color: "red" }} />}
               checked={post?.isLiked}
@@ -287,26 +308,22 @@ export default function PostDetailModal({
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Comment /> <Typography>{post?.commentsCount} Comments</Typography>
+            <Comment />
+            <Typography>{post?.commentsCount} Comments</Typography>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Share /> <Typography>Share</Typography>
+            <Share />
+            <Typography>Share</Typography>
           </Box>
         </Box>
-
         <Divider />
-
-        {/* ===== DANH SÁCH COMMENT ===== */}
         <Typography sx={{ mb: 1 }} fontWeight="bold">
           Bình luận
         </Typography>
-
         <Box sx={{ maxHeight: "300px", overflowY: "auto" }}>
           {post?.comments && renderComments(post.comments)}
         </Box>
-
-        {/* ===== NHẬP COMMENT MỚI (CẤP 1) ===== */}
         <Paper
           sx={{ mt: 2, display: "flex", alignItems: "center", p: 1 }}
           component="form"
@@ -319,7 +336,7 @@ export default function PostDetailModal({
                 ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${session.user.avatar}`
                 : "/user/default-user.png"
             }
-          ></Avatar>
+          />
 
           <TextField
             fullWidth
@@ -329,6 +346,7 @@ export default function PostDetailModal({
             onChange={(e) => setCommentText(e.target.value)}
             InputProps={{ disableUnderline: true }}
           />
+
           <IconButton color="primary" onClick={handlePostComment}>
             <SendIcon />
           </IconButton>

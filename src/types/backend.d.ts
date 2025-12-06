@@ -156,4 +156,12 @@ declare global {
     posts: IPost[];
     isJoined: boolean;
   }
+  interface IStory {
+    _id: string;
+    userId: string;
+    image: string;
+    createdAt: string;
+    avatar?: string; // sẽ lấy từ API user
+    userName?: string; // sẽ lấy từ API user
+  }
 }

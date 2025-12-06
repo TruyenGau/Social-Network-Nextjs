@@ -6,6 +6,7 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 import { sendRequest } from "@/utils/api";
 import PostForm from "@/components/post/createPost";
 import { IUser } from "@/types/next-auth";
+import StoryList from "@/components/story/story.list";
 
 const HomePage = async ({
   searchParams,
@@ -23,7 +24,11 @@ const HomePage = async ({
     },
   });
   return (
-    <Box flex={4} p={6} sx={{ marginTop: "-25px", marginLeft: "20px" }}>
+    <Box flex={4} p={6} sx={{ marginTop: "-30px", marginLeft: "20px" }}>
+      <Box sx={{ width: "100%", maxWidth: "590px", overflow: "hidden" }}>
+        <StoryList />
+      </Box>
+
       <PostForm data={data.data ?? null} />
       <Post session={session} initPostId={searchParams.post ?? ""} />
     </Box>

@@ -210,14 +210,16 @@ const PostList = ({ session, initPostId }: IProps) => {
               </Link>
             }
             action={
-              <IconButton
-                onClick={(e) => {
-                  handleProfileMenuOpen(e);
-                  setSelectedPostIdForMenu(post._id);
-                }}
-              >
-                <MoreVert />
-              </IconButton>
+              session.user._id === post.userId._id && (
+                <IconButton
+                  onClick={(e) => {
+                    handleProfileMenuOpen(e);
+                    setSelectedPostIdForMenu(post._id);
+                  }}
+                >
+                  <MoreVert />
+                </IconButton>
+              )
             }
             title={
               <Link
@@ -265,7 +267,11 @@ const PostList = ({ session, initPostId }: IProps) => {
 
           {/* CONTENT */}
           <CardContent>
-            <Typography variant="h6" fontWeight="bold">
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              onClick={() => setSelectedPostId(post._id)}
+            >
               {post.content}
             </Typography>
           </CardContent>

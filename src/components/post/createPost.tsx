@@ -73,19 +73,19 @@ export default function PostForm(props: IProps) {
       const uploadedVideos = uploadRes.data?.data?.videos || [];
       console.log("check upload", uploadedImages);
       // GỬI POST
-      await axios.post(
+      const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts`,
         {
           content,
           images: uploadedImages,
           videos: uploadedVideos,
           userId: session?.user?._id,
-          community: "test",
         },
         {
           headers: { Authorization: `Bearer ${session?.access_token}` },
         }
       );
+      console.log("check upload res", res);
 
       // CLEAR FORM
       setContent("");
