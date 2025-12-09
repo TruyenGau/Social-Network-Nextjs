@@ -78,67 +78,135 @@ export default function AppHeader() {
   const [anchorNoti, setAnchorNoti] = React.useState<HTMLElement | null>(null);
   const [notifications, setNotifications] = React.useState<any[]>([]);
   const [unread, setUnread] = React.useState(0);
+  // 🔥 Chat unread
+  const [chatUnread, setChatUnread] = React.useState(0);
+  // Lưu thông tin chat cuối cùng
+  const [lastChatTarget, setLastChatTarget] = React.useState<{
+    type: "private" | "group";
+    userId?: string;
+    roomId?: string;
+  } | null>(null);
+  const chatSocketRef = React.useRef<Socket | null>(null);
+
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   // =====================================================================
   // 🔥 1) API: FETCH NOTIFICATION (theo style sendRequest của bạn)
   // =====================================================================
-  // const loadNotifications = async () => {
-  //   if (!session?.access_token) return;
+  const loadNotifications = async () => {
+    if (!session?.access_token) return;
 
-  //   const res = await sendRequest<IBackendRes<any>>({
-  //     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notifications`,
-  //     method: "GET",
-  //     headers: {
-  //       Authorization: `Bearer ${session.access_token}`,
-  //     },
-  //   });
+    const res = await sendRequest<IBackendRes<any>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notifications`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
 
-  //   if (res?.data) {
-  //     setNotifications(res.data);
-  //     setUnread(res.data.filter((n: any) => !n.isRead).length);
-  //   }
-  // };
+    if (res?.data) {
+      setNotifications(res.data);
+      setUnread(res.data.filter((n: any) => !n.isRead).length);
+    }
+  };
 
   // =====================================================================
   // 🔥 2) API MARK READ
   // =====================================================================
-  // const handleMarkRead = async (id: string) => {
-  //   await sendRequest({
-  //     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notifications/${id}/read`,
-  //     method: "PATCH",
-  //     headers: { Authorization: `Bearer ${session?.access_token}` },
-  //   });
-  // };
+  const handleMarkRead = async (id: string) => {
+    await sendRequest({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notifications/${id}/read`,
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
+  };
 
   // =====================================================================
   // 🔥 3) SOCKET REALTIME
   // =====================================================================
-  // React.useEffect(() => {
-  //   if (!session?.user?._id) return;
+  React.useEffect(() => {
+    if (!session?.user?._id) return;
 
-  //   socket = io(process.env.NEXT_PUBLIC_BACKEND_URL!, {
-  //     query: { userId: session.user._id },
-  //     transports: ["websocket"],
-  //   });
+    socket = io(process.env.NEXT_PUBLIC_BACKEND_URL!, {
+      query: { userId: session.user._id },
+      transports: ["websocket"],
+    });
 
-  //   socket.on("notification", (data) => {
-  //     setNotifications((prev) => [data, ...prev]);
-  //     setUnread((u) => u + 1);
-  //   });
+    socket.on("notification", (data) => {
+      setNotifications((prev) => [data, ...prev]);
+      setUnread((u) => u + 1);
+    });
 
-  //   return () => {
-  //     socket?.disconnect();
-  //   };
-  // }, [session?.user?._id]);
+    return () => {
+      socket?.disconnect();
+    };
+  }, [session?.user?._id]);
+
+  // =====================================================================
+  // 🔥 CHAT SOCKET: nhận notif tin nhắn (riêng + nhóm)
+  // =====================================================================
+  React.useEffect(() => {
+    if (!session?.access_token) return;
+
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+    if (!BACKEND_URL) return;
+
+    const chatSocket = io(`${BACKEND_URL}/chat`, {
+      auth: { token: `Bearer ${session.access_token}` },
+      transports: ["websocket"],
+    });
+
+    chatSocketRef.current = chatSocket;
+
+    chatSocket.on("connect", () => {
+      console.log("Chat socket connected (header)", chatSocket.id);
+    });
+
+    // private chat notification
+    chatSocket.on(
+      "new_message_notification",
+      (payload: { roomId: string; senderId: string; message: any }) => {
+        console.log("new_message_notification (header):", payload);
+        setChatUnread((prev) => prev + 1);
+
+        setLastChatTarget({
+          type: "private",
+          userId: payload.senderId,
+        });
+      }
+    );
+
+    // group chat notification
+    chatSocket.on(
+      "new_group_message_notification",
+      (payload: { roomId: string; senderId: string; content: string }) => {
+        console.log("new_group_message_notification (header):", payload);
+        setChatUnread((prev) => prev + 1);
+
+        setLastChatTarget({
+          type: "group",
+          roomId: payload.roomId,
+        });
+      }
+    );
+
+    chatSocket.on("disconnect", () => {
+      console.log("Chat socket disconnected (header)");
+    });
+
+    return () => {
+      chatSocket.disconnect();
+      chatSocketRef.current = null;
+    };
+  }, [session?.access_token]);
 
   // =====================================================================
   // 🔥 4) LOAD NOTIFICATION LÚC LOGIN
   // =====================================================================
-  // React.useEffect(() => {
-  //   loadNotifications();
-  // }, [session]);
+  React.useEffect(() => {
+    loadNotifications();
+  }, [session]);
 
   // =====================================================================
   // MENU PROFILE
@@ -206,9 +274,37 @@ export default function AppHeader() {
           >
             {session ? (
               <>
-                {/* MAIL */}
-                <IconButton size="large" color="inherit">
-                  <Badge badgeContent={0} color="error">
+                {/* MAIL - CHAT UNREAD */}
+                <IconButton
+                  size="large"
+                  color="inherit"
+                  onClick={() => {
+                    if (lastChatTarget) {
+                      if (
+                        lastChatTarget.type === "private" &&
+                        lastChatTarget.userId
+                      ) {
+                        // Chat riêng: dùng userId của người gửi (sender)
+                        router.push(`/chat?userId=${lastChatTarget.userId}`);
+                      } else if (
+                        lastChatTarget.type === "group" &&
+                        lastChatTarget.roomId
+                      ) {
+                        // Chat nhóm: dùng roomId
+                        router.push(
+                          `/chat?roomId=${lastChatTarget.roomId}&type=group`
+                        );
+                      } else {
+                        router.push("/chat");
+                      }
+                    } else {
+                      router.push("/chat");
+                    }
+
+                    setChatUnread(0);
+                  }}
+                >
+                  <Badge badgeContent={chatUnread} color="error">
                     <MailIcon />
                   </Badge>
                 </IconButton>
@@ -298,21 +394,21 @@ export default function AppHeader() {
                 width: "360px",
                 display: "flex",
               }}
-              // onClick={async () => {
-              //   setAnchorNoti(null);
+              onClick={async () => {
+                setAnchorNoti(null);
 
-              //   if (!n.isRead) {
-              //     await handleMarkRead(n._id);
-              //     setNotifications((prev) =>
-              //       prev.map((x) =>
-              //         x._id === n._id ? { ...x, isRead: true } : x
-              //       )
-              //     );
-              //     setUnread((u) => u - 1);
-              //   }
+                if (!n.isRead) {
+                  await handleMarkRead(n._id);
+                  setNotifications((prev) =>
+                    prev.map((x) =>
+                      x._id === n._id ? { ...x, isRead: true } : x
+                    )
+                  );
+                  setUnread((u) => u - 1);
+                }
 
-              //   router.push(`/?post=${n.postId}`);
-              // }}
+                router.push(`/?post=${n.postId}`);
+              }}
             >
               {/* Avatar */}
               <img

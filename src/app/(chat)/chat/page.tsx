@@ -5,19 +5,21 @@ import { redirect } from "next/navigation";
 import ChatPageClient from "@/components/chat/ChatPageClient";
 
 const ChatPage = async () => {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-        redirect("/login");
-    }
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect("/login");
+  }
 
-    const userId = (session.user as any)._id; 
+  const userId = (session.user as any)._id;
 
-    return (
-        <ChatPageClient
-            accessToken={session.access_token as string}
-            userId={userId}
-        />
-    );
+  return (
+    <>
+      <ChatPageClient
+        accessToken={session.access_token as string}
+        userId={userId}
+      />
+    </>
+  );
 };
 
 export default ChatPage;
