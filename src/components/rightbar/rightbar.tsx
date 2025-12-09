@@ -14,7 +14,10 @@ interface IProps {
 const Rightbar = ({ suggesionFriend }: IProps) => {
   const pathname = usePathname();
   const isProfilePage = pathname.startsWith("/profile");
+  const isChatPage = pathname.startsWith("/chat");
 
+  if (isChatPage) return null;
+  
   return (
     <Box
       flex={2}
@@ -33,7 +36,6 @@ const Rightbar = ({ suggesionFriend }: IProps) => {
           height: "calc(100vh - 100px)",
           overflowY: "auto",
           pb: 5,
-
           /* CUSTOM SCROLLBAR */
           "&::-webkit-scrollbar": {
             width: "6px",
@@ -58,11 +60,9 @@ const Rightbar = ({ suggesionFriend }: IProps) => {
             <Box mb={3}>
               <SuggestionsFriend suggesionFriend={suggesionFriend} />
             </Box>
-
             <Box mb={3}>
               <BirthdayUser />
             </Box>
-
             <Box mb={3}>
               <SponsoredAds />
             </Box>

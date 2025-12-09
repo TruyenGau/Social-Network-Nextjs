@@ -105,6 +105,7 @@ declare global {
     updatedAt: string | null;
     likesCount: number;
     commentsCount: number;
+    sharesCount?: number;
     isLiked: boolean; // dựa vào user hiện tại
     comments: IComment[]; // danh sách comment cấp 1
     author: {

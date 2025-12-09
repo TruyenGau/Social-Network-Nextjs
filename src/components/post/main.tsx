@@ -26,6 +26,8 @@ import {
   Paper,
   Menu,
   MenuItem,
+  Modal,
+  Button,
 } from "@mui/material";
 import { sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
@@ -43,6 +45,9 @@ const PostList = ({ session, initPostId }: IProps) => {
   const [selectedPostId, setSelectedPostId] = useState<string>("");
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const [sharePostId, setSharePostId] = useState<string | null>(null);
+  const [shareTitle, setShareTitle] = useState<string>("");
 
   const [selectedPostIdForMenu, setSelectedPostIdForMenu] = useState<
     string | null
@@ -89,6 +94,28 @@ const PostList = ({ session, initPostId }: IProps) => {
     });
     route.refresh();
   };
+
+  // ===== SHARE POST (CONFIRM) =====
+  const handleShareConfirm = async () => {
+    if (!session) return alert("Bạn cần đăng nhập!");
+    if (!sharePostId) return;
+
+    // 1. Gọi API share
+    await sendRequest({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/${sharePostId}/share`,
+      method: "POST",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+      body: { namePost: shareTitle }, // tiêu đề bạn nhập trong modal
+    });
+
+    // 2. Đóng modal + clear input
+    setSharePostId(null);
+    setShareTitle("");
+
+    // 3. Giống hệt PostForm: refresh page để list post reload
+    route.refresh();
+  };
+
 
   const handlePostComment = async (postId: string) => {
     if (!session) return alert("Bạn cần đăng nhập!");
@@ -311,6 +338,10 @@ const PostList = ({ session, initPostId }: IProps) => {
                 gap: 1,
                 cursor: "pointer",
               }}
+              onClick={() => {
+                setSharePostId(post._id);  // mở modal
+                setShareTitle("");
+              }}
             >
               <IconButton size="small">
                 <Share />
@@ -362,6 +393,72 @@ const PostList = ({ session, initPostId }: IProps) => {
           refresh={() => route.refresh()}
         />
       )}
+
+      {/* 🔥 MODAL CHIA SẺ BÀI VIẾT */}
+      <Modal
+        open={!!sharePostId}
+        onClose={() => setSharePostId(null)}
+        sx={{
+          backdropFilter: "blur(3px)",
+          backgroundColor: "rgba(0,0,0,0.2)",
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "white",
+            borderRadius: 3,
+            boxShadow: 24,
+            p: 2,
+            width: "90%",
+            maxWidth: 500,
+          }}
+        >
+          <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+            Chia sẻ
+          </Typography>
+
+          {/* Thông tin user đang share */}
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2, gap: 1.5 }}>
+            <Avatar
+              src={
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${session?.user?.avatar}` ||
+                ""
+              }
+            />
+            <Box>
+              <Typography fontWeight="bold">
+                {session?.user?.name || "Bạn"}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Bảng feed • Chỉ mình tôi
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Ô nhập tiêu đề / cảm nghĩ */}
+          <TextField
+            multiline
+            minRows={3}
+            fullWidth
+            placeholder="Hãy nói gì đó về nội dung này..."
+            value={shareTitle}
+            onChange={(e) => setShareTitle(e.target.value)}
+          />
+
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2, gap: 1 }}>
+            <Button variant="outlined" onClick={() => setSharePostId(null)}>
+              Hủy
+            </Button>
+            <Button variant="contained" onClick={handleShareConfirm}>
+              CHIA SẺ NGAY
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </>
   );
 };

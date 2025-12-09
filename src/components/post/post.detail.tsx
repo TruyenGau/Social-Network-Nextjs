@@ -185,6 +185,21 @@ export default function PostDetailModal({
   };
   console.log("check post ", post);
 
+  // ===== SHARE POST =====
+  const handleShare = async () => {
+    if (!session) return alert("Bạn cần đăng nhập!");
+    if (!post?._id) return;
+
+    await sendRequest({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/${post._id}/share`,
+      method: "POST",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
+
+    await fetchData(); // cập nhật lại chi tiết post (sharesCount mới)
+    refresh();         // reload list ngoài trang chính
+  };
+
   return (
     <Modal
       open={!!post}
@@ -246,9 +261,8 @@ export default function PostDetailModal({
         {Array.isArray(post?.images) && post.images.length > 0 && (
           <CardMedia
             component="img"
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${
-              post?.images?.[0] ?? ""
-            }`}
+            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${post?.images?.[0] ?? ""
+              }`}
             sx={{
               width: "100%",
               borderRadius: 2,
@@ -282,8 +296,14 @@ export default function PostDetailModal({
             <Comment /> <Typography>{post?.commentsCount} Comments</Typography>
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Share /> <Typography>Share</Typography>
+          <Box
+            sx={{ display: "flex", alignItems: "center", gap: 1, cursor: "pointer" }}
+            onClick={handleShare}
+          >
+            <Share />
+            <Typography>
+              {post?.sharesCount ?? 0} Shares
+            </Typography>
           </Box>
         </Box>
 

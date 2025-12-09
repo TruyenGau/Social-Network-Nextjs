@@ -10,13 +10,16 @@ const ChatPage = async () => {
         redirect("/login");
     }
 
-    const userId = (session.user as any)._id; 
+    const userId = (session.user as any)._id;
 
     return (
-        <ChatPageClient
-            accessToken={session.access_token as string}
-            userId={userId}
-        />
+        <>
+            <ChatPageClient
+                accessToken={session.access_token as string}
+                userId={userId}
+            />
+        </>
+
     );
 };
 

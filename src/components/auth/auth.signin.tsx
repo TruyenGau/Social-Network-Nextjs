@@ -212,6 +212,14 @@ export const AuthSignIn = () => {
               <Google titleAccess="Đăng nhập vói Google" />
             </Avatar>
           </Grid>
+
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            Nếu bạn chưa có tài khoản?{" "}
+            <Link href="/auth/signup" style={{ color: "#1976d2" }}>
+              Đăng ký ngay
+            </Link>
+          </Typography>
+
         </Grid>
       </Grid>
       <Snackbar
