@@ -1,20 +1,23 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Avatar,
   Box,
   Card,
   CardActions,
   CardContent,
+  CardHeader,
   Checkbox,
+  Divider,
   IconButton,
+  Menu,
+  MenuItem,
   Paper,
   TextField,
   Typography,
-  Menu,
-  MenuItem,
 } from "@mui/material";
+
 import {
   Favorite,
   FavoriteBorder,
@@ -26,139 +29,93 @@ import {
   Edit,
 } from "@mui/icons-material";
 
-// ---------------------- MOCK DATA DEMO ---------------------- //
-const mockPosts = [
-  {
-    _id: "p1",
-    content: "Ảnh chụp hoàng hôn siêu đẹp 😍",
-    images: ["https://images.unsplash.com/photo-1501973801540-537f08ccae7b"],
-    videos: [],
-    isLiked: false,
-    likesCount: 12,
-    commentsCount: 5,
-    createdAt: "2025-02-12",
-    userId: {
-      _id: "u1",
-      name: "Im Truyền Lê",
-      avatar: "https://i.pravatar.cc/150?img=3",
-    },
-  },
-  {
-    _id: "p2",
-    content: "Đi phượt cuối tuần cùng bạn bè 😁🔥",
-    images: ["https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e"],
-    videos: [],
-    isLiked: true,
-    likesCount: 45,
-    commentsCount: 12,
-    createdAt: "2025-02-10",
-    userId: {
-      _id: "u2",
-      name: "Nguyễn Văn A",
-      avatar: "https://i.pravatar.cc/150?img=5",
-    },
-  },
-  {
-    _id: "p3",
-    content: "Clip vui hôm qua 😂😂",
-    images: [],
-    videos: ["https://www.w3schools.com/html/mov_bbb.mp4"],
-    isLiked: false,
-    likesCount: 9,
-    commentsCount: 3,
-    createdAt: "2025-02-09",
-    userId: {
-      _id: "u3",
-      name: "Lê Phương",
-      avatar: "https://i.pravatar.cc/150?img=8",
-    },
-  },
-];
+import Link from "next/link";
+import { sendRequest } from "@/utils/api";
+import { useToast } from "@/utils/toast";
+import { useSession } from "next-auth/react";
+import CommunityPostDetailModal from "./community.post.detail";
 
 const PostList = () => {
-  const [posts, setPosts] = useState(mockPosts);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const { data: session } = useSession();
+  const toast = useToast();
 
+  const [posts, setPosts] = useState<IPost[]>([]);
   const [openCommentBox, setOpenCommentBox] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedPostIdForMenu, setSelectedPostIdForMenu] = useState<
+    string | null
+  >(null);
+  const [selectedPostId, setSelectedPostId] = useState<string>("");
 
   const isMenuOpen = Boolean(anchorEl);
 
-  const handleLike = (postId: string) => {
-    setPosts((prev) =>
-      prev.map((p) =>
-        p._id === postId
-          ? {
-              ...p,
-              isLiked: !p.isLiked,
-              likesCount: p.isLiked ? p.likesCount - 1 : p.likesCount + 1,
-            }
-          : p
-      )
-    );
+  // ---------------- FETCH FEED POSTS ---------------- //
+  const fetchFeedPosts = async () => {
+    const res = await sendRequest<IBackendRes<any>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/communities/listCommunityIdWithPosts`,
+      method: "POST",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
+
+    if (res.data?.posts) {
+      setPosts(res.data.posts);
+    }
   };
 
+  useEffect(() => {
+    fetchFeedPosts();
+  }, [session]);
+
+  // ---------------- LIKE POST ---------------- //
+  const handleLikes = async (postId: string) => {
+    if (!session) return alert("Bạn cần đăng nhập!");
+
+    await sendRequest({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/likes/${postId}/toggle`,
+      method: "POST",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
+
+    fetchFeedPosts();
+  };
+
+  // ---------------- MENU ---------------- //
   const handleProfileMenuOpen = (
-    event: React.MouseEvent<HTMLElement>,
+    e: React.MouseEvent<HTMLElement>,
     postId: string
   ) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedPostId(postId);
+    setAnchorEl(e.currentTarget);
+    setSelectedPostIdForMenu(postId);
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
+  const handleMenuClose = () => setAnchorEl(null);
+
+  // ---------------- DELETE POST ---------------- //
+  const handleDeletePost = async (postId: string) => {
+    const res = await sendRequest({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/${postId}`,
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
+
+    if (res) toast.success("Xóa bài viết thành công!");
+
+    handleMenuClose();
+    fetchFeedPosts();
   };
 
-  const handlePostComment = (postId: string) => {
-    if (!commentText.trim()) return;
-
-    setPosts((prev) =>
-      prev.map((p) =>
-        p._id === postId ? { ...p, commentsCount: p.commentsCount + 1 } : p
-      )
+  if (!posts.length) {
+    return (
+      <Typography textAlign="center" mt={3}>
+        Không có bài viết nào.
+      </Typography>
     );
-
-    setCommentText("");
-    setOpenCommentBox(null);
-  };
-
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      keepMounted
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem>
-        <IconButton size="small">
-          <Edit />
-        </IconButton>
-        Chỉnh sửa bài viết
-      </MenuItem>
-      <MenuItem>
-        <IconButton size="small">
-          <Delete />
-        </IconButton>
-        Xóa bài viết
-      </MenuItem>
-    </Menu>
-  );
+  }
 
   return (
     <>
-      <Box
-        sx={{
-          fontSize: "18px",
-          fontWeight: 700,
-          color: "#1c1e21",
-          mb: 2,
-          mt: 1,
-          px: 1,
-          marginLeft: "10%",
-        }}
-      >
+      <Box sx={{ fontSize: 20, fontWeight: 700, mt: 2, ml: "10%" }}>
         Hoạt động mới đây
       </Box>
 
@@ -168,136 +125,165 @@ const PostList = () => {
           sx={{
             margin: "20px auto",
             maxWidth: 600,
-            borderRadius: "12px",
-            boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-            background: "#fff",
+            borderRadius: 3,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
           }}
         >
-          {/* ----------------- HEADER ----------------- */}
-          <Box sx={{ display: "flex", alignItems: "center", p: "12px 16px" }}>
-            <Avatar
-              src={post.userId.avatar}
-              sx={{ width: 45, height: 45, cursor: "pointer" }}
-            />
+          {/* ---------------- HEADER ---------------- */}
+          <CardHeader
+            avatar={
+              <Link href={`/profile/${post.userId._id}`}>
+                <Avatar
+                  src={
+                    post.userId.avatar
+                      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post.userId.avatar}`
+                      : "/user/default-user.png"
+                  }
+                  sx={{ cursor: "pointer" }}
+                />
+              </Link>
+            }
+            action={
+              session?.user._id === post.userId._id && (
+                <IconButton onClick={(e) => handleProfileMenuOpen(e, post._id)}>
+                  <MoreVert />
+                </IconButton>
+              )
+            }
+            title={
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                {/* User name */}
+                <Typography fontWeight={600}>{post.userId.name}</Typography>
 
-            <Box sx={{ ml: 2 }}>
-              <Typography sx={{ fontWeight: 600 }}>
-                {post.userId.name}
-              </Typography>
-              <Typography sx={{ fontSize: 13, color: "#65676b" }}>
-                {post.createdAt}
-              </Typography>
-            </Box>
+                {/* Group info */}
+                {post.communityId && (
+                  <Box sx={{ display: "flex", alignItems: "center", mt: 0.3 }}>
+                    <Avatar
+                      src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/group/images/${post.communityId.avatar}`}
+                      sx={{ width: 22, height: 22, mr: 1 }}
+                    />
 
-            <Box sx={{ marginLeft: "auto" }}>
-              <IconButton onClick={(e) => handleProfileMenuOpen(e, post._id)}>
-                <MoreVert />
-              </IconButton>
-            </Box>
-          </Box>
+                    <Typography sx={{ fontSize: 13, color: "#65676b" }}>
+                      Đăng trong nhóm <b>{post.communityId.name}</b>
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            }
+            subheader={new Date(post.createdAt).toLocaleString()}
+          />
 
-          {/* ----------------- CONTENT TEXT ----------------- */}
-          {post.content && (
-            <Typography sx={{ px: 2, pb: 1, fontSize: 15 }}>
-              {post.content}
-            </Typography>
-          )}
-
-          {/* ----------------- IMAGE ----------------- */}
-          {post.images.length > 0 && (
-            <Box sx={{ width: "100%", background: "#000" }}>
-              <img
-                src={post.images[0]}
-                style={{
-                  width: "100%",
-                  maxHeight: "600px",
-                  objectFit: "contain",
-                }}
-              />
-            </Box>
-          )}
-
-          {/* ----------------- VIDEO ----------------- */}
-          {post.videos.length > 0 && (
-            <Box sx={{ width: "100%", background: "#000" }}>
-              <video
-                controls
-                style={{
-                  width: "100%",
-                  maxHeight: "600px",
-                }}
-                src={post.videos[0]}
-              />
-            </Box>
-          )}
-
-          {/* ----------------- ACTION BAR ----------------- */}
-          <CardActions
-            sx={{
-              display: "flex",
-              justifyContent: "space-around",
-              borderTop: "1px solid #e4e6eb",
-              borderBottom: "1px solid #e4e6eb",
-              paddingY: 1,
-            }}
-          >
-            {/* LIKE */}
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Checkbox
-                icon={<FavoriteBorder />}
-                checkedIcon={<Favorite sx={{ color: "red" }} />}
-                checked={post.isLiked}
-                onClick={() => handleLike(post._id)}
-              />
-              <Typography sx={{ fontSize: 14 }}>{post.likesCount}</Typography>
-            </Box>
-
-            {/* COMMENT */}
+          {/* ---------------- IMAGE GRID ---------------- */}
+          {post.images?.length > 0 && (
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
+                display: "grid",
+                gridTemplateColumns:
+                  post.images.length === 1 ? "1fr" : "1fr 1fr",
                 gap: 1,
-                cursor: "pointer",
+                p: 1,
               }}
+              onClick={() => setSelectedPostId(post._id)}
+            >
+              {post.images.slice(0, 4).map((img, index) => (
+                <Box key={index} sx={{ position: "relative" }}>
+                  <img
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
+                    style={{
+                      width: "100%",
+                      height: "230px",
+                      objectFit: "cover",
+                      borderRadius: 8,
+                    }}
+                  />
+                  {index === 3 && post.images.length > 4 && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "rgba(0,0,0,0.55)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: 2,
+                        color: "#fff",
+                        fontSize: 32,
+                      }}
+                    >
+                      +{post.images.length - 4}
+                    </Box>
+                  )}
+                </Box>
+              ))}
+            </Box>
+          )}
+
+          {/* ---------------- VIDEO ---------------- */}
+          {post.videos?.length > 0 && (
+            <video
+              controls
+              style={{ width: "100%", maxHeight: 600 }}
+              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/videos/${post.videos[0]}`}
+            />
+          )}
+
+          {/* ---------------- CONTENT ---------------- */}
+          <CardContent>
+            <Typography fontWeight="bold">{post.content}</Typography>
+          </CardContent>
+
+          {/* ---------------- ACTIONS ---------------- */}
+          <CardActions sx={{ justifyContent: "space-around" }}>
+            <Box>
+              <Checkbox
+                checked={post.isLiked}
+                icon={<FavoriteBorder />}
+                checkedIcon={<Favorite sx={{ color: "red" }} />}
+                onClick={() => handleLikes(post._id)}
+              />
+              {post.likesCount}
+            </Box>
+
+            <Box
+              sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
               onClick={() =>
                 setOpenCommentBox(openCommentBox === post._id ? null : post._id)
               }
             >
               <Comment />
-              <Typography sx={{ fontSize: 14 }}>
-                {post.commentsCount}
-              </Typography>
+              <Typography sx={{ ml: 1 }}>{post.commentsCount}</Typography>
             </Box>
 
-            {/* SHARE */}
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box>
               <Share />
-              <Typography sx={{ fontSize: 14 }}>Share</Typography>
             </Box>
           </CardActions>
 
-          {/* ----------------- COMMENT BOX ----------------- */}
+          {/* COMMENT BOX */}
           {openCommentBox === post._id && (
-            <Box sx={{ px: 2, py: 1 }}>
+            <Box sx={{ px: 2, pb: 2 }}>
+              <Divider sx={{ mb: 1 }} />
               <Paper
                 sx={{
-                  p: "6px 12px",
                   display: "flex",
                   alignItems: "center",
-                  borderRadius: "20px",
-                  border: "1px solid #ddd",
+                  p: "4px 8px",
+                  borderRadius: 4,
+                  border: "1px solid #ccc",
                 }}
               >
                 <TextField
-                  variant="standard"
                   placeholder="Viết bình luận..."
+                  variant="standard"
                   sx={{ flex: 1 }}
+                  InputProps={{ disableUnderline: true }}
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  InputProps={{ disableUnderline: true }}
                 />
-                <IconButton onClick={() => handlePostComment(post._id)}>
+                <IconButton>
                   <Send />
                 </IconButton>
               </Paper>
@@ -306,7 +292,28 @@ const PostList = () => {
         </Card>
       ))}
 
-      {renderMenu}
+      {/* ---------------- MENU ---------------- */}
+      <Menu open={isMenuOpen} anchorEl={anchorEl} onClose={handleMenuClose}>
+        <MenuItem>
+          <Edit sx={{ mr: 1 }} /> Chỉnh sửa
+        </MenuItem>
+
+        <MenuItem
+          onClick={() =>
+            selectedPostIdForMenu && handleDeletePost(selectedPostIdForMenu)
+          }
+        >
+          <Delete sx={{ mr: 1 }} /> Xóa bài viết
+        </MenuItem>
+      </Menu>
+
+      {selectedPostId && (
+        <CommunityPostDetailModal
+          postId={selectedPostId}
+          onClose={() => setSelectedPostId("")}
+          session={session}
+        />
+      )}
     </>
   );
 };

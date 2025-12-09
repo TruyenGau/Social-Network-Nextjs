@@ -7,6 +7,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { sendRequest } from "@/utils/api";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/utils/toast";
 
 interface IProps {
   suggesionFriend: IFriend[] | null;
@@ -18,6 +19,7 @@ const SuggestionsFriend = ({ suggesionFriend }: IProps) => {
   const { data: session } = useSession();
   const route = useRouter();
   const visibleList = showAll ? list : list.slice(0, 4);
+  const toast = useToast();
 
   const handleFollow = async (id: string) => {
     try {
@@ -39,6 +41,7 @@ const SuggestionsFriend = ({ suggesionFriend }: IProps) => {
       route.refresh();
       setList((prev) => prev.filter((u) => u._id !== id));
       window.dispatchEvent(new Event("story-follow-updated"));
+      toast.success("Đã theo dõi");
     } catch (err) {
       console.log("Follow Error:", err);
     }

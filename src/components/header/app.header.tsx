@@ -84,61 +84,61 @@ export default function AppHeader() {
   // =====================================================================
   // 🔥 1) API: FETCH NOTIFICATION (theo style sendRequest của bạn)
   // =====================================================================
-  const loadNotifications = async () => {
-    if (!session?.access_token) return;
+  // const loadNotifications = async () => {
+  //   if (!session?.access_token) return;
 
-    const res = await sendRequest<IBackendRes<any>>({
-      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notifications`,
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
-    });
+  //   const res = await sendRequest<IBackendRes<any>>({
+  //     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notifications`,
+  //     method: "GET",
+  //     headers: {
+  //       Authorization: `Bearer ${session.access_token}`,
+  //     },
+  //   });
 
-    if (res?.data) {
-      setNotifications(res.data);
-      setUnread(res.data.filter((n: any) => !n.isRead).length);
-    }
-  };
+  //   if (res?.data) {
+  //     setNotifications(res.data);
+  //     setUnread(res.data.filter((n: any) => !n.isRead).length);
+  //   }
+  // };
 
   // =====================================================================
   // 🔥 2) API MARK READ
   // =====================================================================
-  const handleMarkRead = async (id: string) => {
-    await sendRequest({
-      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notifications/${id}/read`,
-      method: "PATCH",
-      headers: { Authorization: `Bearer ${session?.access_token}` },
-    });
-  };
+  // const handleMarkRead = async (id: string) => {
+  //   await sendRequest({
+  //     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notifications/${id}/read`,
+  //     method: "PATCH",
+  //     headers: { Authorization: `Bearer ${session?.access_token}` },
+  //   });
+  // };
 
   // =====================================================================
   // 🔥 3) SOCKET REALTIME
   // =====================================================================
-  React.useEffect(() => {
-    if (!session?.user?._id) return;
+  // React.useEffect(() => {
+  //   if (!session?.user?._id) return;
 
-    socket = io(process.env.NEXT_PUBLIC_BACKEND_URL!, {
-      query: { userId: session.user._id },
-      transports: ["websocket"],
-    });
+  //   socket = io(process.env.NEXT_PUBLIC_BACKEND_URL!, {
+  //     query: { userId: session.user._id },
+  //     transports: ["websocket"],
+  //   });
 
-    socket.on("notification", (data) => {
-      setNotifications((prev) => [data, ...prev]);
-      setUnread((u) => u + 1);
-    });
+  //   socket.on("notification", (data) => {
+  //     setNotifications((prev) => [data, ...prev]);
+  //     setUnread((u) => u + 1);
+  //   });
 
-    return () => {
-      socket?.disconnect();
-    };
-  }, [session?.user?._id]);
+  //   return () => {
+  //     socket?.disconnect();
+  //   };
+  // }, [session?.user?._id]);
 
   // =====================================================================
   // 🔥 4) LOAD NOTIFICATION LÚC LOGIN
   // =====================================================================
-  React.useEffect(() => {
-    loadNotifications();
-  }, [session]);
+  // React.useEffect(() => {
+  //   loadNotifications();
+  // }, [session]);
 
   // =====================================================================
   // MENU PROFILE
@@ -298,21 +298,21 @@ export default function AppHeader() {
                 width: "360px",
                 display: "flex",
               }}
-              onClick={async () => {
-                setAnchorNoti(null);
+              // onClick={async () => {
+              //   setAnchorNoti(null);
 
-                if (!n.isRead) {
-                  await handleMarkRead(n._id);
-                  setNotifications((prev) =>
-                    prev.map((x) =>
-                      x._id === n._id ? { ...x, isRead: true } : x
-                    )
-                  );
-                  setUnread((u) => u - 1);
-                }
+              //   if (!n.isRead) {
+              //     await handleMarkRead(n._id);
+              //     setNotifications((prev) =>
+              //       prev.map((x) =>
+              //         x._id === n._id ? { ...x, isRead: true } : x
+              //       )
+              //     );
+              //     setUnread((u) => u - 1);
+              //   }
 
-                router.push(`/?post=${n.postId}`);
-              }}
+              //   router.push(`/?post=${n.postId}`);
+              // }}
             >
               {/* Avatar */}
               <img

@@ -10,10 +10,6 @@ import {
   Stack,
 } from "@mui/material";
 
-import ImageIcon from "@mui/icons-material/Image";
-import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import EventIcon from "@mui/icons-material/Event";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import { useState } from "react";
@@ -21,58 +17,73 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { IUser } from "@/types/next-auth";
+import { useToast } from "@/utils/toast";
 
 interface IProps {
   data: IUser | null;
 }
-export default function PostForm(props: IProps) {
-  const user = props.data;
+
+export default function PostForm({ data }: IProps) {
+  const user = data;
   const { data: session } = useSession();
   const router = useRouter();
+  const toast = useToast();
+
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // CHỌN MEDIA
+  // 📌 Chọn MEDIA (ảnh hoặc video)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const filesList = e.target.files as FileList | null;
-    if (!filesList) return;
-    setFiles((prev) => [...prev, ...Array.from(filesList)]);
+    const fileList = e.target.files;
+    if (!fileList) return;
+
+    // gộp thêm vào files
+    setFiles((prev) => [...prev, ...Array.from(fileList)]);
   };
 
-  // XOÁ MEDIA
+  // 📌 Xoá file trước khi upload
   const removeFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
   };
 
-  // SUBMIT BÀI POST
+  // 📌 Submit (tạo post)
   const handleSubmit = async () => {
     if (!session) return alert("Bạn cần đăng nhập!");
     if (!content.trim() && files.length === 0)
-      return alert("Vui lòng nhập nội dung hoặc ảnh!");
+      return alert("Nhập nội dung hoặc chọn ảnh/video!");
 
     setIsLoading(true);
+
     try {
-      // UPLOAD ẢNH
-      const formData = new FormData();
-      files.forEach((file) => formData.append("media", file));
+      let uploadedImages: string[] = [];
+      let uploadedVideos: string[] = [];
 
-      const uploadRes = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/files/upload-media`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${session?.access_token}`,
-            "Content-Type": "multipart/form-data",
-            folder_type: "post",
-          },
-        }
-      );
+      // 🟦 Có media → upload lên server
+      if (files.length > 0) {
+        const formData = new FormData();
+        files.forEach((file) => {
+          formData.append("media", file);
+        });
 
-      const uploadedImages = uploadRes.data?.data?.images || [];
-      const uploadedVideos = uploadRes.data?.data?.videos || [];
-      console.log("check upload", uploadedImages);
-      // GỬI POST
+        const uploadRes = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/files/upload-media`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${session?.access_token}`,
+              "Content-Type": "multipart/form-data",
+              folder_type: "post",
+            },
+          }
+        );
+
+        uploadedImages = uploadRes.data?.data?.images || [];
+        uploadedVideos = uploadRes.data?.data?.videos || [];
+      }
+
+      console.log("check image video", uploadedImages, uploadedVideos);
+      // 🟩 Tạo POST
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts`,
         {
@@ -85,16 +96,21 @@ export default function PostForm(props: IProps) {
           headers: { Authorization: `Bearer ${session?.access_token}` },
         }
       );
-      console.log("check upload res", res);
-
-      // CLEAR FORM
+      if (res.data.data.success === true) {
+        toast.success("Tạo bài viết thành công");
+      }
+      if (res.data.data.success === false) {
+        toast.error(res.data.data.message);
+      }
+      // reset form
       setContent("");
       setFiles([]);
       router.refresh();
     } catch (err) {
-      console.error(err);
-      alert("Lỗi khi tạo bài viết!");
+      console.log(err);
+      alert("Đăng bài lỗi!");
     }
+
     setIsLoading(false);
   };
 
@@ -105,16 +121,17 @@ export default function PostForm(props: IProps) {
         p: 2,
         mb: 3,
         borderRadius: 3,
-        maxWidth: "600px", // giống post bên dưới
-        margin: "0 auto", // căn giữa
+        maxWidth: "600px",
+        margin: "0 auto",
         width: "100%",
       }}
     >
       <Box display="flex" gap={2}>
         <Avatar
           src={
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${user?.avatar}` ||
-            ""
+            user?.avatar
+              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${user.avatar}`
+              : ""
           }
         />
         <TextField
@@ -135,12 +152,14 @@ export default function PostForm(props: IProps) {
         />
       </Box>
 
+      {/* ACTION BUTTONS */}
       <Stack direction="row" justifyContent="space-between" mt={2}>
-        <Stack direction="row" gap={1}>
+        <Stack direction="row" gap={2}>
+          {/* 🟦 CHỌN ẢNH */}
           <Button
             startIcon={
               <img
-                src="/icons/addimage.png" // Ảnh nằm trong thư mục public/icons/
+                src="/icons/addimage.png"
                 width={20}
                 height={20}
                 style={{ objectFit: "contain" }}
@@ -154,11 +173,12 @@ export default function PostForm(props: IProps) {
               hidden
               multiple
               type="file"
-              accept="image/*,video/*"
+              accept="image/*"
               onChange={handleFileChange}
             />
           </Button>
 
+          {/* 🟥 CHỌN VIDEO */}
           <Button
             startIcon={
               <img
@@ -190,43 +210,33 @@ export default function PostForm(props: IProps) {
             fontSize: "0.85rem",
             height: "36px",
             backgroundColor: "#1877F2",
-            "&:hover": {
-              backgroundColor: "#1877F2 !important", // giữ nguyên 👈
-            },
             borderRadius: "16px",
           }}
-          onClick={handleSubmit}
           disabled={isLoading}
+          onClick={handleSubmit}
         >
           {isLoading ? "Đang đăng..." : "Đăng bài viết"}
         </Button>
       </Stack>
 
-      {/* PREVIEW (ẢNH + VIDEO) */}
+      {/* PREVIEW MULTIPLE MEDIA */}
       {files.length > 0 && (
         <Box mt={2}>
           {files.map((file, i) => (
             <Box key={i} position="relative" mt={1}>
-              {/* KIỂM TRA LOẠI FILE */}
               {file.type.startsWith("image/") ? (
                 <img
                   src={URL.createObjectURL(file)}
                   style={{ width: "100%", borderRadius: 8 }}
-                  alt="preview"
                 />
-              ) : file.type.startsWith("video/") ? (
+              ) : (
                 <video
                   src={URL.createObjectURL(file)}
                   controls
                   style={{ width: "100%", borderRadius: 8 }}
                 />
-              ) : (
-                <Typography color="error">
-                  Không hỗ trợ loại file này!
-                </Typography>
               )}
 
-              {/* NÚT XOÁ */}
               <IconButton
                 onClick={() => removeFile(i)}
                 sx={{

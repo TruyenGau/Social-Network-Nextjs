@@ -9,6 +9,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import axios from "axios";
+import { useToast } from "@/utils/toast";
 
 interface Props {
   onClose: () => void;
@@ -21,6 +22,7 @@ export default function CreateStoryModal({ onClose, onCreated }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
   const handleChooseFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -69,11 +71,11 @@ export default function CreateStoryModal({ onClose, onCreated }: Props) {
           headers: { Authorization: `Bearer ${session?.access_token}` },
         }
       );
-
+      toast.success("Tạo Story thành công");
       onCreated();
     } catch (e) {
       console.error(e);
-      alert("Lỗi khi tạo story!");
+      toast.error("Lỗi khi tạo Story");
     }
 
     setLoading(false);

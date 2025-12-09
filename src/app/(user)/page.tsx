@@ -7,6 +7,7 @@ import { sendRequest } from "@/utils/api";
 import PostForm from "@/components/post/createPost";
 import { IUser } from "@/types/next-auth";
 import StoryList from "@/components/story/story.list";
+import { redirect } from "next/navigation";
 
 const HomePage = async ({
   searchParams,
@@ -14,6 +15,9 @@ const HomePage = async ({
   searchParams: { post?: string };
 }) => {
   const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect("/auth/signin");
+  }
   const data = await sendRequest<IBackendRes<IUser>>({
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/${session?.user._id}`,
     method: "GET",
@@ -23,6 +27,7 @@ const HomePage = async ({
       next: { tags: ["fetch-profile-info"] },
     },
   });
+
   return (
     <Box flex={4} p={6} sx={{ marginTop: "-30px", marginLeft: "20px" }}>
       <Box sx={{ width: "100%", maxWidth: "590px", overflow: "hidden" }}>

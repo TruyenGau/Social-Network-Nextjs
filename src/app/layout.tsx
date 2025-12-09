@@ -7,6 +7,8 @@ import NPprogressWrapper from "@/lib/npprogress.wrapper";
 import { UserContextProvider } from "@/lib/track.wrapper";
 import { ToastProvider } from "@/utils/toast";
 import type { Metadata } from "next";
+import "antd/dist/reset.css";
+import StyledComponentsRegistry from "@/components/theme-registry/antd-registry";
 
 export const metadata: Metadata = {
   title: "tiêu đề cho cả website nè",
@@ -20,15 +22,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ThemeRegistry>
-          <NPprogressWrapper>
-            <NextAuthWrapper>
-              <ToastProvider>
-                <UserContextProvider>{children}</UserContextProvider>
-              </ToastProvider>
-            </NextAuthWrapper>
-          </NPprogressWrapper>
-        </ThemeRegistry>
+        <StyledComponentsRegistry>
+          <ThemeRegistry>
+            <NPprogressWrapper>
+              <NextAuthWrapper>
+                <ToastProvider>
+                  <UserContextProvider>{children}</UserContextProvider>
+                </ToastProvider>
+              </NextAuthWrapper>
+            </NPprogressWrapper>
+          </ThemeRegistry>
+        </StyledComponentsRegistry>
       </body>
     </html>
   );

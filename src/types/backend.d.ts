@@ -52,6 +52,11 @@ declare global {
     createdAt: string;
     updatedAt: string;
     isLiked: boolean;
+    communityId: {
+      _id: string;
+      name: string;
+      avatar: string;
+    };
   }
 
   interface IAuthUser {

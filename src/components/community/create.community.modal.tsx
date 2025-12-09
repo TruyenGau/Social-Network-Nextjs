@@ -26,6 +26,7 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { sendRequest } from "@/utils/api";
+import { useToast } from "@/utils/toast";
 
 interface IProps {
   open: boolean;
@@ -35,6 +36,7 @@ interface IProps {
 export default function CreateGroupModal({ open, onClose }: IProps) {
   const { data: session } = useSession();
   const route = useRouter();
+  const toast = useToast();
 
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
@@ -132,9 +134,10 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
         },
       });
       route.refresh();
+      toast.success("Tạo nhóm thành công");
     } catch (err) {
       console.error(err);
-      alert("Lỗi khi tạo nhóm!");
+      toast.error("Lỗi khi tạo nhóm!");
     }
   };
 

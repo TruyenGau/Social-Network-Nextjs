@@ -1,38 +1,50 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Box, Typography, Avatar, Button, Card } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Avatar,
+  Button,
+  Card,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogActions,
+} from "@mui/material";
 import CreatePost from "./create.post.group";
 import { IUser } from "@/types/next-auth";
 import { useHasMounted } from "@/utils/customHook";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { sendRequest } from "@/utils/api";
 import PostListMock from "./postlistmock";
+import GroupMembersList from "./community.members";
+import { useToast } from "@/utils/toast";
 
 interface IProps {
-  groupId: string; // 👉 chỉ nhận ID
+  groupId: string;
   user: IUser | null;
 }
 
 const GroupDetailPage = ({ groupId, user }: IProps) => {
   const hasMounted = useHasMounted();
-  const router = useRouter();
   const { data: session } = useSession();
+  const router = useRouter();
 
   const [group, setGroup] = useState<IGroups | null>(null);
   const [loading, setLoading] = useState(true);
   const [reloadPostFlag, setReloadPostFlag] = useState(false);
-  const handlePostCreated = () => {
-    setReloadPostFlag(!reloadPostFlag); // đổi flag -> PostListMock sẽ refetch
-  };
+  const toast = useToast();
+  const [activeTab, setActiveTab] = useState("discussion");
+  const [openConfirm, setOpenConfirm] = useState(false);
 
-  const route = useRouter();
+  const handlePostCreated = () => setReloadPostFlag(!reloadPostFlag);
+
   const fetchGroup = async () => {
     if (!session) return;
 
     setLoading(true);
-
     const res = await sendRequest<IBackendRes<IGroups>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/communities/${groupId}`,
       method: "GET",
@@ -48,32 +60,17 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
   }, [session]);
 
   if (!hasMounted || loading) return <p>Loading...</p>;
-
   if (!group) return <p>Không tìm thấy nhóm.</p>;
 
-  // ================================
-  // JOIN GROUP
-  // ================================
   const handleJoin = async () => {
     const res = await sendRequest<IBackendRes<any>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/communities/${groupId}/join`,
       method: "POST",
       headers: { Authorization: `Bearer ${session?.access_token}` },
     });
-    await sendRequest<IBackendRes<any>>({
-      url: "/api/revalidate",
-      method: "POST",
-      queryParams: {
-        tag: "fetch-groups",
-        secret: "levantruyen",
-      },
-    });
-    route.refresh();
-    if (res.data) {
-      fetchGroup(); // 👉 cập nhật UI ngay
-    } else {
-      alert(res.message);
-    }
+
+    router.refresh();
+    if (res.data) fetchGroup();
   };
 
   const handleLeave = async () => {
@@ -82,19 +79,31 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
       method: "POST",
       headers: { Authorization: `Bearer ${session?.access_token}` },
     });
-    await sendRequest<IBackendRes<any>>({
-      url: "/api/revalidate",
-      method: "POST",
-      queryParams: {
-        tag: "fetch-groups",
-        secret: "levantruyen",
-      },
+
+    router.refresh();
+    if (res.data) fetchGroup();
+  };
+
+  const handleDeleteGroup = async (groupId: string) => {
+    const res = await sendRequest<IBackendRes<any>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/communities/${groupId}`,
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
     });
-    route.refresh();
-    if (res.data) {
-      fetchGroup(); // 👉 cập nhật UI ngay
+    if (res.statusCode === 200) {
+      await sendRequest<IBackendRes<any>>({
+        url: "/api/revalidate",
+        method: "POST",
+        queryParams: {
+          tag: "fetch-groups",
+          secret: "levantruyen",
+        },
+      });
+      toast.success("Bạn đã xóa nhóm thành công");
+      router.push("/community");
+      router.refresh();
     } else {
-      alert(res.message);
+      toast.error("Có lỗi nãy ra");
     }
   };
 
@@ -117,7 +126,26 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
           px: 2,
         }}
       >
-        {/* COVER */}
+        <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
+          <DialogTitle>Xác nhận xoá nhóm</DialogTitle>
+          <DialogContent>
+            <Typography>Bạn có chắc chắn muốn xoá nhóm này không?</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenConfirm(false)}>Hủy</Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => {
+                setOpenConfirm(false);
+                handleDeleteGroup(groupId);
+              }}
+            >
+              Xoá
+            </Button>
+          </DialogActions>
+        </Dialog>
+        ;{/* COVER */}
         <Box
           sx={{
             width: "100%",
@@ -132,7 +160,6 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </Box>
-
         {/* HEADER */}
         <Box sx={{ width: "100%", mb: 3, position: "relative" }}>
           <Avatar
@@ -159,7 +186,7 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
             👥 {group.membersCount} thành viên · 📝 {group.postsCount} bài viết
           </Typography>
 
-          {/* Members */}
+          {/* Members preview */}
           <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
             {group.members.slice(0, 10).map((m, i) => (
               <Avatar
@@ -194,6 +221,17 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
             <Button variant="contained" sx={{ ml: 1 }}>
               + Mời
             </Button>
+
+            {group.admins[0]._id === session?.user._id && (
+              <Button
+                variant="outlined"
+                color="error"
+                sx={{ ml: 1, fontWeight: 600 }}
+                onClick={() => setOpenConfirm(true)}
+              >
+                Xóa nhóm
+              </Button>
+            )}
           </Box>
 
           {/* Tabs */}
@@ -206,33 +244,49 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
               pb: 1,
             }}
           >
-            {["Thảo luận", "Đáng chú ý", "Thành viên", "Sự kiện", "File"].map(
-              (tab, index) => (
-                <Typography
-                  key={index}
-                  sx={{
-                    cursor: "pointer",
-                    fontWeight: index === 0 ? 700 : 500,
-                    borderBottom: index === 0 ? "3px solid #1877f2" : "",
-                    color: index === 0 ? "#1877f2" : "#333",
-                  }}
-                >
-                  {tab}
-                </Typography>
-              )
-            )}
+            {[
+              { key: "discussion", label: "Thảo luận" },
+              { key: "highlight", label: "Đáng chú ý" },
+              { key: "members", label: "Thành viên" },
+              { key: "events", label: "Sự kiện" },
+              { key: "files", label: "File" },
+            ].map((tab) => (
+              <Typography
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                sx={{
+                  cursor: "pointer",
+                  fontWeight: activeTab === tab.key ? 700 : 500,
+                  borderBottom:
+                    activeTab === tab.key ? "3px solid #1877f2" : "",
+                  color: activeTab === tab.key ? "#1877f2" : "#333",
+                }}
+              >
+                {tab.label}
+              </Typography>
+            ))}
           </Box>
         </Box>
-
-        {/* BODY */}
+        {/* BODY CONTENT */}
         <Box sx={{ display: "flex", width: "100%", gap: 4 }}>
           <Box sx={{ width: "750px" }}>
-            <CreatePost
-              data={user}
-              groupId={groupId}
-              onPostCreated={handlePostCreated}
-            />
-            <PostListMock groupId={groupId} reloadFlag={reloadPostFlag} />
+            {activeTab === "discussion" && (
+              <>
+                <CreatePost
+                  user={user}
+                  groupId={groupId}
+                  onPostCreated={handlePostCreated}
+                  isJoined={group.isJoined}
+                />
+                <PostListMock
+                  groupId={groupId}
+                  reloadFlag={reloadPostFlag}
+                  adminId={group.admins[0]._id}
+                />
+              </>
+            )}
+
+            {activeTab === "members" && <GroupMembersList groupId={groupId} />}
           </Box>
 
           <Box sx={{ width: "330px", position: "sticky", top: 90 }}>

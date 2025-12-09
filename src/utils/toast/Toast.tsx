@@ -41,7 +41,7 @@ export const Toast: FC<ToastProps> = ({
       onClose={handleClose}
       TransitionProps={{ onExited }}
       anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      autoHideDuration={autoHideDuration ?? 5000}
+      autoHideDuration={autoHideDuration ?? 3000}
       {...props}
     >
       <Alert severity={message.severity}>{message.message}</Alert>

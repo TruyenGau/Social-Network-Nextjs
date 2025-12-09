@@ -32,16 +32,22 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { sendRequest } from "@/utils/api";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import CommunityPostDetailModal from "./community.post.detail";
+import { useToast } from "@/utils/toast";
 
 interface IProps {
   groupId: string | "";
   reloadFlag: boolean;
+  adminId: string;
 }
 
-const PostListMock = ({ groupId, reloadFlag }: IProps) => {
+const PostListMock = ({ groupId, reloadFlag, adminId }: IProps) => {
   const [openCommentBox, setOpenCommentBox] = useState<string | null>(null);
   const [commentText, setCommentText] = useState<string>("");
   const { data: session } = useSession();
+  const [selectedPostId, setSelectedPostId] = useState<string>("");
+  const route = useRouter();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedPostIdForMenu, setSelectedPostIdForMenu] = useState<
@@ -49,6 +55,7 @@ const PostListMock = ({ groupId, reloadFlag }: IProps) => {
   >(null);
   const [posts, setPosts] = useState<IPost[]>([]);
   const isMenuOpen = Boolean(anchorEl);
+  const toast = useToast();
 
   const handleProfileMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
@@ -61,22 +68,21 @@ const PostListMock = ({ groupId, reloadFlag }: IProps) => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+  const fetchPosts = async () => {
+    const res = await sendRequest<IBackendRes<IModelPaginate<IPost>>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/group/${groupId}`,
+      method: "GET",
+      queryParams: { current: 1, pageSize: 20, sort: "-createdAt" },
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
+
+    if (res.data) {
+      setPosts(res.data.result);
+    }
+  };
   useEffect(() => {
-    const fetchPosts = async () => {
-      const res = await sendRequest<IBackendRes<IModelPaginate<IPost>>>({
-        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/group/${groupId}`,
-        method: "GET",
-        queryParams: { current: 1, pageSize: 20, sort: "-createdAt" },
-        headers: { Authorization: `Bearer ${session?.access_token}` },
-      });
-
-      if (res.data) {
-        setPosts(res.data.result);
-      }
-    };
-
     fetchPosts();
-  }, [groupId, session, reloadFlag]);
+  }, [groupId, session, reloadFlag, selectedPostId]);
 
   if (!posts || posts.length === 0) {
     return (
@@ -85,7 +91,27 @@ const PostListMock = ({ groupId, reloadFlag }: IProps) => {
       </Typography>
     );
   }
-
+  const handleLikes = async (postId: string) => {
+    if (!session) return alert("Bạn cần đăng nhập!");
+    await sendRequest({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/likes/${postId}/toggle`,
+      method: "POST",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
+    fetchPosts();
+  };
+  const handleDeletePost = async (postId: string) => {
+    const res = await sendRequest({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/${postId}`,
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
+    if (res) {
+      toast.success("Xóa Bài Post Thành Công");
+      handleMenuClose();
+    }
+    fetchPosts();
+  };
   return (
     <>
       {posts.map((post) => (
@@ -97,6 +123,7 @@ const PostListMock = ({ groupId, reloadFlag }: IProps) => {
             borderRadius: 3,
             boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
             overflow: "hidden",
+            cursor: "pointer",
           }}
         >
           {/* HEADER */}
@@ -114,9 +141,17 @@ const PostListMock = ({ groupId, reloadFlag }: IProps) => {
               </Link>
             }
             action={
-              <IconButton onClick={(e) => handleProfileMenuOpen(e, post._id)}>
-                <MoreVert />
-              </IconButton>
+              (session?.user._id === post.userId._id ||
+                session?.user._id === adminId) && (
+                <IconButton
+                  onClick={(e) => {
+                    handleProfileMenuOpen(e, post._id);
+                    setSelectedPostIdForMenu(post._id);
+                  }}
+                >
+                  <MoreVert />
+                </IconButton>
+              )
             }
             title={
               <Link
@@ -131,11 +166,59 @@ const PostListMock = ({ groupId, reloadFlag }: IProps) => {
 
           {/* IMAGE */}
           {post.images && post.images.length > 0 && (
-            <CardMedia
-              component="img"
-              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${post.images[0]}`}
-              sx={{ width: "100%", maxHeight: 600, objectFit: "contain" }}
-            />
+            <Box
+              onClick={() => setSelectedPostId(post._id)}
+              sx={{
+                display: "grid",
+                gridTemplateColumns:
+                  post.images.length === 1
+                    ? "1fr"
+                    : post.images.length === 2
+                    ? "1fr 1fr"
+                    : "1fr 1fr", // 3 ảnh trở lên sẽ grid 2 cột
+                gap: 1,
+                backgroundColor: "#fafafa",
+                p: 1,
+                borderRadius: "8px",
+              }}
+            >
+              {post.images.slice(0, 4).map((img, idx) => (
+                <Box key={idx} sx={{ position: "relative" }}>
+                  <img
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
+                    style={{
+                      width: "100%",
+                      height: post.images.length === 1 ? "auto" : "220px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                    }}
+                  />
+
+                  {/* Nếu nhiều hơn 4 ảnh → overlay " + x ảnh " */}
+                  {idx === 3 && post.images.length > 4 && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "rgba(0,0,0,0.55)",
+                        borderRadius: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontSize: "32px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      +{post.images.length - 4}
+                    </Box>
+                  )}
+                </Box>
+              ))}
+            </Box>
           )}
 
           {/* VIDEO */}
@@ -172,6 +255,7 @@ const PostListMock = ({ groupId, reloadFlag }: IProps) => {
                 icon={<FavoriteBorder />}
                 checkedIcon={<Favorite sx={{ color: "red" }} />}
                 checked={post.isLiked}
+                onClick={() => handleLikes(post._id)}
               />
               <Typography variant="body2">{post.likesCount} Likes</Typography>
             </Box>
@@ -246,10 +330,26 @@ const PostListMock = ({ groupId, reloadFlag }: IProps) => {
           <Edit sx={{ mr: 1 }} /> Chỉnh sửa bài viết
         </MenuItem>
 
-        <MenuItem>
-          <Delete sx={{ mr: 1 }} /> Xóa bài viết
+        <MenuItem
+          onClick={() => {
+            handleDeletePost(selectedPostIdForMenu!);
+          }}
+        >
+          <IconButton size="small">
+            <Delete />
+          </IconButton>
+          Xóa Bài Viết
         </MenuItem>
       </Menu>
+
+      {selectedPostId && (
+        <CommunityPostDetailModal
+          postId={selectedPostId}
+          onClose={() => setSelectedPostId("")}
+          session={session}
+          refresh={() => route.refresh()}
+        />
+      )}
     </>
   );
 };

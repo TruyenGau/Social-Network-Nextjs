@@ -20,6 +20,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import { useToast } from "@/utils/toast";
 
 interface IProps {
   open: boolean;
@@ -51,7 +52,7 @@ export default function ProfileUpdateModal({
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const toast = useToast();
   // Upload ảnh
   const uploadImage = async (file: File, folderType: string) => {
     const formData = new FormData();
@@ -87,6 +88,7 @@ export default function ProfileUpdateModal({
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
         body: {
+          email: user.email,
           _id: user._id,
           ...form,
           avatar: avatarUrl,
@@ -106,11 +108,11 @@ export default function ProfileUpdateModal({
       });
 
       route.refresh();
-      alert("Cập nhật thành công!");
+      toast.success("Cập nhật thông tin người dùng thành công");
       onClose();
     } catch (err) {
       console.error(err);
-      alert("Có lỗi xảy ra!");
+      toast.error("Có lỗi xảy ra khi cập nhật thông tin");
     }
     setIsLoading(false);
   };

@@ -23,9 +23,9 @@ import SendIcon from "@mui/icons-material/Send";
 import { useEffect, useState } from "react";
 import { sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
-import ImageViewer from "./image.view";
+import ImageViewer from "../post/image.view";
 
-export default function PostDetailModal({
+export default function CommunityPostDetailModal({
   postId,
   onClose,
   session,
@@ -38,8 +38,6 @@ export default function PostDetailModal({
   const [replyToCommentId, setReplyToCommentId] = useState<string | null>(null);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
-
-  const router = useRouter();
 
   if (postId === "") return null;
 
@@ -222,7 +220,6 @@ export default function PostDetailModal({
       open={!!post}
       onClose={() => {
         onClose();
-        router.replace("/", { scroll: false });
       }}
       sx={{
         backdropFilter: "blur(3px)",
@@ -249,7 +246,6 @@ export default function PostDetailModal({
           <IconButton
             onClick={() => {
               onClose();
-              router.replace("/", { scroll: false });
             }}
           >
             <CloseIcon />

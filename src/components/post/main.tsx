@@ -233,18 +233,61 @@ const PostList = ({ session, initPostId }: IProps) => {
           />
 
           {/* 📸 HIỂN THỊ ẢNH */}
+          {/* 📸 HIỂN THỊ NHIỀU ẢNH */}
           {post.images && post.images.length > 0 && (
-            <CardMedia
-              component="img"
+            <Box
               onClick={() => setSelectedPostId(post._id)}
-              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${post.images[0]}`}
               sx={{
-                width: "100%",
-                maxHeight: "600px",
-                objectFit: "contain",
+                display: "grid",
+                gridTemplateColumns:
+                  post.images.length === 1
+                    ? "1fr"
+                    : post.images.length === 2
+                    ? "1fr 1fr"
+                    : "1fr 1fr", // 3 ảnh trở lên sẽ grid 2 cột
+                gap: 1,
                 backgroundColor: "#fafafa",
+                p: 1,
+                borderRadius: "8px",
               }}
-            />
+            >
+              {post.images.slice(0, 4).map((img, idx) => (
+                <Box key={idx} sx={{ position: "relative" }}>
+                  <img
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
+                    style={{
+                      width: "100%",
+                      height: post.images.length === 1 ? "auto" : "220px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                    }}
+                  />
+
+                  {/* Nếu nhiều hơn 4 ảnh → overlay " + x ảnh " */}
+                  {idx === 3 && post.images.length > 4 && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "rgba(0,0,0,0.55)",
+                        borderRadius: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontSize: "32px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      +{post.images.length - 4}
+                    </Box>
+                  )}
+                </Box>
+              ))}
+            </Box>
           )}
 
           {/* 🎬 HIỂN THỊ VIDEO */}

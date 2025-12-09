@@ -6,7 +6,6 @@ import {
   Avatar,
   IconButton,
   Paper,
-  Typography,
   Stack,
 } from "@mui/material";
 
@@ -16,26 +15,34 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { IUser } from "@/types/next-auth";
+import { useToast } from "@/utils/toast";
 
 interface IProps {
-  data: IUser | null;
-  groupId: string | "";
+  user: IUser | null;
+  groupId: string;
   onPostCreated: () => void;
+  isJoined: boolean;
 }
 
-export default function CreatePost({ data, groupId, onPostCreated }: IProps) {
-  const user = data;
+export default function CreatePostGroup({
+  user,
+  groupId,
+  onPostCreated,
+  isJoined,
+}: IProps) {
   const { data: session } = useSession();
   const router = useRouter();
+  const toast = useToast();
 
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const filesList = e.target.files as FileList | null;
-    if (!filesList) return;
-    setFiles((prev) => [...prev, ...Array.from(filesList)]);
+    const fileList = e.target.files;
+    if (!fileList) return;
+
+    setFiles((prev) => [...prev, ...Array.from(fileList)]);
   };
 
   const removeFile = (index: number) => {
@@ -45,30 +52,37 @@ export default function CreatePost({ data, groupId, onPostCreated }: IProps) {
   const handleSubmit = async () => {
     if (!session) return alert("Bạn cần đăng nhập!");
     if (!content.trim() && files.length === 0)
-      return alert("Vui lòng nhập nội dung hoặc ảnh!");
+      return alert("Vui lòng nhập nội dung hoặc chọn media!");
 
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
-      files.forEach((file) => formData.append("media", file));
+      let uploadedImages: string[] = [];
+      let uploadedVideos: string[] = [];
 
-      const uploadRes = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/files/upload-media`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${session?.access_token}`,
-            "Content-Type": "multipart/form-data",
-            folder_type: "post",
-          },
-        }
-      );
+      // 🟦 Upload media nếu có
+      if (files.length > 0) {
+        const formData = new FormData();
+        files.forEach((file) => formData.append("media", file));
 
-      const uploadedImages = uploadRes.data?.data?.images || [];
-      const uploadedVideos = uploadRes.data?.data?.videos || [];
+        const uploadRes = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/files/upload-media`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${session?.access_token}`,
+              "Content-Type": "multipart/form-data",
+              folder_type: "post",
+            },
+          }
+        );
 
-      await axios.post(
+        uploadedImages = uploadRes.data?.data?.images || [];
+        uploadedVideos = uploadRes.data?.data?.videos || [];
+      }
+
+      // 🟩 Tạo bài viết GROUP
+      const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts`,
         {
           content,
@@ -81,7 +95,13 @@ export default function CreatePost({ data, groupId, onPostCreated }: IProps) {
           headers: { Authorization: `Bearer ${session?.access_token}` },
         }
       );
-
+      if (res.data.data.success === true) {
+        toast.success("Tạo bài viết thành công");
+      }
+      if (res.data.data.success === false) {
+        toast.error(res.data.data.message);
+      }
+      // Reset form
       setContent("");
       setFiles([]);
       onPostCreated();
@@ -101,122 +121,94 @@ export default function CreatePost({ data, groupId, onPostCreated }: IProps) {
         p: 2,
         mb: 3,
         borderRadius: "12px",
-        maxWidth: "750px",
-        width: "80%",
-        mx: "auto",
+        width: "100%",
         boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
       }}
     >
-      {/* ==== ROW INPUT ==== */}
-      <Box display="flex" gap={2} alignItems="center">
+      {/* INPUT */}
+      <Box display="flex" gap={2} alignItems="flex-start">
         <Avatar
           src={
             user?.avatar
               ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${user.avatar}`
               : "/user/default-user.png"
           }
-          sx={{ width: 45, height: 45 }}
         />
 
-        <Box
+        <TextField
+          placeholder="Bạn đang nghĩ gì?"
+          multiline
+          fullWidth
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
           sx={{
-            flex: 1,
-            background: "#f0f2f5",
-            borderRadius: "25px",
-            padding: "10px 18px",
-            fontSize: "15px",
-            color: "#555",
-            border: "1px solid #ddd",
-            cursor: "pointer",
-            "&:hover": { background: "#e9eaec" },
-          }}
-        >
-          <TextField
-            placeholder="Bạn đang nghĩ gì?"
-            multiline
-            fullWidth
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            sx={{
-              bgcolor: "#f7f7f7",
+            bgcolor: "#f7f7f7",
+            borderRadius: "10px",
+            "& .MuiOutlinedInput-root": {
               borderRadius: "10px",
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "10px",
-                fontSize: "0.9rem",
-                padding: "10px",
-              },
+              fontSize: "0.9rem",
+              padding: "10px",
+            },
+          }}
+        />
+      </Box>
+
+      {/* ACTION BUTTONS */}
+      <Stack direction="row" justifyContent="space-between" mt={2}>
+        <Stack direction="row" gap={2}>
+          {/* 🖼 Chọn ảnh */}
+          <Button
+            startIcon={<img src="/icons/addimage.png" width={20} height={20} />}
+            component="label"
+            sx={{ textTransform: "none", fontSize: "0.85rem", color: "#555" }}
+          >
+            Ảnh
+            <input
+              hidden
+              multiple
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+          </Button>
+
+          {/* 🎥 Chọn video */}
+          <Button
+            startIcon={<img src="/icons/addVideo.png" width={20} height={20} />}
+            component="label"
+            sx={{ textTransform: "none", fontSize: "0.85rem", color: "#555" }}
+          >
+            Video
+            <input
+              hidden
+              multiple
+              type="file"
+              accept="video/*"
+              onChange={handleFileChange}
+            />
+          </Button>
+        </Stack>
+
+        {isJoined ? (
+          <Button
+            variant="contained"
+            sx={{
+              px: 3,
+              borderRadius: "20px",
+              fontWeight: 600,
+              textTransform: "none",
             }}
-          />
-        </Box>
+            onClick={handleSubmit}
+            disabled={isLoading}
+          >
+            {isLoading ? "Đang đăng..." : "Đăng bài viết"}
+          </Button>
+        ) : (
+          <></>
+        )}
+      </Stack>
 
-        <Button
-          variant="contained"
-          sx={{
-            borderRadius: "20px",
-            px: 3,
-            textTransform: "none",
-            fontWeight: 600,
-            height: "38px",
-          }}
-          onClick={handleSubmit}
-          disabled={isLoading}
-        >
-          {isLoading ? "Đang đăng..." : "Đăng bài viết"}
-        </Button>
-      </Box>
-
-      {/* ==== ACTION BUTTONS ==== */}
-      <Box
-        sx={{
-          display: "flex",
-          gap: 3,
-          mt: 2,
-          px: 1,
-          alignItems: "center",
-        }}
-      >
-        <Button
-          startIcon={<img src="/icons/addimage.png" width={20} height={20} />}
-          component="label"
-          sx={{
-            textTransform: "none",
-            fontWeight: 600,
-            color: "#555",
-            "&:hover": { background: "#f0f2f5" },
-          }}
-        >
-          Photo
-          <input
-            hidden
-            multiple
-            type="file"
-            accept="image/*,video/*"
-            onChange={handleFileChange}
-          />
-        </Button>
-
-        <Button
-          startIcon={<img src="/icons/addVideo.png" width={20} height={20} />}
-          component="label"
-          sx={{
-            textTransform: "none",
-            fontWeight: 600,
-            color: "#555",
-            "&:hover": { background: "#f0f2f5" },
-          }}
-        >
-          Video
-          <input
-            hidden
-            multiple
-            type="file"
-            accept="video/*"
-            onChange={handleFileChange}
-          />
-        </Button>
-      </Box>
-
-      {/* ==== PREVIEW MEDIA ==== */}
+      {/* PREVIEW MEDIA */}
       {files.length > 0 && (
         <Box mt={2}>
           {files.map((file, i) => (
