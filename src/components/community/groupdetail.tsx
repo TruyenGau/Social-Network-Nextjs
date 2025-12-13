@@ -23,6 +23,7 @@ import PostListMock from "./postlistmock";
 import GroupMembersList from "./community.members";
 import { useToast } from "@/utils/toast";
 import SavedPostList from "./community.saved.post";
+import InviteFriendsDialog from "./community.invite.friend";
 
 interface IProps {
   groupId: string;
@@ -40,7 +41,7 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
   const toast = useToast();
   const [activeTab, setActiveTab] = useState("discussion");
   const [openConfirm, setOpenConfirm] = useState(false);
-
+  const [openInvite, setOpenInvite] = useState<boolean>(false);
   const handlePostCreated = () => setReloadPostFlag(!reloadPostFlag);
 
   const fetchGroup = async () => {
@@ -224,7 +225,11 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
               </Button>
             )}
 
-            <Button variant="contained" sx={{ ml: 1 }}>
+            <Button
+              variant="contained"
+              sx={{ ml: 1 }}
+              onClick={() => setOpenInvite(true)}
+            >
               + Mời
             </Button>
 
@@ -353,6 +358,11 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
           </Box>
         </Box>
       </Box>
+      <InviteFriendsDialog
+        open={openInvite}
+        onClose={() => setOpenInvite(false)}
+        groupId={groupId}
+      />
     </Box>
   );
 };

@@ -58,6 +58,7 @@ declare global {
       avatar: string;
     };
     isSaved: boolean;
+    isPinned: boolean;
   }
 
   interface IAuthUser {
@@ -169,5 +170,12 @@ declare global {
     createdAt: string;
     avatar?: string; // sẽ lấy từ API user
     userName?: string; // sẽ lấy từ API user
+  }
+
+  interface IInvitedGroup {
+    _id: string;
+    name: string;
+    avatar?: string;
+    membersCount: number;
   }
 }

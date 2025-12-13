@@ -21,6 +21,8 @@ import { redirect, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { fetchDefaultImages, sendRequest } from "@/utils/api";
 import { io, Socket } from "socket.io-client";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import { Avatar } from "@mui/material";
 
 /* ================= STYLE ================= */
 
@@ -78,6 +80,11 @@ export default function AppHeader() {
 
   const socketRef = React.useRef<Socket | null>(null);
 
+  const [groupInvites, setGroupInvites] = React.useState<any[]>([]);
+  const [groupInviteUnread, setGroupInviteUnread] = React.useState(0);
+  const [anchorGroupInvite, setAnchorGroupInvite] =
+    React.useState<HTMLElement | null>(null);
+
   /* ================= LOAD NOTI FROM API ================= */
 
   const loadNotifications = async () => {
@@ -87,12 +94,23 @@ export default function AppHeader() {
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notifications`,
       method: "GET",
       headers: { Authorization: `Bearer ${session.access_token}` },
+      nextOption: {
+        cache: "no-store", // 🔥 QUAN TRỌNG NHẤT
+      },
     });
 
-    if (res?.data) {
-      setNotifications(res.data);
-      setUnread(res.data.filter((n: any) => !n.isRead).length);
-    }
+    if (!res?.data) return;
+
+    const all = res.data;
+
+    const normalNoti = all.filter((n: any) => n.type !== "GROUP_INVITE");
+    const invites = all.filter((n: any) => n.type === "GROUP_INVITE");
+
+    setNotifications(normalNoti);
+    setUnread(normalNoti.filter((n: any) => !n.isRead).length);
+
+    setGroupInvites(invites);
+    setGroupInviteUnread(invites.filter((n: any) => !n.isRead).length);
   };
 
   React.useEffect(() => {
@@ -134,6 +152,12 @@ export default function AppHeader() {
           type: "group",
           roomId: data.roomId,
         });
+      }
+
+      if (data.type === "GROUP_INVITE") {
+        setGroupInvites((prev) => [data, ...prev]);
+        setGroupInviteUnread((u) => u + 1);
+        return;
       }
     });
 
@@ -205,6 +229,16 @@ export default function AppHeader() {
                 </Badge>
               </IconButton>
 
+              {/* GROUP INVITE ICON */}
+              <IconButton
+                color="inherit"
+                onClick={(e) => setAnchorGroupInvite(e.currentTarget)}
+              >
+                <Badge badgeContent={groupInviteUnread} color="error">
+                  <GroupAddIcon />
+                </Badge>
+              </IconButton>
+
               {/* NOTIFICATION ICON */}
               <IconButton
                 color="inherit"
@@ -213,11 +247,6 @@ export default function AppHeader() {
                 <Badge badgeContent={unread} color="error">
                   <NotificationsIcon />
                 </Badge>
-              </IconButton>
-
-              {/* PROFILE */}
-              <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
-                <AccountCircle />
               </IconButton>
 
               <Image
@@ -258,6 +287,71 @@ export default function AppHeader() {
             {n.type === "COMMENT" && "💬 Đã bình luận bài viết của bạn"}
             {n.type === "CHAT_PRIVATE" && "📩 Tin nhắn mới"}
             {n.type === "CHAT_GROUP" && "👥 Tin nhắn nhóm"}
+          </MenuItem>
+        ))}
+      </Menu>
+
+      {/* GROUP INVITE MENU */}
+      <Menu
+        anchorEl={anchorGroupInvite}
+        open={Boolean(anchorGroupInvite)}
+        onClose={() => setAnchorGroupInvite(null)}
+        sx={{ maxHeight: 400, width: 360 }}
+      >
+        {groupInvites.length === 0 && <MenuItem>Không có lời mời</MenuItem>}
+
+        {groupInvites.map((n: any) => (
+          <MenuItem
+            key={n._id}
+            onClick={async () => {
+              setAnchorGroupInvite(null);
+
+              if (!n.isRead) {
+                await handleMarkRead(n._id);
+
+                setGroupInvites((prev) =>
+                  prev.map((x) =>
+                    x._id === n._id ? { ...x, isRead: true } : x
+                  )
+                );
+                setGroupInviteUnread((u) => Math.max(0, u - 1));
+              }
+
+              router.push("/invite"); // trang xem lời mời
+            }}
+            sx={{
+              alignItems: "flex-start",
+              gap: 1.5,
+              py: 1.5,
+              backgroundColor: n.isRead ? "transparent" : "#f0f7ff",
+              "&:hover": {
+                backgroundColor: "#e6f0ff",
+              },
+            }}
+          >
+            {/* AVATAR NGƯỜI MỜI */}
+            <Avatar
+              src={
+                n.fromUserId?.avatar
+                  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${n.fromUserId.avatar}`
+                  : "/user/default-user.png"
+              }
+              sx={{ width: 40, height: 40 }}
+            />
+
+            {/* CONTENT */}
+            <Box sx={{ flex: 1 }}>
+              <Typography fontSize={14}>
+                <b>{n.fromUserId?.name}</b>{" "}
+                <Typography component="span" fontSize={14}>
+                  đã mời bạn tham gia một nhóm
+                </Typography>
+              </Typography>
+
+              <Typography fontSize={13} color="text.secondary" sx={{ mt: 0.5 }}>
+                👥 Nhấn để xem chi tiết
+              </Typography>
+            </Box>
           </MenuItem>
         ))}
       </Menu>

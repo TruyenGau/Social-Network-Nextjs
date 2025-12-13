@@ -88,12 +88,9 @@ const PostListMock = ({
 
     if (!res?.data) return;
 
-    // ⭐⭐ QUAN TRỌNG ⭐⭐
     if (isSaved) {
-      // API saved KHÔNG paginate
       setPosts(Array.isArray(res.data) ? res.data : []);
     } else {
-      // API group CÓ paginate
       setPosts(Array.isArray(res.data.result) ? res.data.result : []);
     }
   };
@@ -141,6 +138,30 @@ const PostListMock = ({
     fetchPosts();
   };
 
+  /* ===== PIN / UNPIN (ADMIN) ===== */
+
+  const handlePinPost = async (postId: string, isPinned: boolean) => {
+    if (!session) return;
+
+    const url = `${
+      process.env.NEXT_PUBLIC_BACKEND_URL
+    }/api/v1/communities/${groupId}/posts/${postId}/${
+      isPinned ? "unpin" : "pin"
+    }`;
+
+    await sendRequest({
+      url,
+      method: "POST",
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+
+    toast.success(isPinned ? "Đã bỏ ghim bài viết" : "Đã ghim bài viết");
+    handleMenuClose();
+    fetchPosts();
+  };
+
+  /* ================= MENU ================= */
+
   const handleMenuOpen = (e: React.MouseEvent<HTMLElement>, postId: string) => {
     setAnchorEl(e.currentTarget);
     setSelectedPostIdForMenu(postId);
@@ -151,8 +172,6 @@ const PostListMock = ({
     setSelectedPostIdForMenu(null);
   };
 
-  /* ====== MENU PERMISSION ====== */
-
   const selectedPost = posts.find((p) => p._id === selectedPostIdForMenu);
   const isOwnerMenu = session?.user._id === selectedPost?.userId._id;
   const isAdminMenu = session?.user._id === adminId;
@@ -162,7 +181,6 @@ const PostListMock = ({
   return (
     <>
       {posts.map((post) => {
-        const isOwner = session?.user._id === post.userId._id;
         const isAdmin = session?.user._id === adminId;
 
         return (
@@ -173,7 +191,6 @@ const PostListMock = ({
               maxWidth: 600,
               borderRadius: 3,
               boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
-              cursor: "pointer",
             }}
           >
             {/* HEADER */}
@@ -197,12 +214,20 @@ const PostListMock = ({
                 )
               }
               title={
-                <Link
-                  href={`/profile/${post.userId._id}`}
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  {post.userId.name}
-                </Link>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Link
+                    href={`/profile/${post.userId._id}`}
+                    style={{ textDecoration: "none", color: "inherit" }}
+                  >
+                    {post.userId.name}
+                  </Link>
+
+                  {post.isPinned && (
+                    <Typography fontSize={13} color="primary">
+                      📌 Đã ghim
+                    </Typography>
+                  )}
+                </Box>
               }
               subheader={new Date(post.createdAt).toLocaleDateString()}
             />
@@ -307,6 +332,21 @@ const PostListMock = ({
 
       {/* MENU */}
       <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleMenuClose}>
+        {isAdminMenu && (
+          <MenuItem
+            onClick={() =>
+              handlePinPost(
+                selectedPostIdForMenu!,
+                selectedPost?.isPinned ?? false
+              )
+            }
+          >
+            {selectedPost?.isPinned
+              ? "📌 Bỏ ghim bài viết"
+              : "📌 Ghim bài viết"}
+          </MenuItem>
+        )}
+
         {(isOwnerMenu || isAdminMenu) && (
           <MenuItem>
             <Edit sx={{ mr: 1 }} /> Chỉnh sửa bài viết

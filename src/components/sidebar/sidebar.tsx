@@ -139,12 +139,12 @@ export default function Sidebar(props: IProps) {
               <ListItemButton
                 sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#ede7f6" } }}
                 component="a"
-                href="#"
+                href="/invite"
               >
                 <ListItemIcon>
                   <AccountBox sx={{ color: "#673ab7" }} />
                 </ListItemIcon>
-                <ListItemText primary="Thông Tin Cá Nhân" />
+                <ListItemText primary="Lời Mời Vào Nhóm" />
               </ListItemButton>
             </ListItem>
           </List>
