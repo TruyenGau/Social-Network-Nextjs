@@ -1,7 +1,8 @@
 import AppHeader from "@/components/header/app.header";
 import { Box, Stack } from "@mui/material";
-import SideBar from "../(user)/sidebar";
+
 import RightBar from "../(user)/rightbar";
+import SideBarSever from "../(user)/sidebar.sever";
 
 export default function UserLayout({
   children,
@@ -18,7 +19,7 @@ export default function UserLayout({
         sx={{ mt: 4, px: 2 }}
       >
         <Box sx={{ flexBasis: "20%", flexShrink: 0 }}>
-          <SideBar />
+          <SideBarSever />
         </Box>
         <Box sx={{ flexBasis: "50%" }}>{children}</Box>
         <Box sx={{ flexBasis: "30%", flexShrink: 0 }}>

@@ -57,6 +57,7 @@ declare global {
       name: string;
       avatar: string;
     };
+    isSaved: boolean;
   }
 
   interface IAuthUser {

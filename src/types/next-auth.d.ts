@@ -5,14 +5,17 @@ interface IUser {
   _id: string;
   name: string;
   email: string;
-  role: string;
+  role: {
+    _id: string;
+    name: string;
+  };
   permissions: string;
   online: string;
   type: string;
   avatar: string;
   coverPhoto: string;
   age: number;
-  community: string[];
+  communities: string[];
   avatar: string;
   coverPhoto;
   school: string;

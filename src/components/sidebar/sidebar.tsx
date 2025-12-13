@@ -150,20 +150,6 @@ export default function Sidebar(props: IProps) {
           </List>
         </Paper>
       </Stack>
-
-      {/* Nút post */}
-      {/* <Fab
-        color="primary"
-        onClick={() => setOpenCreatePost(true)}
-        sx={{ position: "fixed", bottom: 20, left: 20, zIndex: 9999 }}
-      >
-        <Add />
-      </Fab> */}
-
-      {/* <CreatePostModal
-        open={openCreatePost}
-        onClose={() => setOpenCreatePost(false)}
-      /> */}
     </Box>
   );
 }

@@ -172,6 +172,10 @@ const PostList = () => {
             }
             subheader={new Date(post.createdAt).toLocaleString()}
           />
+          {/* ---------------- CONTENT ---------------- */}
+          <CardContent>
+            <Typography variant="h6">{post.content}</Typography>
+          </CardContent>
 
           {/* ---------------- IMAGE GRID ---------------- */}
           {post.images?.length > 0 && (
@@ -191,8 +195,8 @@ const PostList = () => {
                     src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
                     style={{
                       width: "100%",
-                      height: "230px",
-                      objectFit: "cover",
+                      height: "400px",
+                      objectFit: "contain",
                       borderRadius: 8,
                     }}
                   />
@@ -229,11 +233,6 @@ const PostList = () => {
               src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/videos/${post.videos[0]}`}
             />
           )}
-
-          {/* ---------------- CONTENT ---------------- */}
-          <CardContent>
-            <Typography fontWeight="bold">{post.content}</Typography>
-          </CardContent>
 
           {/* ---------------- ACTIONS ---------------- */}
           <CardActions sx={{ justifyContent: "space-around" }}>

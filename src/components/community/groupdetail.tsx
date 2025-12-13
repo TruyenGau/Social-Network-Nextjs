@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogTitle,
   DialogActions,
+  Divider,
 } from "@mui/material";
 import CreatePost from "./create.post.group";
 import { IUser } from "@/types/next-auth";
@@ -21,6 +22,7 @@ import { sendRequest } from "@/utils/api";
 import PostListMock from "./postlistmock";
 import GroupMembersList from "./community.members";
 import { useToast } from "@/utils/toast";
+import SavedPostList from "./community.saved.post";
 
 interface IProps {
   groupId: string;
@@ -191,7 +193,11 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
             {group.members.slice(0, 10).map((m, i) => (
               <Avatar
                 key={i}
-                src={m.avatar}
+                src={
+                  m.avatar
+                    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${m.avatar}`
+                    : "/user/default-user.png"
+                }
                 sx={{ width: 34, height: 34, border: "2px solid white" }}
               />
             ))}
@@ -246,6 +252,7 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
           >
             {[
               { key: "discussion", label: "Thảo luận" },
+              { key: "saved", label: "Đã lưu" },
               { key: "highlight", label: "Đáng chú ý" },
               { key: "members", label: "Thành viên" },
               { key: "events", label: "Sự kiện" },
@@ -287,6 +294,9 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
             )}
 
             {activeTab === "members" && <GroupMembersList groupId={groupId} />}
+            {activeTab === "saved" && (
+              <SavedPostList adminId={group.admins[0]._id} />
+            )}
           </Box>
 
           <Box sx={{ width: "330px", position: "sticky", top: 90 }}>
@@ -294,9 +304,51 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
               <Typography variant="h6" fontWeight={700}>
                 Giới thiệu
               </Typography>
+
+              {/* Mô tả nhóm */}
               <Typography sx={{ mt: 1, fontSize: "14px", color: "#444" }}>
-                {group.description || "Chưa có mô tả nhóm."}
+                {group.description || "Ae vào nhóm vui vẻ hoà đồng!"}
               </Typography>
+
+              <Divider sx={{ my: 2 }} />
+
+              {/* Thông tin cố định */}
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                {/* Quyền riêng tư */}
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography fontSize="18px">🌐</Typography>
+                  <Box>
+                    <Typography fontSize="14px" fontWeight={600}>
+                      Công khai
+                    </Typography>
+                    <Typography fontSize="13px" color="text.secondary">
+                      Bất kỳ ai cũng có thể nhìn thấy mọi người trong nhóm và
+                      những gì họ đăng.
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {/* Hiển thị */}
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography fontSize="18px">👁️</Typography>
+                  <Box>
+                    <Typography fontSize="14px" fontWeight={600}>
+                      Hiển thị
+                    </Typography>
+                    <Typography fontSize="13px" color="text.secondary">
+                      Ai cũng có thể tìm thấy nhóm này.
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {/* Vị trí */}
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Typography fontSize="18px">📍</Typography>
+                  <Typography fontSize="14px" fontWeight={600}>
+                    Việt Nam
+                  </Typography>
+                </Box>
+              </Box>
             </Card>
           </Box>
         </Box>

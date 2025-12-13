@@ -1,27 +1,38 @@
 "use client";
 import { io, Socket } from "socket.io-client";
-import { useEffect } from "react";
-
-let socket: Socket | null = null;
+import { useEffect, useRef } from "react";
 
 export function useNotificationSocket(
-  userId: string,
+  token: string | undefined,
   onReceive: (data: any) => void
 ) {
-  useEffect(() => {
-    if (!userId) return;
+  const socketRef = useRef<Socket | null>(null);
 
-    socket = io(process.env.NEXT_PUBLIC_BACKEND_URL!, {
-      query: { userId },
+  useEffect(() => {
+    if (!token) return;
+
+    const socket = io(`${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications`, {
+      auth: { token: `Bearer ${token}` },
       transports: ["websocket"],
+    });
+
+    socketRef.current = socket;
+
+    socket.on("connect", () => {
+      console.log("🔔 Notification socket connected", socket.id);
     });
 
     socket.on("notification", (data) => {
       onReceive(data);
     });
 
+    socket.on("disconnect", () => {
+      console.log("🔕 Notification socket disconnected");
+    });
+
     return () => {
-      socket?.disconnect();
+      socket.disconnect();
+      socketRef.current = null;
     };
-  }, [userId]);
+  }, [token]);
 }

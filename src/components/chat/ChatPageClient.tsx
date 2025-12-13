@@ -208,21 +208,6 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
       });
     });
 
-    s.on(
-      "new_message_notification",
-      (payload: { roomId: string; senderId: string; message: IMessage }) => {
-        const msg = payload.message;
-        const roomId = payload.roomId || getRoomIdFromMessage(msg);
-        if (!roomId) return;
-
-        setMessagesByRoom((prev) => {
-          const old = prev[roomId] || [];
-          if (old.some((m) => m._id === msg._id)) return prev;
-          return { ...prev, [roomId]: [...old, msg] };
-        });
-      }
-    );
-
     s.on("receive_group_message", (msg: IMessage | any) => {
       setMessagesByRoom((prev) => {
         const roomId = getRoomIdFromMessage(msg);
@@ -233,17 +218,39 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
       });
     });
 
-    s.on(
-      "new_group_message_notification",
-      (payload: { roomId: string; senderId: string; content: string }) => {
-        console.log("new_group_message_notification", payload);
-      }
-    );
-
     return () => {
       s.disconnect();
     };
   }, [accessToken, BACKEND_URL]);
+
+  const prevRoomIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!socket || !currentRoom) return;
+
+    // leave room cũ
+    if (prevRoomIdRef.current) {
+      socket.emit("leave_room", { roomId: prevRoomIdRef.current });
+    }
+
+    // join room mới
+    if (currentRoom.type === "private") {
+      socket.emit("join_private", { roomId: currentRoom._id });
+    }
+
+    if (currentRoom.type === "group") {
+      socket.emit("join_group", { roomId: currentRoom._id });
+    }
+
+    prevRoomIdRef.current = currentRoom._id;
+
+    return () => {
+      if (prevRoomIdRef.current) {
+        socket.emit("leave_room", { roomId: prevRoomIdRef.current });
+        prevRoomIdRef.current = null;
+      }
+    };
+  }, [currentRoom?._id]);
 
   // ===== 2. Lấy danh sách followings =====
   useEffect(() => {
@@ -274,6 +281,45 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
     if (userId && accessToken) fetchFollowings();
   }, [userId, accessToken, BACKEND_URL]);
 
+  // ===== POLLING ONLINE STATUS (BẮT BUỘC) =====
+  useEffect(() => {
+    if (!accessToken || !userId) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(
+          `${BACKEND_URL}/api/v1/follow/following/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }
+        );
+        if (!res.ok) return;
+
+        const json: IBackendRes<IFollowItem[]> = await res.json();
+
+        // 🔥 chỉ update online, KHÔNG replace toàn bộ object
+        setFollowings((prev) =>
+          prev.map((f) => {
+            const updated = json.data.find(
+              (x) => x.following._id === f.following._id
+            );
+            return updated
+              ? {
+                  ...f,
+                  following: {
+                    ...f.following,
+                    online: updated.following.online,
+                  },
+                }
+              : f;
+          })
+        );
+      } catch {}
+    }, 5000); // 5s là hợp lý
+
+    return () => clearInterval(interval);
+  }, [accessToken, userId, BACKEND_URL]);
+
   // ===== Lấy danh sách TIN NHẮN CHỜ =====
   useEffect(() => {
     const fetchPendingRequests = async () => {
@@ -300,6 +346,26 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
       fetchPendingRequests();
     }
   }, [userId, accessToken, BACKEND_URL]);
+
+  // ===== SYNC currentFriend ONLINE STATUS =====
+  useEffect(() => {
+    if (!currentFriend) return;
+
+    const updated = followings.find(
+      (f) => f.following._id === currentFriend._id
+    );
+
+    if (updated) {
+      setCurrentFriend((prev) =>
+        prev
+          ? {
+              ...prev,
+              online: updated.following.online,
+            }
+          : prev
+      );
+    }
+  }, [followings]);
 
   // TỰ ĐỘNG MỞ CHAT RIÊNG KHI CÓ ?userId=...
   useEffect(() => {
@@ -373,6 +439,8 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
 
   // ===== Chọn bạn → tạo/tìm room private =====
   const handleSelectFriend = async (item: IFollowItem) => {
+    // 🔥 LEAVE ROOM CŨ
+
     const friend = item.following;
     setCurrentFriend(friend);
 
@@ -392,6 +460,9 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
       const room: IRoom = raw.data ?? raw;
 
       setCurrentRoom(room);
+
+      // 🔥 JOIN ROOM PRIVATE (BẮT BUỘC)
+
       await fetchMessages(room._id);
     } catch (err) {
       console.error(err);
@@ -419,6 +490,9 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
       const room: IRoom = raw.data ?? raw;
 
       setCurrentRoom(room);
+
+      // 🔥 JOIN ROOM PRIVATE
+
       await fetchMessages(room._id);
     } catch (err) {
       console.error(err);
@@ -519,12 +593,13 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
 
   // ===== Chọn group =====
   const handleSelectGroup = async (room: IRoom) => {
+    // 🔥 LEAVE ROOM CŨ
+
     setCurrentFriend(null);
     setCurrentRoom(room);
 
     try {
       if (socket) {
-        socket.emit("join_group", { roomId: room._id });
       }
       await fetchMessages(room._id);
     } catch (err) {

@@ -1,8 +1,30 @@
 import { withAuth } from "next-auth/middleware";
-// This function can be marked `async` if using `await` inside
-export default withAuth({
-  pages: {
-    signIn: "auth/signin",
+import { NextResponse } from "next/server";
+
+export default withAuth(
+  function middleware(req) {
+    const role = req.nextauth.token?.user.role.name;
+
+    // Nếu vào route /admin nhưng role không phải ADMIN → chặn
+    if (req.nextUrl.pathname.startsWith("/admin") && role !== "SUPER_ADMIN") {
+      return NextResponse.redirect(new URL("/403", req.url)); // hoặc chuyển về trang chủ
+    }
+
+    return NextResponse.next();
   },
-});
-export const config = { matcher: ["/playlist", "/track/upload"] };
+  {
+    pages: {
+      signIn: "/auth/signin",
+    },
+  }
+);
+
+// Áp dụng middleware cho route nào?
+export const config = {
+  matcher: [
+    "/admin/:path*", // bảo vệ toàn bộ admin
+    "/profile",
+    "/community",
+    "/",
+  ],
+};

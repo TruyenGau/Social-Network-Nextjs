@@ -17,15 +17,12 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { fetchDefaultImages } from "@/utils/api";
-
-// 🔥 ADDED
+import { fetchDefaultImages, sendRequest } from "@/utils/api";
 import { io, Socket } from "socket.io-client";
-import { sendRequest } from "@/utils/api";
 
-let socket: Socket | null = null;
+/* ================= STYLE ================= */
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -35,12 +32,7 @@ const Search = styled("div")(({ theme }) => ({
     backgroundColor: alpha(theme.palette.common.white, 0.25),
   },
   marginRight: theme.spacing(2),
-  marginLeft: 0,
   width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(3),
-    width: "auto",
-  },
 }));
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
@@ -58,7 +50,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
     width: "100%",
     [theme.breakpoints.up("md")]: {
       width: "300px",
@@ -66,43 +57,36 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+/* ================= COMPONENT ================= */
+
 export default function AppHeader() {
   const router = useRouter();
   const { data: session } = useSession();
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
-    React.useState<HTMLElement | null>(null);
-
-  // 🔥 Notification State
   const [anchorNoti, setAnchorNoti] = React.useState<HTMLElement | null>(null);
+
   const [notifications, setNotifications] = React.useState<any[]>([]);
   const [unread, setUnread] = React.useState(0);
-  // 🔥 Chat unread
+
   const [chatUnread, setChatUnread] = React.useState(0);
-  // Lưu thông tin chat cuối cùng
   const [lastChatTarget, setLastChatTarget] = React.useState<{
     type: "private" | "group";
     userId?: string;
     roomId?: string;
   } | null>(null);
-  const chatSocketRef = React.useRef<Socket | null>(null);
 
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const socketRef = React.useRef<Socket | null>(null);
 
-  // =====================================================================
-  // 🔥 1) API: FETCH NOTIFICATION (theo style sendRequest của bạn)
-  // =====================================================================
+  /* ================= LOAD NOTI FROM API ================= */
+
   const loadNotifications = async () => {
     if (!session?.access_token) return;
 
     const res = await sendRequest<IBackendRes<any>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notifications`,
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
+      headers: { Authorization: `Bearer ${session.access_token}` },
     });
 
     if (res?.data) {
@@ -111,9 +95,56 @@ export default function AppHeader() {
     }
   };
 
-  // =====================================================================
-  // 🔥 2) API MARK READ
-  // =====================================================================
+  React.useEffect(() => {
+    loadNotifications();
+  }, [session?.access_token]);
+
+  /* ================= SOCKET: /notifications ================= */
+
+  React.useEffect(() => {
+    if (!session?.access_token) return;
+
+    const socket = io(`${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications`, {
+      auth: { token: `Bearer ${session.access_token}` },
+      transports: ["websocket"],
+    });
+
+    socketRef.current = socket;
+
+    socket.on("notification", (data) => {
+      // LIKE / COMMENT
+      if (data.type === "LIKE" || data.type === "COMMENT") {
+        setNotifications((prev) => [data, ...prev]);
+        setUnread((u) => u + 1);
+      }
+
+      // CHAT PRIVATE
+      if (data.type === "CHAT_PRIVATE") {
+        setChatUnread((u) => u + 1);
+        setLastChatTarget({
+          type: "private",
+          userId: data.senderId,
+        });
+      }
+
+      // CHAT GROUP
+      if (data.type === "CHAT_GROUP") {
+        setChatUnread((u) => u + 1);
+        setLastChatTarget({
+          type: "group",
+          roomId: data.roomId,
+        });
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [session?.access_token]);
+
+  /* ================= MARK READ ================= */
+
   const handleMarkRead = async (id: string) => {
     await sendRequest({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notifications/${id}/read`,
@@ -122,349 +153,140 @@ export default function AppHeader() {
     });
   };
 
-  // =====================================================================
-  // 🔥 3) SOCKET REALTIME
-  // =====================================================================
-  React.useEffect(() => {
-    if (!session?.user?._id) return;
-
-    socket = io(process.env.NEXT_PUBLIC_BACKEND_URL!, {
-      query: { userId: session.user._id },
-      transports: ["websocket"],
-    });
-
-    socket.on("notification", (data) => {
-      setNotifications((prev) => [data, ...prev]);
-      setUnread((u) => u + 1);
-    });
-
-    return () => {
-      socket?.disconnect();
-    };
-  }, [session?.user?._id]);
-
-  // =====================================================================
-  // 🔥 CHAT SOCKET: nhận notif tin nhắn (riêng + nhóm)
-  // =====================================================================
-  React.useEffect(() => {
-    if (!session?.access_token) return;
-
-    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-    if (!BACKEND_URL) return;
-
-    const chatSocket = io(`${BACKEND_URL}/chat`, {
-      auth: { token: `Bearer ${session.access_token}` },
-      transports: ["websocket"],
-    });
-
-    chatSocketRef.current = chatSocket;
-
-    chatSocket.on("connect", () => {
-      console.log("Chat socket connected (header)", chatSocket.id);
-    });
-
-    // private chat notification
-    chatSocket.on(
-      "new_message_notification",
-      (payload: { roomId: string; senderId: string; message: any }) => {
-        console.log("new_message_notification (header):", payload);
-        setChatUnread((prev) => prev + 1);
-
-        setLastChatTarget({
-          type: "private",
-          userId: payload.senderId,
-        });
-      }
-    );
-
-    // group chat notification
-    chatSocket.on(
-      "new_group_message_notification",
-      (payload: { roomId: string; senderId: string; content: string }) => {
-        console.log("new_group_message_notification (header):", payload);
-        setChatUnread((prev) => prev + 1);
-
-        setLastChatTarget({
-          type: "group",
-          roomId: payload.roomId,
-        });
-      }
-    );
-
-    chatSocket.on("disconnect", () => {
-      console.log("Chat socket disconnected (header)");
-    });
-
-    return () => {
-      chatSocket.disconnect();
-      chatSocketRef.current = null;
-    };
-  }, [session?.access_token]);
-
-  // =====================================================================
-  // 🔥 4) LOAD NOTIFICATION LÚC LOGIN
-  // =====================================================================
-  React.useEffect(() => {
-    loadNotifications();
-  }, [session]);
-
-  // =====================================================================
-  // MENU PROFILE
-  // =====================================================================
-  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) =>
-    setAnchorEl(event.currentTarget);
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setMobileMoreAnchorEl(null);
-  };
-
-  const handleMobileMenuClose = () => setMobileMoreAnchorEl(null);
-
-  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) =>
-    setMobileMoreAnchorEl(event.currentTarget);
-
-  const handleRederectHome = () => router.push("/");
-
-  // =====================================================================
-  // RENDER
-  // =====================================================================
+  /* ================= RENDER ================= */
 
   return (
     <Box sx={{ padding: "15px" }}>
       <AppBar position="fixed" sx={{ backgroundColor: "#41bd4bff" }}>
-        <Toolbar sx={{ position: "relative", px: "5px", minHeight: "64px" }}>
+        <Toolbar sx={{ minHeight: "64px" }}>
           <Typography
             variant="h6"
-            noWrap
-            sx={{
-              display: { xs: "none", sm: "block" },
-              cursor: "pointer",
-              mr: 2,
-            }}
-            onClick={handleRederectHome}
+            sx={{ cursor: "pointer", mr: 2 }}
+            onClick={() => router.push("/")}
           >
             MEO MEO
           </Typography>
 
-          <Search
-            sx={{
-              position: "absolute",
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: { xs: "70%", sm: "60%", md: "50%" },
-              maxWidth: "600px",
-            }}
-          >
+          <Search sx={{ mx: "auto", maxWidth: 600 }}>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase placeholder="Tìm kiếm..." />
           </Search>
 
-          <Box sx={{ flexGrow: 1 }} />
-
-          {/* ================== RIGHT ICON ================== */}
-          <Box
-            sx={{
-              display: { xs: "none", md: "flex" },
-              gap: "20px",
-              alignItems: "center",
-            }}
-          >
-            {session ? (
-              <>
-                {/* MAIL - CHAT UNREAD */}
-                <IconButton
-                  size="large"
-                  color="inherit"
-                  onClick={() => {
-                    if (lastChatTarget) {
-                      if (
-                        lastChatTarget.type === "private" &&
-                        lastChatTarget.userId
-                      ) {
-                        // Chat riêng: dùng userId của người gửi (sender)
-                        router.push(`/chat?userId=${lastChatTarget.userId}`);
-                      } else if (
-                        lastChatTarget.type === "group" &&
-                        lastChatTarget.roomId
-                      ) {
-                        // Chat nhóm: dùng roomId
-                        router.push(
-                          `/chat?roomId=${lastChatTarget.roomId}&type=group`
-                        );
-                      } else {
-                        router.push("/chat");
-                      }
-                    } else {
-                      router.push("/chat");
-                    }
-
-                    setChatUnread(0);
-                  }}
-                >
-                  <Badge badgeContent={chatUnread} color="error">
-                    <MailIcon />
-                  </Badge>
-                </IconButton>
-
-                {/* 🔥 NOTIFICATION */}
-                <IconButton
-                  size="large"
-                  color="inherit"
-                  onClick={(e) => setAnchorNoti(e.currentTarget)}
-                >
-                  <Badge badgeContent={unread} color="error">
-                    <NotificationsIcon />
-                  </Badge>
-                </IconButton>
-
-                {/* PROFILE */}
-                <IconButton
-                  size="large"
-                  color="inherit"
-                  onClick={handleProfileMenuOpen}
-                >
-                  <AccountCircle />
-                </IconButton>
-
-                <Image
-                  onClick={handleProfileMenuOpen}
-                  style={{ height: 35, width: 35, cursor: "pointer" }}
-                  src={fetchDefaultImages(session?.user?.type)}
-                  alt=""
-                  height={35}
-                  width={35}
-                />
-              </>
-            ) : (
-              <Link
-                href="/auth/signin"
-                style={{ color: "#fff", textDecoration: "none" }}
+          {session && (
+            <>
+              {/* CHAT ICON */}
+              <IconButton
+                color="inherit"
+                onClick={() => {
+                  if (!lastChatTarget) {
+                    router.push("/chat");
+                  } else if (
+                    lastChatTarget.type === "private" &&
+                    lastChatTarget.userId
+                  ) {
+                    router.push(`/chat?userId=${lastChatTarget.userId}`);
+                  } else if (
+                    lastChatTarget.type === "group" &&
+                    lastChatTarget.roomId
+                  ) {
+                    router.push(
+                      `/chat?roomId=${lastChatTarget.roomId}&type=group`
+                    );
+                  } else {
+                    router.push("/chat");
+                  }
+                  setChatUnread(0);
+                }}
               >
-                Login
-              </Link>
-            )}
-          </Box>
+                <Badge badgeContent={chatUnread} color="error">
+                  <MailIcon />
+                </Badge>
+              </IconButton>
 
-          {/* MOBILE ICON */}
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-controls="primary-search-account-menu-mobile"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
-          </Box>
+              {/* NOTIFICATION ICON */}
+              <IconButton
+                color="inherit"
+                onClick={(e) => setAnchorNoti(e.currentTarget)}
+              >
+                <Badge badgeContent={unread} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+
+              {/* PROFILE */}
+              <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
+                <AccountCircle />
+              </IconButton>
+
+              <Image
+                src={fetchDefaultImages(session.user?.type)}
+                alt=""
+                width={35}
+                height={35}
+                style={{ borderRadius: "50%", cursor: "pointer" }}
+                onClick={(e) => setAnchorEl(e.currentTarget as any)}
+              />
+            </>
+          )}
         </Toolbar>
       </AppBar>
 
-      {/* 🔥 DROPDOWN NOTIFICATION */}
+      {/* NOTIFICATION MENU */}
       <Menu
         anchorEl={anchorNoti}
         open={Boolean(anchorNoti)}
         onClose={() => setAnchorNoti(null)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
         sx={{ maxHeight: 500, width: 360 }}
       >
         {notifications.length === 0 && <MenuItem>Không có thông báo</MenuItem>}
 
-        {notifications.map((n: any, idx: number) => {
-          const user = n.fromUserId;
-          const avatarUrl = user?.avatar
-            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${user.avatar}`
-            : "/default-avatar.png";
-
-          return (
-            <MenuItem
-              key={idx}
-              sx={{
-                whiteSpace: "normal",
-                alignItems: "flex-start",
-                gap: 1.8,
-                paddingY: 1.6,
-                paddingX: 1.8,
-                backgroundColor: !n.isRead ? "#e8f4ff" : "white",
-                borderBottom: "1px solid #e5e5e5",
-                cursor: "pointer",
-                width: "360px",
-                display: "flex",
-              }}
-              onClick={async () => {
-                setAnchorNoti(null);
-
-                if (!n.isRead) {
-                  await handleMarkRead(n._id);
-                  setNotifications((prev) =>
-                    prev.map((x) =>
-                      x._id === n._id ? { ...x, isRead: true } : x
-                    )
-                  );
-                  setUnread((u) => u - 1);
-                }
-
-                router.push(`/?post=${n.postId}`);
-              }}
-            >
-              {/* Avatar */}
-              <img
-                src={avatarUrl}
-                width="50"
-                height="50"
-                style={{
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                }}
-                alt="avatar"
-              />
-
-              {/* Text */}
-              <Box sx={{ flex: 1 }}>
-                <Typography sx={{ fontSize: "1rem", fontWeight: 600 }}>
-                  {user?.name}
-                </Typography>
-
-                <Typography sx={{ fontSize: "0.9rem", color: "#333" }}>
-                  {n.type === "LIKE"
-                    ? "đã thích bài viết của bạn"
-                    : "đã bình luận bài viết của bạn"}
-                </Typography>
-
-                <Typography
-                  sx={{ fontSize: "0.75rem", color: "#777", marginTop: "4px" }}
-                >
-                  {new Date(n.createdAt).toLocaleString()}
-                </Typography>
-              </Box>
-            </MenuItem>
-          );
-        })}
+        {notifications.map((n: any) => (
+          <MenuItem
+            key={n._id}
+            onClick={async () => {
+              setAnchorNoti(null);
+              if (!n.isRead) {
+                await handleMarkRead(n._id);
+                setUnread((u) => u - 1);
+              }
+              if (n.postId) router.push(`/?post=${n.postId}`);
+            }}
+          >
+            {n.type === "LIKE" && "👍 Đã thích bài viết của bạn"}
+            {n.type === "COMMENT" && "💬 Đã bình luận bài viết của bạn"}
+            {n.type === "CHAT_PRIVATE" && "📩 Tin nhắn mới"}
+            {n.type === "CHAT_GROUP" && "👥 Tin nhắn nhóm"}
+          </MenuItem>
+        ))}
       </Menu>
 
       {/* PROFILE MENU */}
       <Menu
         anchorEl={anchorEl}
-        open={isMenuOpen}
-        onClose={handleMenuClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
       >
-        <MenuItem>
-          <Link
-            href={`/profile/${session?.user?._id}`}
-            style={{ textDecoration: "none", color: "unset" }}
-          >
-            Profile
-          </Link>
+        <MenuItem onClick={() => router.push(`/profile/${session?.user?._id}`)}>
+          Profile
         </MenuItem>
+        {session?.user.role.name === "SUPER_ADMIN" && (
+          <MenuItem>
+            {" "}
+            <Link
+              href={"/admin"}
+              style={{ textDecoration: "none", color: "unset" }}
+            >
+              {" "}
+              Trang Admin{" "}
+            </Link>{" "}
+          </MenuItem>
+        )}
         <MenuItem
           onClick={() => {
-            handleMenuClose();
             signOut();
+            redirect("/auth/signin");
           }}
         >
           Logout

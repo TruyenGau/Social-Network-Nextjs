@@ -31,6 +31,7 @@ import { sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import PostDetailModal from "./post.detail";
 import Link from "next/link";
+import { useToast } from "@/utils/toast";
 
 interface IProps {
   session: any;
@@ -43,7 +44,7 @@ const PostList = ({ session, initPostId }: IProps) => {
   const [selectedPostId, setSelectedPostId] = useState<string>("");
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-
+  const toast = useToast();
   const [selectedPostIdForMenu, setSelectedPostIdForMenu] = useState<
     string | null
   >(null);
@@ -113,7 +114,7 @@ const PostList = ({ session, initPostId }: IProps) => {
       headers: { Authorization: `Bearer ${session?.access_token}` },
     });
     if (res) {
-      alert("Xóa Bài Post Thành Công");
+      toast.success("Xóa Bài Post Thành Công");
       handleMenuClose();
     }
     route.refresh();
@@ -232,6 +233,16 @@ const PostList = ({ session, initPostId }: IProps) => {
             subheader={new Date(post.createdAt).toLocaleDateString()}
           />
 
+          {/* CONTENT */}
+          <CardContent>
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              onClick={() => setSelectedPostId(post._id)}
+            >
+              {post.content}
+            </Typography>
+          </CardContent>
           {/* 📸 HIỂN THỊ ẢNH */}
           {/* 📸 HIỂN THỊ NHIỀU ẢNH */}
           {post.images && post.images.length > 0 && (
@@ -307,17 +318,6 @@ const PostList = ({ session, initPostId }: IProps) => {
               />
             </Box>
           )}
-
-          {/* CONTENT */}
-          <CardContent>
-            <Typography
-              variant="h6"
-              fontWeight="bold"
-              onClick={() => setSelectedPostId(post._id)}
-            >
-              {post.content}
-            </Typography>
-          </CardContent>
 
           {/* LIKE / COMMENT / SHARE */}
           <CardActions

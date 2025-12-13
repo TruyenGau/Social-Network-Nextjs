@@ -90,6 +90,7 @@ export default function ProfileUpdateModal({
         body: {
           email: user.email,
           _id: user._id,
+          role: user.role,
           ...form,
           avatar: avatarUrl,
           coverPhoto: coverUrl,

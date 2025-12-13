@@ -9,6 +9,7 @@ import {
   ApartmentOutlined,
   SafetyOutlined,
   SolutionOutlined,
+  GroupOutlined,
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
 
@@ -18,10 +19,9 @@ export default function AdminSidebar() {
 
   const menuItems = [
     { key: "/admin", label: "Dashboard", icon: <DashboardOutlined /> },
-    { key: "/admin/company", label: "Company", icon: <ApartmentOutlined /> },
     { key: "/admin/user", label: "User", icon: <UserOutlined /> },
-    { key: "/admin/job", label: "Job", icon: <SolutionOutlined /> },
-    { key: "/admin/resume", label: "Resume", icon: <FileOutlined /> },
+    { key: "/admin/post", label: "Post", icon: <SolutionOutlined /> },
+    { key: "/admin/community", label: "Community", icon: <GroupOutlined /> },
     { key: "/admin/permission", label: "Permission", icon: <SafetyOutlined /> },
     { key: "/admin/role", label: "Role", icon: <TeamOutlined /> },
   ];

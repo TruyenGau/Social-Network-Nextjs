@@ -1,8 +1,32 @@
 "use client";
 
-import { Layout, Avatar } from "antd";
+import { Layout, Avatar, Dropdown, MenuProps } from "antd";
+import { signOut } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 export default function AdminHeader() {
+  const items: MenuProps["items"] = [
+    {
+      key: "1",
+      label: <a href="/">Trang chủ</a>,
+    },
+    {
+      key: "2",
+      // gọi signOut() khi click
+      label: (
+        <span
+          onClick={() => {
+            signOut();
+            redirect("/auth/signin");
+          }}
+          style={{ color: "red" }}
+        >
+          Đăng xuất
+        </span>
+      ),
+    },
+  ];
+
   return (
     <Layout.Header
       style={{
@@ -15,7 +39,11 @@ export default function AdminHeader() {
       }}
     >
       <span style={{ marginRight: 10 }}>Welcome Im admin</span>
-      <Avatar>IM</Avatar>
+
+      {/* DROPDOWN */}
+      <Dropdown menu={{ items }} placement="bottomRight" trigger={["click"]}>
+        <Avatar style={{ cursor: "pointer" }}>IM</Avatar>
+      </Dropdown>
     </Layout.Header>
   );
 }
