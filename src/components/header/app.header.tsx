@@ -21,7 +21,6 @@ import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { fetchDefaultImages } from "@/utils/api";
 
-// 🔥 ADDED
 import { io, Socket } from "socket.io-client";
 import { sendRequest } from "@/utils/api";
 
