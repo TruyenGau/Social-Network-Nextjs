@@ -59,6 +59,14 @@ declare global {
     };
     isSaved: boolean;
     isPinned: boolean;
+    status: string;
+    sharedPostId: string;
+    postType: "NORMAL" | "BIRTHDAY";
+    taggedUserIds: {
+      _id: string;
+      name: string;
+      avatar?: string;
+    }[];
   }
 
   interface IAuthUser {
@@ -162,6 +170,7 @@ declare global {
     updatedAt: string;
     posts: IPost[];
     isJoined: boolean;
+    visibility: "PUBLIC" | "PRIVATE";
   }
   interface IStory {
     _id: string;

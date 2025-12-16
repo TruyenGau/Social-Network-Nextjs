@@ -41,6 +41,9 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
 
+  // ✅ NEW: visibility
+  const [visibility, setVisibility] = useState<"PUBLIC" | "PRIVATE">("PUBLIC");
+
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
 
@@ -50,7 +53,9 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
   const avatarRef = useRef<HTMLInputElement>(null);
   const coverRef = useRef<HTMLInputElement>(null);
 
-  /** UPLOAD PREVIEW */
+  /* =========================
+     PREVIEW IMAGE
+  ========================= */
   const handlePreview = (
     e: React.ChangeEvent<HTMLInputElement>,
     setFile: (file: File | null) => void,
@@ -63,7 +68,9 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
     setPreview(URL.createObjectURL(file));
   };
 
-  /** UPLOAD MEDIA → TRẢ VỀ TÊN FILE */
+  /* =========================
+     UPLOAD MEDIA
+  ========================= */
   const uploadMedia = async (file: File) => {
     const formData = new FormData();
     formData.append("media", file);
@@ -80,52 +87,50 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
       }
     );
 
-    return res.data?.data?.images?.[0] || null;
+    return res.data?.data?.images?.[0] || "";
   };
 
-  /** SUBMIT */
+  /* =========================
+     SUBMIT
+  ========================= */
   const handleSubmit = async () => {
-    if (!session) return alert("Bạn cần đăng nhập!");
-    if (!groupName.trim()) return alert("Tên nhóm không được bỏ trống!");
+    if (!session) {
+      toast.error("Bạn cần đăng nhập!");
+      return;
+    }
+
+    if (!groupName.trim()) {
+      toast.error("Tên nhóm không được bỏ trống!");
+      return;
+    }
 
     let avatarName = "";
     let coverName = "";
 
     try {
-      // UPLOAD AVATAR
-      if (avatarFile) {
-        const uploaded = await uploadMedia(avatarFile);
-        avatarName = uploaded;
-      }
+      if (avatarFile) avatarName = await uploadMedia(avatarFile);
+      if (coverFile) coverName = await uploadMedia(coverFile);
 
-      // UPLOAD COVER
-      if (coverFile) {
-        const uploaded = await uploadMedia(coverFile);
-        coverName = uploaded;
-      }
-
-      // CREATE COMMUNITY
-      const res = await axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/communities`,
         {
           name: groupName,
-          description: description,
+          description,
           avatar: avatarName,
           coverPhoto: coverName,
+          visibility, // ✅ GỬI LÊN BACKEND
         },
         {
           headers: { Authorization: `Bearer ${session?.access_token}` },
         }
       );
 
-      const newGroup = res.data?.data;
-
       onClose();
       setGroupName("");
       setDescription("");
+      setVisibility("PUBLIC");
 
-      // if (newGroup?._id) router.push(`/community/${newGroup._id}`);
-      await sendRequest<IBackendRes<any>>({
+      await sendRequest({
         url: "/api/revalidate",
         method: "POST",
         queryParams: {
@@ -133,6 +138,7 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
           secret: "levantruyen",
         },
       });
+
       route.refresh();
       toast.success("Tạo nhóm thành công");
     } catch (err) {
@@ -157,7 +163,6 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
           height: 140,
         }}
       >
-        {/* COVER */}
         {coverPreview ? (
           <img
             src={coverPreview}
@@ -264,6 +269,21 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
           onChange={(e) => setDescription(e.target.value)}
           sx={{ mb: 3 }}
         />
+
+        {/* ✅ QUYỀN RIÊNG TƯ */}
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <InputLabel>Quyền riêng tư</InputLabel>
+          <Select
+            value={visibility}
+            label="Quyền riêng tư"
+            onChange={(e) =>
+              setVisibility(e.target.value as "PUBLIC" | "PRIVATE")
+            }
+          >
+            <MenuItem value="PUBLIC">🌍 Công khai</MenuItem>
+            <MenuItem value="PRIVATE">🔒 Riêng tư</MenuItem>
+          </Select>
+        </FormControl>
       </DialogContent>
 
       {/* ACTIONS */}

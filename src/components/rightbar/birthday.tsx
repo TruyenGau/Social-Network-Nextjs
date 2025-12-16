@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { Avatar, Box, Button, Paper, Typography } from "@mui/material";
 import CakeIcon from "@mui/icons-material/Cake";
 import { sendRequest } from "@/utils/api";
+import BirthdayWishModal from "./birthday.modal";
+import { useSession } from "next-auth/react";
 
 interface IBirthday {
   _id: string;
@@ -15,6 +17,9 @@ interface IBirthday {
 const BirthdayUser = () => {
   const [birthdays, setBirthdays] = useState<IBirthday[]>([]);
   const [loading, setLoading] = useState(true);
+  const { data: session } = useSession();
+  const [openWish, setOpenWish] = useState(false);
+  const [targetUser, setTargetUser] = useState<IBirthday | null>(null);
 
   useEffect(() => {
     const fetchBirthdays = async () => {
@@ -22,6 +27,9 @@ const BirthdayUser = () => {
         const res = await sendRequest<IBackendRes<IBirthday[]>>({
           url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/birthday/today`,
           method: "GET",
+          queryParams: {
+            userId: session?.user._id,
+          },
         });
 
         setBirthdays(res.data ?? []);
@@ -79,8 +87,12 @@ const BirthdayUser = () => {
                 px: 2,
                 bgcolor: "#1877F2",
               }}
+              onClick={() => {
+                setTargetUser(birthdays[0]);
+                setOpenWish(true);
+              }}
             >
-              Chúc mừng
+              🎂 Chúc mừng
             </Button>
           </Box>
 
@@ -124,6 +136,16 @@ const BirthdayUser = () => {
             Hôm nay không có ai sinh nhật 🎂
           </Typography>
         </Box>
+      )}
+      {openWish && targetUser && (
+        <BirthdayWishModal
+          open={openWish}
+          user={targetUser}
+          onClose={() => setOpenWish(false)}
+          onSuccess={() => {
+            // reload feed hoặc router.refresh()
+          }}
+        />
       )}
     </Paper>
   );

@@ -15,7 +15,10 @@ const Rightbar = ({ suggesionFriend }: IProps) => {
   const pathname = usePathname();
   const isProfilePage = pathname.startsWith("/profile");
   const isCommunityPage = pathname.startsWith("/community");
+  const isMusicPage = pathname.startsWith("/music");
+
   if (isCommunityPage) return <></>;
+
   const isChatPage = pathname.startsWith("/chat");
 
   if (isChatPage) return null;

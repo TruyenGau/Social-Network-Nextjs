@@ -1,62 +1,69 @@
 "use client";
 import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import InputBase from "@mui/material/InputBase";
-import Badge from "@mui/material/Badge";
-import MenuItem from "@mui/material/MenuItem";
-import Menu from "@mui/material/Menu";
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  IconButton,
+  Typography,
+  InputBase,
+  Badge,
+  MenuItem,
+  Menu,
+  Avatar,
+} from "@mui/material";
+
 import SearchIcon from "@mui/icons-material/Search";
-import AccountCircle from "@mui/icons-material/AccountCircle";
+import HomeIcon from "@mui/icons-material/Home";
+import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
+import GroupsIcon from "@mui/icons-material/Groups";
+import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import MoreIcon from "@mui/icons-material/MoreVert";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+
 import Link from "next/link";
 import Image from "next/image";
-import { redirect, useRouter } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { fetchDefaultImages, sendRequest } from "@/utils/api";
 import { io, Socket } from "socket.io-client";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import { Avatar } from "@mui/material";
 
 /* ================= STYLE ================= */
 
-const Search = styled("div")(({ theme }) => ({
+const Search = styled("div")(() => ({
   position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: theme.spacing(2),
-  width: "100%",
-}));
-
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
+  borderRadius: 999,
+  backgroundColor: "#f0f2f5",
+  width: 260,
+  height: 40,
   display: "flex",
   alignItems: "center",
-  justifyContent: "center",
 }));
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
+const SearchIconWrapper = styled("div")({
+  padding: "0 12px",
+  display: "flex",
+  alignItems: "center",
+  color: "#65676b",
+});
+
+const StyledInputBase = styled(InputBase)({
+  color: "#050505",
+  width: "100%",
   "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "300px",
-    },
+    fontSize: 14,
   },
+});
+
+const CenterIconButton = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== "active",
+})<{ active?: boolean }>(({ active }) => ({
+  borderRadius: 8,
+  padding: "10px 36px",
+  color: active ? "#1877f2" : "#65676b",
+  borderBottom: active ? "3px solid #1877f2" : "3px solid transparent",
 }));
 
 /* ================= COMPONENT ================= */
@@ -67,6 +74,8 @@ export default function AppHeader() {
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [anchorNoti, setAnchorNoti] = React.useState<HTMLElement | null>(null);
+  const [anchorGroupInvite, setAnchorGroupInvite] =
+    React.useState<HTMLElement | null>(null);
 
   const [notifications, setNotifications] = React.useState<any[]>([]);
   const [unread, setUnread] = React.useState(0);
@@ -82,10 +91,31 @@ export default function AppHeader() {
 
   const [groupInvites, setGroupInvites] = React.useState<any[]>([]);
   const [groupInviteUnread, setGroupInviteUnread] = React.useState(0);
-  const [anchorGroupInvite, setAnchorGroupInvite] =
-    React.useState<HTMLElement | null>(null);
+  const pathname = usePathname();
+  const centerTabs = [
+    {
+      key: "home",
+      path: "/",
+      icon: <HomeIcon fontSize="large" />,
+    },
+    {
+      key: "video",
+      path: "/video",
+      icon: <OndemandVideoIcon fontSize="large" />,
+    },
+    {
+      key: "community",
+      path: "/community",
+      icon: <GroupsIcon fontSize="large" />,
+    },
+    {
+      key: "game",
+      path: "/music",
+      icon: <SportsEsportsIcon fontSize="large" />,
+    },
+  ];
 
-  /* ================= LOAD NOTI FROM API ================= */
+  /* ================= LOAD NOTIFICATIONS ================= */
 
   const loadNotifications = async () => {
     if (!session?.access_token) return;
@@ -94,20 +124,16 @@ export default function AppHeader() {
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/notifications`,
       method: "GET",
       headers: { Authorization: `Bearer ${session.access_token}` },
-      nextOption: {
-        cache: "no-store", // 🔥 QUAN TRỌNG NHẤT
-      },
+      nextOption: { cache: "no-store" },
     });
 
     if (!res?.data) return;
 
-    const all = res.data;
+    const normal = res.data.filter((n: any) => n.type !== "GROUP_INVITE");
+    const invites = res.data.filter((n: any) => n.type === "GROUP_INVITE");
 
-    const normalNoti = all.filter((n: any) => n.type !== "GROUP_INVITE");
-    const invites = all.filter((n: any) => n.type === "GROUP_INVITE");
-
-    setNotifications(normalNoti);
-    setUnread(normalNoti.filter((n: any) => !n.isRead).length);
+    setNotifications(normal);
+    setUnread(normal.filter((n: any) => !n.isRead).length);
 
     setGroupInvites(invites);
     setGroupInviteUnread(invites.filter((n: any) => !n.isRead).length);
@@ -117,7 +143,7 @@ export default function AppHeader() {
     loadNotifications();
   }, [session?.access_token]);
 
-  /* ================= SOCKET: /notifications ================= */
+  /* ================= SOCKET ================= */
 
   React.useEffect(() => {
     if (!session?.access_token) return;
@@ -154,14 +180,16 @@ export default function AppHeader() {
         });
       }
 
+      // GROUP INVITE
       if (data.type === "GROUP_INVITE") {
         setGroupInvites((prev) => [data, ...prev]);
         setGroupInviteUnread((u) => u + 1);
-        return;
       }
     });
 
+    // ✅ CLEANUP ĐÚNG
     return () => {
+      socket.off("notification");
       socket.disconnect();
       socketRef.current = null;
     };
@@ -180,89 +208,94 @@ export default function AppHeader() {
   /* ================= RENDER ================= */
 
   return (
-    <Box sx={{ padding: "15px" }}>
-      <AppBar position="fixed" sx={{ backgroundColor: "#41bd4bff" }}>
-        <Toolbar sx={{ minHeight: "64px" }}>
+    <AppBar
+      position="fixed"
+      elevation={1}
+      sx={{ bgcolor: "#fff", color: "#000" }}
+    >
+      <Toolbar sx={{ justifyContent: "space-between" }}>
+        {/* ========== LEFT ========== */}
+        <Box display="flex" alignItems="center" gap={2}>
           <Typography
-            variant="h6"
-            sx={{ cursor: "pointer", mr: 2 }}
+            fontWeight={800}
+            fontSize={24}
+            color="#1877f2"
+            sx={{ cursor: "pointer" }}
             onClick={() => router.push("/")}
           >
-            MEO MEO
+            MEO
           </Typography>
 
-          <Search sx={{ mx: "auto", maxWidth: 600 }}>
+          <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
-            <StyledInputBase placeholder="Tìm kiếm..." />
+            <StyledInputBase placeholder="Tìm kiếm trên MEO" />
           </Search>
+        </Box>
 
-          {session && (
-            <>
-              {/* CHAT ICON */}
-              <IconButton
-                color="inherit"
-                onClick={() => {
-                  if (!lastChatTarget) {
-                    router.push("/chat");
-                  } else if (
-                    lastChatTarget.type === "private" &&
-                    lastChatTarget.userId
-                  ) {
-                    router.push(`/chat?userId=${lastChatTarget.userId}`);
-                  } else if (
-                    lastChatTarget.type === "group" &&
-                    lastChatTarget.roomId
-                  ) {
-                    router.push(
-                      `/chat?roomId=${lastChatTarget.roomId}&type=group`
-                    );
-                  } else {
-                    router.push("/chat");
-                  }
-                  setChatUnread(0);
-                }}
+        {/* ========== CENTER ========== */}
+        <Box display="flex" alignItems="center">
+          {centerTabs.map((tab) => {
+            const isActive =
+              tab.path === "/"
+                ? pathname === "/"
+                : pathname.startsWith(tab.path);
+
+            return (
+              <CenterIconButton
+                key={tab.key}
+                active={isActive}
+                onClick={() => router.push(tab.path)}
               >
-                <Badge badgeContent={chatUnread} color="error">
-                  <MailIcon />
-                </Badge>
-              </IconButton>
+                {tab.icon}
+              </CenterIconButton>
+            );
+          })}
+        </Box>
 
-              {/* GROUP INVITE ICON */}
-              <IconButton
-                color="inherit"
-                onClick={(e) => setAnchorGroupInvite(e.currentTarget)}
-              >
-                <Badge badgeContent={groupInviteUnread} color="error">
-                  <GroupAddIcon />
-                </Badge>
-              </IconButton>
+        {/* ========== RIGHT ========== */}
+        {session && (
+          <Box display="flex" alignItems="center" gap={1}>
+            <IconButton
+              onClick={() => {
+                if (!lastChatTarget) router.push("/chat");
+                else if (lastChatTarget.type === "private")
+                  router.push(`/chat?userId=${lastChatTarget.userId}`);
+                else
+                  router.push(
+                    `/chat?roomId=${lastChatTarget.roomId}&type=group`
+                  );
+                setChatUnread(0);
+              }}
+            >
+              <Badge badgeContent={chatUnread} color="error">
+                <MailIcon />
+              </Badge>
+            </IconButton>
 
-              {/* NOTIFICATION ICON */}
-              <IconButton
-                color="inherit"
-                onClick={(e) => setAnchorNoti(e.currentTarget)}
-              >
-                <Badge badgeContent={unread} color="error">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
+            <IconButton onClick={(e) => setAnchorGroupInvite(e.currentTarget)}>
+              <Badge badgeContent={groupInviteUnread} color="error">
+                <GroupAddIcon />
+              </Badge>
+            </IconButton>
 
-              <Image
-                src={fetchDefaultImages(session.user?.type)}
-                alt=""
-                width={35}
-                height={35}
-                style={{ borderRadius: "50%", cursor: "pointer" }}
-                onClick={(e) => setAnchorEl(e.currentTarget as any)}
-              />
-            </>
-          )}
-        </Toolbar>
-      </AppBar>
+            <IconButton onClick={(e) => setAnchorNoti(e.currentTarget)}>
+              <Badge badgeContent={unread} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
 
-      {/* NOTIFICATION MENU */}
+            <Avatar
+              src={fetchDefaultImages(session.user?.type)}
+              sx={{ cursor: "pointer" }}
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+            />
+          </Box>
+        )}
+      </Toolbar>
+
+      {/* ========== NOTIFICATION MENU ========== */}
       <Menu
         anchorEl={anchorNoti}
         open={Boolean(anchorNoti)}
@@ -278,7 +311,7 @@ export default function AppHeader() {
               setAnchorNoti(null);
               if (!n.isRead) {
                 await handleMarkRead(n._id);
-                setUnread((u) => u - 1);
+                setUnread((u) => Math.max(0, u - 1));
               }
               if (n.postId) router.push(`/?post=${n.postId}`);
             }}
@@ -291,7 +324,7 @@ export default function AppHeader() {
         ))}
       </Menu>
 
-      {/* GROUP INVITE MENU */}
+      {/* ========== GROUP INVITE MENU ========== */}
       <Menu
         anchorEl={anchorGroupInvite}
         open={Boolean(anchorGroupInvite)}
@@ -305,58 +338,27 @@ export default function AppHeader() {
             key={n._id}
             onClick={async () => {
               setAnchorGroupInvite(null);
-
               if (!n.isRead) {
                 await handleMarkRead(n._id);
-
-                setGroupInvites((prev) =>
-                  prev.map((x) =>
-                    x._id === n._id ? { ...x, isRead: true } : x
-                  )
-                );
                 setGroupInviteUnread((u) => Math.max(0, u - 1));
               }
-
-              router.push("/invite"); // trang xem lời mời
-            }}
-            sx={{
-              alignItems: "flex-start",
-              gap: 1.5,
-              py: 1.5,
-              backgroundColor: n.isRead ? "transparent" : "#f0f7ff",
-              "&:hover": {
-                backgroundColor: "#e6f0ff",
-              },
+              router.push("/invite");
             }}
           >
-            {/* AVATAR NGƯỜI MỜI */}
             <Avatar
               src={
                 n.fromUserId?.avatar
                   ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${n.fromUserId.avatar}`
                   : "/user/default-user.png"
               }
-              sx={{ width: 40, height: 40 }}
+              sx={{ mr: 1 }}
             />
-
-            {/* CONTENT */}
-            <Box sx={{ flex: 1 }}>
-              <Typography fontSize={14}>
-                <b>{n.fromUserId?.name}</b>{" "}
-                <Typography component="span" fontSize={14}>
-                  đã mời bạn tham gia một nhóm
-                </Typography>
-              </Typography>
-
-              <Typography fontSize={13} color="text.secondary" sx={{ mt: 0.5 }}>
-                👥 Nhấn để xem chi tiết
-              </Typography>
-            </Box>
+            <b>{n.fromUserId?.name}</b>&nbsp;đã mời bạn tham gia nhóm
           </MenuItem>
         ))}
       </Menu>
 
-      {/* PROFILE MENU */}
+      {/* ========== PROFILE MENU ========== */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -367,14 +369,12 @@ export default function AppHeader() {
         </MenuItem>
         {session?.user.role.name === "SUPER_ADMIN" && (
           <MenuItem>
-            {" "}
             <Link
-              href={"/admin"}
+              href="/admin"
               style={{ textDecoration: "none", color: "unset" }}
             >
-              {" "}
-              Trang Admin{" "}
-            </Link>{" "}
+              Trang Admin
+            </Link>
           </MenuItem>
         )}
         <MenuItem
@@ -386,6 +386,6 @@ export default function AppHeader() {
           Logout
         </MenuItem>
       </Menu>
-    </Box>
+    </AppBar>
   );
 }

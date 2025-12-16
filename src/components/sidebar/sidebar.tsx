@@ -25,6 +25,8 @@ import ProfileCard from "../profile/profile.card";
 import { useSession } from "next-auth/react";
 import { sendRequest } from "@/utils/api";
 import { IUser } from "@/types/next-auth";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 interface IProps {
   data: IUser | null;
 }
@@ -125,26 +127,26 @@ export default function Sidebar(props: IProps) {
             </ListItem>
             <ListItem disablePadding>
               <ListItemButton
-                sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#fce4ec" } }}
-                component="a"
-                href="#"
-              >
-                <ListItemIcon>
-                  <Settings sx={{ color: "#e91e63" }} />
-                </ListItemIcon>
-                <ListItemText primary="Cài đặt" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton
                 sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#ede7f6" } }}
                 component="a"
                 href="/invite"
               >
                 <ListItemIcon>
-                  <AccountBox sx={{ color: "#673ab7" }} />
+                  <GroupAddIcon sx={{ color: "#673ab7" }} />
                 </ListItemIcon>
                 <ListItemText primary="Lời Mời Vào Nhóm" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#fce4ec" } }}
+                component="a"
+                href="/music"
+              >
+                <ListItemIcon>
+                  <SportsEsportsIcon sx={{ color: "#e91e63" }} />
+                </ListItemIcon>
+                <ListItemText primary="Giải trí" />
               </ListItemButton>
             </ListItem>
           </List>

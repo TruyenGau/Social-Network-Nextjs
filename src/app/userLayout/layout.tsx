@@ -16,7 +16,7 @@ export default function UserLayout({
         direction="row"
         spacing={2}
         justifyContent="space-between"
-        sx={{ mt: 4, px: 2 }}
+        sx={{ px: 2, mt: "60px" }}
       >
         <Box sx={{ flexBasis: "20%", flexShrink: 0 }}>
           <SideBarSever />
