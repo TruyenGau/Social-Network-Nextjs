@@ -16,7 +16,7 @@ import {
   Article,
   Group,
   Person,
-  Settings,
+  SportsEsports,
   AccountBox,
   Add,
 } from "@mui/icons-material";
@@ -125,14 +125,14 @@ export default function Sidebar(props: IProps) {
             </ListItem>
             <ListItem disablePadding>
               <ListItemButton
-                sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#fce4ec" } }}
+                sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#e3f2fd" } }}
                 component="a"
                 href="#"
               >
                 <ListItemIcon>
-                  <Settings sx={{ color: "#e91e63" }} />
+                  <SportsEsports sx={{ color: "#e91e63" }} />
                 </ListItemIcon>
-                <ListItemText primary="Cài đặt" />
+                <ListItemText primary="Giải trí" />
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
