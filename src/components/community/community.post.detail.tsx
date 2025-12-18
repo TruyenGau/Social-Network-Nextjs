@@ -24,6 +24,7 @@ import { useEffect, useState } from "react";
 import { sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import ImageViewer from "../post/image.view";
+import { useToast } from "@/utils/toast";
 
 export default function CommunityPostDetailModal({
   postId,
@@ -38,7 +39,7 @@ export default function CommunityPostDetailModal({
   const [replyToCommentId, setReplyToCommentId] = useState<string | null>(null);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
-
+  const toast = useToast();
   if (postId === "") return null;
 
   const fetchData = async () => {
@@ -77,13 +78,18 @@ export default function CommunityPostDetailModal({
     if (!session) return alert("Bạn phải đăng nhập!");
     if (!commentText.trim()) return;
 
-    await sendRequest({
+    const res = await sendRequest<IBackendRes<any>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/comments`,
       method: "POST",
       headers: { Authorization: `Bearer ${session?.access_token}` },
       body: { content: commentText, postId },
     });
-
+    if (res?.data?.success === true) {
+      toast.success("Bình luận thành công");
+    }
+    if (res?.data?.success === false) {
+      toast.error(res?.data?.message);
+    }
     setCommentText("");
     fetchData();
     refresh();

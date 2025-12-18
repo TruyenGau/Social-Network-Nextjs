@@ -87,28 +87,6 @@ const PostList = ({ session, initPostId }: IProps) => {
     fetchData();
   }, [session]); // fetch lại khi session thay đổi
 
-  const handleSharePost = async () => {
-    if (!sharePostId) return;
-
-    try {
-      await sendRequest({
-        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/${sharePostId}/share`,
-        method: "POST",
-        headers: { Authorization: `Bearer ${session?.access_token}` },
-        body: {
-          content: shareContent,
-        },
-      });
-
-      toast.success("Đã chia sẻ bài viết");
-      setSharePostId(null);
-      setShareContent("");
-      route.refresh();
-    } catch (err) {
-      toast.error("Chia sẻ thất bại");
-    }
-  };
-
   const handleLikes = async (postId: string) => {
     if (!session) return alert("Bạn cần đăng nhập!");
     await sendRequest({
@@ -123,12 +101,19 @@ const PostList = ({ session, initPostId }: IProps) => {
     if (!session) return alert("Bạn cần đăng nhập!");
     if (!commentText.trim()) return;
 
-    await sendRequest({
+    const res = await sendRequest<IBackendRes<any>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/comments`,
       method: "POST",
       headers: { Authorization: `Bearer ${session?.access_token}` },
       body: { content: commentText, postId: postId },
     });
+
+    if (res?.data?.success === true) {
+      toast.success("Bình luận thành công");
+    }
+    if (res?.data?.success === false) {
+      toast.error(res?.data?.message);
+    }
 
     setCommentText("");
     setOpenCommentBox(null);

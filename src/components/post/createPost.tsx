@@ -80,7 +80,6 @@ export default function PostForm({ data }: IProps) {
 
         const uploadData = uploadRes.data?.data;
 
-        // ❌ MEDIA BỊ CHẶN
         if (uploadData?.success === false) {
           toast.error(uploadData.message || "Ảnh/video không hợp lệ");
           setIsLoading(false);
@@ -91,7 +90,6 @@ export default function PostForm({ data }: IProps) {
         uploadedVideos = uploadRes.data?.data?.videos || [];
       }
 
-      console.log("check image video", uploadedImages, uploadedVideos);
       // 🟩 Tạo POST
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts`,
