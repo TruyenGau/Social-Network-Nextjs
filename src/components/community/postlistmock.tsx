@@ -63,6 +63,9 @@ const PostListMock = ({
   const [selectedPostIdForMenu, setSelectedPostIdForMenu] = useState<
     string | null
   >(null);
+  const [activePostTab, setActivePostTab] = useState<"APPROVED" | "PENDING">(
+    "APPROVED"
+  );
 
   const isMenuOpen = Boolean(anchorEl);
 
@@ -82,7 +85,12 @@ const PostListMock = ({
       method: isSaved ? "PUT" : "GET",
       queryParams: isSaved
         ? {}
-        : { current: 1, pageSize: 20, sort: "-createdAt" },
+        : {
+            current: 1,
+            pageSize: 20,
+            sort: "-createdAt",
+            status: activePostTab,
+          },
       headers: { Authorization: `Bearer ${session.access_token}` },
     });
 
@@ -97,7 +105,7 @@ const PostListMock = ({
 
   useEffect(() => {
     fetchPosts();
-  }, [groupId, session, reloadFlag, selectedPostId]);
+  }, [groupId, session, reloadFlag, selectedPostId, activePostTab]);
 
   if (!posts || posts.length === 0) {
     return (
@@ -160,6 +168,33 @@ const PostListMock = ({
     fetchPosts();
   };
 
+  const handleApprovePost = async (postId: string) => {
+    await sendRequest({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/${postId}/approve`,
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
+
+    toast.success("Đã duyệt bài viết");
+
+    handleMenuClose();
+
+    // ✅ CHUYỂN SANG TAB ĐÃ DUYỆT
+    setActivePostTab("APPROVED");
+  };
+
+  const handleRejectPost = async (postId: string) => {
+    await sendRequest({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/${postId}/reject`,
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
+
+    toast.success("Đã từ chối bài viết");
+    handleMenuClose();
+    fetchPosts();
+  };
+
   /* ================= MENU ================= */
 
   const handleMenuOpen = (e: React.MouseEvent<HTMLElement>, postId: string) => {
@@ -180,6 +215,43 @@ const PostListMock = ({
 
   return (
     <>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 3,
+          mb: 2,
+          borderBottom: "1px solid #eee",
+        }}
+      >
+        <Typography
+          onClick={() => setActivePostTab("APPROVED")}
+          sx={{
+            cursor: "pointer",
+            pb: 1,
+            fontWeight: activePostTab === "APPROVED" ? 700 : 500,
+            borderBottom:
+              activePostTab === "APPROVED" ? "3px solid #1877f2" : "none",
+            color: activePostTab === "APPROVED" ? "#1877f2" : "#555",
+          }}
+        >
+          Bài viết
+        </Typography>
+
+        <Typography
+          onClick={() => setActivePostTab("PENDING")}
+          sx={{
+            cursor: "pointer",
+            pb: 1,
+            fontWeight: activePostTab === "PENDING" ? 700 : 500,
+            borderBottom:
+              activePostTab === "PENDING" ? "3px solid #f59e0b" : "none",
+            color: activePostTab === "PENDING" ? "#f59e0b" : "#555",
+          }}
+        >
+          Chờ duyệt
+        </Typography>
+      </Box>
+
       {posts.map((post) => {
         const isAdmin = session?.user._id === adminId;
 
@@ -225,6 +297,21 @@ const PostListMock = ({
                   {post.isPinned && (
                     <Typography fontSize={13} color="primary">
                       📌 Đã ghim
+                    </Typography>
+                  )}
+
+                  {post.status === "PENDING" && (
+                    <Typography
+                      fontSize={12}
+                      sx={{
+                        px: 1,
+                        borderRadius: 1,
+                        bgcolor: "#fef3c7",
+                        color: "#b45309",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Chờ duyệt
                     </Typography>
                   )}
                 </Box>
@@ -332,6 +419,24 @@ const PostListMock = ({
 
       {/* MENU */}
       <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleMenuClose}>
+        {/* ADMIN APPROVE / REJECT (CHỈ TAB CHỜ DUYỆT) */}
+        {isAdminMenu && activePostTab === "PENDING" && (
+          <>
+            <MenuItem onClick={() => handleApprovePost(selectedPostIdForMenu!)}>
+              ✅ Duyệt bài viết
+            </MenuItem>
+
+            <MenuItem
+              onClick={() => handleRejectPost(selectedPostIdForMenu!)}
+              sx={{ color: "error.main" }}
+            >
+              ❌ Từ chối bài viết
+            </MenuItem>
+
+            <Divider />
+          </>
+        )}
+
         {isAdminMenu && (
           <MenuItem
             onClick={() =>

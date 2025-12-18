@@ -305,16 +305,16 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
             );
             return updated
               ? {
-                  ...f,
-                  following: {
-                    ...f.following,
-                    online: updated.following.online,
-                  },
-                }
+                ...f,
+                following: {
+                  ...f.following,
+                  online: updated.following.online,
+                },
+              }
               : f;
           })
         );
-      } catch {}
+      } catch { }
     }, 5000); // 5s là hợp lý
 
     return () => clearInterval(interval);
@@ -359,9 +359,9 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
       setCurrentFriend((prev) =>
         prev
           ? {
-              ...prev,
-              online: updated.following.online,
-            }
+            ...prev,
+            online: updated.following.online,
+          }
           : prev
       );
     }
@@ -525,7 +525,7 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
             Authorization: `Bearer ${accessToken}`,
           },
         }
-      ).catch(() => {});
+      ).catch(() => { });
 
       // 3. Xoá khỏi danh sách tin nhắn chờ
       setPendingRequests((prev) =>
@@ -772,7 +772,7 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
 
   return (
     <>
-      <Box sx={{ p: 2, display: "flex", height: "80vh", gap: 8 }}>
+      <Box sx={{ p: 2, display: "flex", mt: "40px", height: "80vh", gap: 8 }}>
         {/* CỘT GIỮA: KHUNG CHAT */}
         <Box
           sx={{

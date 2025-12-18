@@ -32,6 +32,9 @@ import { useRouter } from "next/navigation";
 import PostDetailModal from "./post.detail";
 import Link from "next/link";
 import { useToast } from "@/utils/toast";
+import UpdatePostModal from "./post.update";
+import SharePostModal from "./post.share";
+import SharedPostCard from "./post.shared";
 
 interface IProps {
   session: any;
@@ -54,6 +57,9 @@ const PostList = ({ session, initPostId }: IProps) => {
     React.useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(anchorEl);
   const route = useRouter();
+  const [editPostId, setEditPostId] = useState<string | null>(null);
+  const [sharePostId, setSharePostId] = useState<string | null>(null);
+  const [shareContent, setShareContent] = useState("");
 
   useEffect(() => {
     if (initPostId) {
@@ -80,6 +86,28 @@ const PostList = ({ session, initPostId }: IProps) => {
 
     fetchData();
   }, [session]); // fetch lại khi session thay đổi
+
+  const handleSharePost = async () => {
+    if (!sharePostId) return;
+
+    try {
+      await sendRequest({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/${sharePostId}/share`,
+        method: "POST",
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+        body: {
+          content: shareContent,
+        },
+      });
+
+      toast.success("Đã chia sẻ bài viết");
+      setSharePostId(null);
+      setShareContent("");
+      route.refresh();
+    } catch (err) {
+      toast.error("Chia sẻ thất bại");
+    }
+  };
 
   const handleLikes = async (postId: string) => {
     if (!session) return alert("Bạn cần đăng nhập!");
@@ -154,17 +182,18 @@ const PostList = ({ session, initPostId }: IProps) => {
         },
       }}
     >
-      <MenuItem>
-        <Link
-          style={{ color: "unset", textDecoration: "unset" }}
-          href={`/profile/${session?.user._id}`}
-        >
-          <IconButton size="small">
-            <Edit />
-          </IconButton>
-          Chỉnh Sửa Bài Viết
-        </Link>
+      <MenuItem
+        onClick={() => {
+          setEditPostId(selectedPostIdForMenu!);
+          handleMenuClose();
+        }}
+      >
+        <IconButton size="small">
+          <Edit />
+        </IconButton>
+        Chỉnh sửa bài viết
       </MenuItem>
+
       <MenuItem
         onClick={() => {
           handleDeletePost(selectedPostIdForMenu!);
@@ -235,14 +264,92 @@ const PostList = ({ session, initPostId }: IProps) => {
 
           {/* CONTENT */}
           <CardContent>
-            <Typography
-              variant="h6"
-              fontWeight="bold"
-              onClick={() => setSelectedPostId(post._id)}
-            >
-              {post.content}
-            </Typography>
+            {/* ===== SHARE LABEL ===== */}
+            {/* {post.sharedPostId && (
+              <Typography
+                fontSize={13}
+                color="text.secondary"
+                sx={{
+                  mb: 0.5,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                }}
+              >
+                🔁 <strong>{post.userId?.name}</strong> đã chia sẻ một bài viết
+              </Typography>
+            )} */}
+
+            {/* ===== BIRTHDAY CARD ===== */}
+            {post.content && (
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                sx={{ mb: 1 }}
+                onClick={() => setSelectedPostId(post._id)}
+              >
+                {post.content}
+              </Typography>
+            )}
+            {post.postType === "BIRTHDAY" && post.taggedUserIds?.length > 0 && (
+              <Box
+                sx={{
+                  mb: 1.8,
+                  p: 2,
+                  borderRadius: 2.5,
+                  background:
+                    "linear-gradient(135deg, #fff5f7 0%, #ffeef3 100%)",
+                  border: "1px solid #f8bbd0",
+                }}
+              >
+                {/* HEADER */}
+
+                {/* USER */}
+                <Box display="flex" alignItems="center" gap={1.2}>
+                  <Avatar
+                    src={
+                      post.taggedUserIds[0].avatar
+                        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post.taggedUserIds[0].avatar}`
+                        : "/user/default-user.png"
+                    }
+                    sx={{
+                      width: 44,
+                      height: 44,
+                      border: "2px solid #f06292",
+                    }}
+                  />
+
+                  <Box>
+                    <Link
+                      href={`/profile/${post.taggedUserIds[0]._id}`}
+                      style={{ textDecoration: "none" }}
+                    >
+                      <Typography
+                        fontWeight={700}
+                        sx={{
+                          color: "#d81b60",
+                          lineHeight: 1.2,
+                          "&:hover": { textDecoration: "underline" },
+                        }}
+                      >
+                        {post.taggedUserIds[0].name}
+                      </Typography>
+                    </Link>
+
+                    <Typography fontSize={12} color="text.secondary">
+                      🎉 Hôm nay là sinh nhật của bạn ấy
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            )}
+
+            {/* ===== CAPTION ===== */}
+
+            {/* ===== SHARED POST ===== */}
+            {post.sharedPostId && <SharedPostCard post={post.sharedPostId} />}
           </CardContent>
+
           {/* 📸 HIỂN THỊ ẢNH */}
           {/* 📸 HIỂN THỊ NHIỀU ẢNH */}
           {post.images && post.images.length > 0 && (
@@ -365,6 +472,7 @@ const PostList = ({ session, initPostId }: IProps) => {
                 gap: 1,
                 cursor: "pointer",
               }}
+              onClick={() => setSharePostId(post._id)}
             >
               <IconButton size="small">
                 <Share />
@@ -414,6 +522,30 @@ const PostList = ({ session, initPostId }: IProps) => {
           onClose={() => setSelectedPostId("")}
           session={session}
           refresh={() => route.refresh()}
+        />
+      )}
+      {editPostId && (
+        <UpdatePostModal
+          postId={editPostId}
+          open={!!editPostId}
+          onClose={() => setEditPostId(null)}
+          session={session}
+          onUpdated={() => {
+            setEditPostId(null);
+            route.refresh();
+          }}
+        />
+      )}
+      {sharePostId && (
+        <SharePostModal
+          open={!!sharePostId}
+          postId={sharePostId}
+          session={session}
+          onClose={() => setSharePostId(null)}
+          onShared={() => {
+            setSharePostId(null);
+            route.refresh();
+          }}
         />
       )}
     </>

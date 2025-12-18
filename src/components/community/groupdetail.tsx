@@ -24,6 +24,7 @@ import GroupMembersList from "./community.members";
 import { useToast } from "@/utils/toast";
 import SavedPostList from "./community.saved.post";
 import InviteFriendsDialog from "./community.invite.friend";
+import UpdateGroupModal from "./update.community";
 
 interface IProps {
   groupId: string;
@@ -43,6 +44,7 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [openInvite, setOpenInvite] = useState<boolean>(false);
   const handlePostCreated = () => setReloadPostFlag(!reloadPostFlag);
+  const [openUpdate, setOpenUpdate] = useState(false);
 
   const fetchGroup = async () => {
     if (!session) return;
@@ -243,6 +245,16 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
                 Xóa nhóm
               </Button>
             )}
+            {group.admins[0]._id === session?.user._id && (
+              <Button
+                variant="outlined"
+                color="success"
+                sx={{ ml: 1, fontWeight: 600 }}
+                onClick={() => setOpenUpdate(true)}
+              >
+                Cập nhật thông tin nhóm
+              </Button>
+            )}
           </Box>
 
           {/* Tabs */}
@@ -324,7 +336,7 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
                   <Typography fontSize="18px">🌐</Typography>
                   <Box>
                     <Typography fontSize="14px" fontWeight={600}>
-                      Công khai
+                      {group.visibility}
                     </Typography>
                     <Typography fontSize="13px" color="text.secondary">
                       Bất kỳ ai cũng có thể nhìn thấy mọi người trong nhóm và
@@ -362,6 +374,12 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
         open={openInvite}
         onClose={() => setOpenInvite(false)}
         groupId={groupId}
+      />
+      <UpdateGroupModal
+        open={openUpdate}
+        onClose={() => setOpenUpdate(false)}
+        group={group}
+        onUpdated={fetchGroup}
       />
     </Box>
   );

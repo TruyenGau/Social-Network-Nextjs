@@ -78,6 +78,15 @@ export default function PostForm({ data }: IProps) {
           }
         );
 
+        const uploadData = uploadRes.data?.data;
+
+        // ❌ MEDIA BỊ CHẶN
+        if (uploadData?.success === false) {
+          toast.error(uploadData.message || "Ảnh/video không hợp lệ");
+          setIsLoading(false);
+          return; // ⛔ DỪNG TẠI ĐÂY
+        }
+
         uploadedImages = uploadRes.data?.data?.images || [];
         uploadedVideos = uploadRes.data?.data?.videos || [];
       }
