@@ -1,157 +1,200 @@
 "use client";
-import React, { useEffect, useState } from "react";
 import {
+  Avatar,
   Box,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Fab,
-  Paper,
   Stack,
+  Typography,
 } from "@mui/material";
-import {
-  Home,
-  Article,
-  Group,
-  Person,
-  Settings,
-  AccountBox,
-  Add,
-} from "@mui/icons-material";
-import CreatePostModal from "../post/createPost";
-import ProfileCard from "../profile/profile.card";
-import { useSession } from "next-auth/react";
-import { sendRequest } from "@/utils/api";
-import { IUser } from "@/types/next-auth";
+import HomeIcon from "@mui/icons-material/Home";
+import ArticleIcon from "@mui/icons-material/Article";
+import GroupsIcon from "@mui/icons-material/Groups";
+import PeopleIcon from "@mui/icons-material/People";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
+import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
+import ProfileCard from "../profile/profile.card";
+import { IUser } from "@/types/next-auth";
+
 interface IProps {
   data: IUser | null;
 }
 
-export default function Sidebar(props: IProps) {
-  const [openCreatePost, setOpenCreatePost] = useState(false);
-  const user = props.data;
-  const { data: session } = useSession();
+const menuStyle = {
+  borderRadius: "8px",
+  py: 1.25, // 👈 tăng chiều cao dòng
+  minHeight: 44,
+  px: 1, // 👈 ép padding đồng bộ
+  "&:hover": {
+    bgcolor: "#f0f2f5",
+  },
+};
+
+export default function Sidebar({ data }: IProps) {
+  if (!data) return null;
 
   return (
     <Box
-      flex={1}
-      sx={{ display: { xs: "none", sm: "block" }, marginLeft: "15px" }}
+      sx={{
+        position: "fixed",
+        top: 64,
+        left: 0,
+        width: 300,
+        height: "calc(100vh - 64px)",
+        pl: 2,
+        pr: 1,
+        overflowY: "auto",
+        display: { xs: "none", md: "block" },
+      }}
     >
-      {/* 👉 Dùng STACK ĐỂ TÁCH 2 KHUNG */}
-      <Stack
-        direction="column"
-        spacing={1} // khoảng cách giữa 2 khung
-        sx={{ position: "fixed", width: "325px", mt: "20px" }}
-      >
-        {/* ===== KHUNG 1: PROFILE CARD ===== */}
-        <Paper
-          elevation={4}
-          sx={{
-            borderRadius: "20px",
-            p: 2,
-            bgcolor: "white",
-            transition: "all 0.3s ease",
-          }}
-        >
-          <ProfileCard
-            id={user?._id ?? ""}
-            name={user?.name ?? ""}
-            followers={user?.followersCount ?? 0}
-            avatarUrl={user?.avatar ?? ""}
-            coverUrl={user?.coverPhoto ?? ""}
-          />
-        </Paper>
+      {/* PROFILE + MENU */}
+      <List>
+        {/* PROFILE */}
+        <ListItem disablePadding>
+          <ListItemButton
+            href={`/profile/${data._id}`}
+            sx={{
+              ...menuStyle,
+              mb: 0.5,
+            }}
+          >
+            <Avatar
+              src={
+                data.avatar
+                  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${data.avatar}`
+                  : "/user/default-user.png"
+              }
+              sx={{ width: 36, height: 36, mr: 1.5 }}
+            />
+            <ListItemText
+              primary={data.name}
+              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+            />
+          </ListItemButton>
+        </ListItem>
 
-        {/* ===== KHUNG 2: MENU SIDEBAR ===== */}
-        <Paper
-          elevation={4}
-          sx={{
-            borderRadius: "20px",
-            p: 2,
-            bgcolor: "white",
-            transition: "all 0.3s ease",
-          }}
+        {/* MENU ITEM */}
+        <ListItem disablePadding>
+          <ListItemButton href="/" sx={menuStyle}>
+            <ListItemIcon sx={{ minWidth: 28 }}>
+              {" "}
+              {/* 👈 MẤU CHỐT */}
+              <HomeIcon sx={{ color: "#1877F2", fontSize: 22 }} />
+            </ListItemIcon>
+            <ListItemText
+              primary="Trang Chủ"
+              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+            />
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton sx={menuStyle}>
+            <ListItemIcon sx={{ minWidth: 28 }}>
+              <ArticleIcon sx={{ color: "#f02849", fontSize: 22 }} />
+            </ListItemIcon>
+            <ListItemText
+              primary="Bài Viết"
+              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+            />
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton href="/community" sx={menuStyle}>
+            <ListItemIcon sx={{ minWidth: 28 }}>
+              <GroupsIcon sx={{ color: "#42b72a", fontSize: 22 }} />
+            </ListItemIcon>
+            <ListItemText
+              primary="Nhóm"
+              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+            />
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton href="/chat" sx={menuStyle}>
+            <ListItemIcon sx={{ minWidth: 28 }}>
+              <PeopleIcon sx={{ color: "#1877F2", fontSize: 22 }} />
+            </ListItemIcon>
+            <ListItemText
+              primary="Bạn Bè"
+              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+            />
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton href="/invite" sx={menuStyle}>
+            <ListItemIcon sx={{ minWidth: 28 }}>
+              <GroupAddIcon sx={{ color: "#8b6be8", fontSize: 22 }} />
+            </ListItemIcon>
+            <ListItemText
+              primary="Lời Mời Vào Nhóm"
+              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+            />
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton href="/music" sx={menuStyle}>
+            <ListItemIcon sx={{ minWidth: 28 }}>
+              <OndemandVideoIcon sx={{ color: "#f5533d", fontSize: 22 }} />
+            </ListItemIcon>
+            <ListItemText
+              primary="Giải trí"
+              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+            />
+          </ListItemButton>
+        </ListItem>
+      </List>
+      <Box mt={2}>
+        <Typography
+          fontSize={15}
+          fontWeight={600}
+          color="#65676B"
+          sx={{ px: 1, mb: 1 }}
         >
-          <List>
-            <ListItem disablePadding>
-              <ListItemButton
-                component="a"
-                href="/"
-                sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#f0f4ff" } }}
+          Lối tắt
+        </Typography>
+
+        <List dense>
+          {[
+            { label: "Nhóm CNTT", icon: "👨‍💻" },
+            { label: "TigerStudy", icon: "🐯" },
+            { label: "Học React", icon: "⚛️" },
+          ].map((item) => (
+            <ListItemButton
+              key={item.label}
+              sx={{
+                borderRadius: "8px",
+                minHeight: 44, // 👈 QUAN TRỌNG
+                px: 1,
+                "&:hover": { bgcolor: "#f0f2f5" },
+              }}
+            >
+              <Box
+                sx={{
+                  minWidth: 28, // 👈 GIỐNG ListItemIcon
+                  display: "flex",
+                  justifyContent: "center",
+                  mr: 1,
+                  fontSize: 18,
+                }}
               >
-                <ListItemIcon>
-                  <Home sx={{ color: "#007bff" }} />
-                </ListItemIcon>
-                <ListItemText primary="Trang Chủ" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton
-                sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#fff6e5" } }}
-                component="a"
-                href="#"
-              >
-                <ListItemIcon>
-                  <Article sx={{ color: "#ff9800" }} />
-                </ListItemIcon>
-                <ListItemText primary="Bài Viết" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton
-                sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#e8f5e9" } }}
-                component="a"
-                href="/community"
-              >
-                <ListItemIcon>
-                  <Group sx={{ color: "#4caf50" }} />
-                </ListItemIcon>
-                <ListItemText primary="Nhóm" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton
-                sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#fff3e0" } }}
-                component="a"
-                href="/chat"
-              >
-                <ListItemIcon>
-                  <Person sx={{ color: "#795548" }} />
-                </ListItemIcon>
-                <ListItemText primary="Bạn Bè" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton
-                sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#ede7f6" } }}
-                component="a"
-                href="/invite"
-              >
-                <ListItemIcon>
-                  <GroupAddIcon sx={{ color: "#673ab7" }} />
-                </ListItemIcon>
-                <ListItemText primary="Lời Mời Vào Nhóm" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton
-                sx={{ borderRadius: "12px", "&:hover": { bgcolor: "#fce4ec" } }}
-                component="a"
-                href="/music"
-              >
-                <ListItemIcon>
-                  <SportsEsportsIcon sx={{ color: "#e91e63" }} />
-                </ListItemIcon>
-                <ListItemText primary="Giải trí" />
-              </ListItemButton>
-            </ListItem>
-          </List>
-        </Paper>
-      </Stack>
+                {item.icon}
+              </Box>
+
+              <Typography fontSize={14} fontWeight={500}>
+                {item.label}
+              </Typography>
+            </ListItemButton>
+          ))}
+        </List>
+      </Box>
     </Box>
   );
 }

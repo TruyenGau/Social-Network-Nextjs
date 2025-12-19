@@ -8,13 +8,19 @@ const SponsoredAds = () => {
       elevation={1}
       sx={{
         p: 2,
-        borderRadius: 3,
+        borderRadius: 3, // ~12px
         backgroundColor: "#fff",
-        width: "100%",
+        boxShadow: "none",
+        border: "1px solid #e4e6eb",
       }}
     >
       {/* TITLE */}
-      <Typography fontSize={13} color="text.secondary" fontWeight={600} mb={1}>
+      <Typography
+        fontSize={13}
+        fontWeight={600}
+        color="#65676B"
+        sx={{ mb: 1 }} // 👈 thêm khoảng cách
+      >
         Quảng cáo được tài trợ
       </Typography>
 
@@ -25,10 +31,10 @@ const SponsoredAds = () => {
         alt="ads"
         sx={{
           width: "100%",
-          height: 250,
+          height: 180,
           objectFit: "cover",
           borderRadius: 2,
-          mb: 1,
+          mb: 1.2, // 👈 cách avatar giống FB
         }}
       />
 
@@ -52,15 +58,14 @@ const SponsoredAds = () => {
       {/* BUTTON */}
       <Button
         fullWidth
-        variant="contained"
         sx={{
           textTransform: "none",
+          fontSize: 13,
+          fontWeight: 600,
           bgcolor: "#e4e6eb",
-          color: "#000",
+          color: "#050505",
           boxShadow: "none",
-          "&:hover": {
-            bgcolor: "#d8dadd",
-          },
+          "&:hover": { bgcolor: "#d8dadd" },
         }}
       >
         Tìm hiểu thêm

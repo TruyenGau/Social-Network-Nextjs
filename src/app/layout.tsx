@@ -9,7 +9,7 @@ import { ToastProvider } from "@/utils/toast";
 import type { Metadata } from "next";
 import "antd/dist/reset.css";
 import StyledComponentsRegistry from "@/components/theme-registry/antd-registry";
-
+import "./globals.css";
 export const metadata: Metadata = {
   title: "tiêu đề cho cả website nè",
   description: "truyền đẹop trai",

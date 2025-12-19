@@ -1,0 +1,7 @@
+html,
+body {
+  font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px; /* 👈 Facebook ~15px */
+  line-height: 1.34;
+  background-color: #f0f2f5;
+}

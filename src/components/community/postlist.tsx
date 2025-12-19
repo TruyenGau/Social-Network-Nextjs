@@ -115,7 +115,7 @@ const PostList = () => {
 
   return (
     <>
-      <Box sx={{ fontSize: 20, fontWeight: 700, mt: 2, ml: "10%" }}>
+      <Box sx={{ fontSize: 20, fontWeight: 700, mt: 2, mb: 2 }}>
         Hoạt động mới đây
       </Box>
 
@@ -124,7 +124,7 @@ const PostList = () => {
           key={post._id}
           sx={{
             margin: "20px auto",
-            maxWidth: 600,
+            maxWidth: 650,
             borderRadius: 3,
             boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
           }}

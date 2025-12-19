@@ -10,22 +10,26 @@ export default function UserLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#F5F7FB" }}>
       <AppHeader />
-      <Stack
-        direction="row"
-        spacing={2}
-        justifyContent="space-between"
-        sx={{ px: 2, mt: "60px" }}
+
+      {/* LEFT SIDEBAR */}
+      <SideBarSever />
+
+      {/* CENTER FEED */}
+      <Box
+        sx={{
+          mt: "60px",
+          maxWidth: 760,
+          mx: "auto", // 👈 CHỈ FEED ĐƯỢC CENTER
+          px: 1,
+        }}
       >
-        <Box sx={{ flexBasis: "20%", flexShrink: 0 }}>
-          <SideBarSever />
-        </Box>
-        <Box sx={{ flexBasis: "50%" }}>{children}</Box>
-        <Box sx={{ flexBasis: "30%", flexShrink: 0 }}>
-          <RightBar />
-        </Box>
-      </Stack>
-    </>
+        {children}
+      </Box>
+
+      {/* RIGHT SIDEBAR */}
+      <RightBar />
+    </Box>
   );
 }

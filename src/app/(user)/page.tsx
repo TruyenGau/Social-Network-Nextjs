@@ -29,12 +29,22 @@ const HomePage = async ({
   });
 
   return (
-    <Box flex={4} p={6} sx={{ marginTop: "-30px", marginLeft: "20px" }}>
-      <Box sx={{ width: "100%", maxWidth: "590px", overflow: "hidden" }}>
+    <Box
+      sx={{
+        width: "100%",
+        p: 0, // ❌ bỏ p={6}
+        m: 0, // ❌ bỏ margin lệch
+      }}
+    >
+      {/* STORY */}
+      <Box sx={{ width: "100%", mb: 2 }}>
         <StoryList />
       </Box>
 
+      {/* POST FORM */}
       <PostForm data={data.data ?? null} />
+
+      {/* POST LIST */}
       <Post session={session} initPostId={searchParams.post ?? ""} />
     </Box>
   );

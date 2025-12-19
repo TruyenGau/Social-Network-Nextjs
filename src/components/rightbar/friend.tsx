@@ -56,14 +56,15 @@ const SuggestionsFriend = ({ suggesionFriend }: IProps) => {
       elevation={1}
       sx={{
         p: 2,
-        borderRadius: 3,
-        width: "100%",
+        borderRadius: 3, // ~12px
         backgroundColor: "#fff",
+        boxShadow: "none",
+        border: "1px solid #e4e6eb",
       }}
     >
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography fontWeight={600} fontSize={14} color="text.secondary">
+        <Typography fontWeight={600} fontSize={13} color="#65676B">
           Gợi ý kết bạn
         </Typography>
 
@@ -119,8 +120,8 @@ const SuggestionsFriend = ({ suggesionFriend }: IProps) => {
                 size="small"
                 onClick={() => handleRemove(user._id)} // REMOVE
                 sx={{
-                  color: "#999",
-                  "&:hover": { backgroundColor: "#f3f3f3" },
+                  bgcolor: "#e4e6eb",
+                  "&:hover": { bgcolor: "#d8dadd" },
                 }}
               >
                 <CancelIcon fontSize="small" />

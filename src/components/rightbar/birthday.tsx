@@ -47,11 +47,17 @@ const BirthdayUser = () => {
   return (
     <Paper
       elevation={1}
-      sx={{ p: 2, borderRadius: 3, backgroundColor: "#fff" }}
+      sx={{
+        p: 2,
+        borderRadius: 3, // ~12px
+        backgroundColor: "#fff",
+        boxShadow: "none",
+        border: "1px solid #e4e6eb",
+      }}
     >
       {/* TITLE */}
-      <Typography fontWeight={600} fontSize={15} mb={1}>
-        Sinh nhật hôm nay
+      <Typography fontWeight={600} fontSize={13} color="#65676B">
+        Sinh nhật
       </Typography>
 
       {/* TODAY'S BIRTHDAY */}
@@ -61,6 +67,11 @@ const BirthdayUser = () => {
             display="flex"
             alignItems="center"
             justifyContent="space-between"
+            sx={{
+              p: 1,
+              borderRadius: 2,
+              "&:hover": { bgcolor: "#f5f6f7" },
+            }}
           >
             {/* LEFT */}
             <Box display="flex" alignItems="center" gap={1.2}>
@@ -83,13 +94,12 @@ const BirthdayUser = () => {
               size="small"
               sx={{
                 textTransform: "none",
-                borderRadius: 2,
+                borderRadius: 999,
                 px: 2,
+                fontSize: 13,
+                fontWeight: 600,
                 bgcolor: "#1877F2",
-              }}
-              onClick={() => {
-                setTargetUser(birthdays[0]);
-                setOpenWish(true);
+                "&:hover": { bgcolor: "#166FE5" },
               }}
             >
               🎂 Chúc mừng
@@ -108,9 +118,6 @@ const BirthdayUser = () => {
             >
               <Typography fontWeight={600} fontSize={14}>
                 Sinh nhật sắp tới
-              </Typography>
-              <Typography fontSize={13} color="text.secondary">
-                Còn {birthdays.length - 1} người nữa sắp đến sinh nhật
               </Typography>
             </Box>
           )}

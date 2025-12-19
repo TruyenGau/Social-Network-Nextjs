@@ -246,11 +246,14 @@ export default function PostDetailModal({
           bgcolor: "white",
           borderRadius: 3,
           boxShadow: 24,
-          p: 2,
-          width: "85%",
-          maxWidth: 600,
-          maxHeight: "90vh",
+
+          width: "92%", // 👈 chiếm gần full
+          maxWidth: 760, // 👈 CHUẨN FB
+          height: "92vh", // 👈 cao hơn
+          maxHeight: "92vh",
+
           overflowY: "auto",
+          p: 2.5,
         }}
       >
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -283,6 +286,9 @@ export default function PostDetailModal({
         <Divider sx={{ my: 1 }} />
         {/* ===== HÌNH POST ===== */}
         {/* ⭐ HIỂN THỊ NHIỀU ẢNH THEO GRID GIỐNG FACEBOOK ⭐ */}
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          {post?.content}
+        </Typography>
         {post?.images && post.images.length > 0 && (
           <Box
             sx={{
@@ -358,10 +364,6 @@ export default function PostDetailModal({
             style={{ width: "100%", maxHeight: "600px", borderRadius: "8px" }}
           />
         )}
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          {post?.namePost}
-        </Typography>
-        <Typography>{post?.content}</Typography>
         <Divider sx={{ my: 2 }} />
         <Box sx={{ display: "flex", justifyContent: "space-around", mb: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>

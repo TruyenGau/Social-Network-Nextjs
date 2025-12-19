@@ -1,88 +1,39 @@
 "use client";
-import React from "react";
 import Link from "next/link";
-import {
-  Box,
-  Card,
-  CardContent,
-  CardMedia,
-  Typography,
-  Avatar,
-  Button,
-} from "@mui/material";
+import { Box, Avatar, Typography, ListItemButton } from "@mui/material";
 
 interface ProfileCardProps {
-  name: string;
-  followers: number;
-  avatarUrl: string;
-  coverUrl: string;
   id: string;
+  name: string;
+  avatarUrl: string;
 }
 
-const ProfileCard = ({
-  id,
-  name,
-  followers,
-  avatarUrl,
-  coverUrl,
-}: ProfileCardProps) => {
+const ProfileCard = ({ id, name, avatarUrl }: ProfileCardProps) => {
   return (
-    <Card
+    <ListItemButton
+      component={Link}
+      href={`/profile/${id}`}
       sx={{
-        width: "100%",
-        borderRadius: 3,
-        overflow: "hidden",
-        boxShadow: "0 0 0 rgba(0,0,0,0)",
-        textAlign: "center",
-        p: 1,
+        borderRadius: "8px",
+        py: 1,
+        px: 1,
+        mb: 0.5,
+        "&:hover": { bgcolor: "#f0f2f5" },
       }}
     >
-      <CardMedia
-        component="img"
-        height="80" //
-        image={`${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${coverUrl}`}
+      <Avatar
+        src={
+          avatarUrl
+            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${avatarUrl}`
+            : "/user/default-user.png"
+        }
+        sx={{ width: 36, height: 36, mr: 1.5 }}
       />
-
-      <Box sx={{ display: "flex", justifyContent: "center", mt: -3 }}>
-        <Avatar
-          src={
-            avatarUrl
-              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${avatarUrl}`
-              : "/user/default-user.png"
-          }
-          sx={{ width: 55, height: 55, border: "2px solid white" }}
-        />
-      </Box>
-
-      <CardContent sx={{ mt: 1, p: 1 }}>
-        <Typography variant="subtitle1" fontWeight="bold">
-          {name}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {followers} followers
-        </Typography>
-
-        <Link href={`/profile/${id}`} style={{ textDecoration: "none" }}>
-          <Button
-            variant="contained"
-            sx={{
-              mt: 1,
-              borderRadius: "16px",
-              textTransform: "none",
-              px: 2,
-              py: 0.5,
-              fontSize: "0.8rem", // chữ nhỏ hơn
-              backgroundColor: "#1877F2",
-              "&:hover": {
-                backgroundColor: "#1877F2 !important", // giữ nguyên 👈
-              },
-            }}
-          >
-            My Profile
-          </Button>
-        </Link>
-      </CardContent>
-    </Card>
+      <Typography fontSize={14} fontWeight={500}>
+        {name}
+      </Typography>
+    </ListItemButton>
   );
 };
+
 export default ProfileCard;

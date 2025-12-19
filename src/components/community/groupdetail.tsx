@@ -116,10 +116,9 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
     <Box
       sx={{
         width: "100%",
-        mt: "20px",
         display: "flex",
         justifyContent: "center",
-        ml: "3%",
+        mt: 3,
       }}
     >
       <Box
@@ -314,59 +313,6 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
             {activeTab === "saved" && (
               <SavedPostList adminId={group.admins[0]._id} />
             )}
-          </Box>
-
-          <Box sx={{ width: "330px", position: "sticky", top: 90 }}>
-            <Card sx={{ p: 2, mb: 3 }}>
-              <Typography variant="h6" fontWeight={700}>
-                Giới thiệu
-              </Typography>
-
-              {/* Mô tả nhóm */}
-              <Typography sx={{ mt: 1, fontSize: "14px", color: "#444" }}>
-                {group.description || "Ae vào nhóm vui vẻ hoà đồng!"}
-              </Typography>
-
-              <Divider sx={{ my: 2 }} />
-
-              {/* Thông tin cố định */}
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-                {/* Quyền riêng tư */}
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Typography fontSize="18px">🌐</Typography>
-                  <Box>
-                    <Typography fontSize="14px" fontWeight={600}>
-                      {group.visibility}
-                    </Typography>
-                    <Typography fontSize="13px" color="text.secondary">
-                      Bất kỳ ai cũng có thể nhìn thấy mọi người trong nhóm và
-                      những gì họ đăng.
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* Hiển thị */}
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Typography fontSize="18px">👁️</Typography>
-                  <Box>
-                    <Typography fontSize="14px" fontWeight={600}>
-                      Hiển thị
-                    </Typography>
-                    <Typography fontSize="13px" color="text.secondary">
-                      Ai cũng có thể tìm thấy nhóm này.
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* Vị trí */}
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Typography fontSize="18px">📍</Typography>
-                  <Typography fontSize="14px" fontWeight={600}>
-                    Việt Nam
-                  </Typography>
-                </Box>
-              </Box>
-            </Card>
           </Box>
         </Box>
       </Box>

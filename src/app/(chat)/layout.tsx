@@ -16,7 +16,7 @@ export default function ChatLayout({
         direction="row"
         spacing={2}
         justifyContent="space-between"
-        sx={{ mt: 4, px: 2 }}
+        sx={{ mt: 8, px: 2 }}
       >
         {/* LEFT: SIDEBAR 20% */}
         <Box sx={{ flexBasis: "20%", flexShrink: 0 }}>
