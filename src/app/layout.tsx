@@ -10,6 +10,7 @@ import type { Metadata } from "next";
 import "antd/dist/reset.css";
 import StyledComponentsRegistry from "@/components/theme-registry/antd-registry";
 import "./globals.css";
+import { ThemeModeProvider } from "@/lib/theme.mode.context";
 export const metadata: Metadata = {
   title: "tiêu đề cho cả website nè",
   description: "truyền đẹop trai",
@@ -23,15 +24,17 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <StyledComponentsRegistry>
-          <ThemeRegistry>
-            <NPprogressWrapper>
-              <NextAuthWrapper>
-                <ToastProvider>
-                  <UserContextProvider>{children}</UserContextProvider>
-                </ToastProvider>
-              </NextAuthWrapper>
-            </NPprogressWrapper>
-          </ThemeRegistry>
+          <ThemeModeProvider>
+            <ThemeRegistry>
+              <NPprogressWrapper>
+                <NextAuthWrapper>
+                  <ToastProvider>
+                    <UserContextProvider>{children}</UserContextProvider>
+                  </ToastProvider>
+                </NextAuthWrapper>
+              </NPprogressWrapper>
+            </ThemeRegistry>
+          </ThemeModeProvider>
         </StyledComponentsRegistry>
       </body>
     </html>

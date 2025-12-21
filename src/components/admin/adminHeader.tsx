@@ -38,7 +38,7 @@ export default function AdminHeader() {
         borderBottom: "1px solid #eee",
       }}
     >
-      <span style={{ marginRight: 10 }}>Welcome Im admin</span>
+      <span style={{ marginRight: 10 }}>Xin Chào Admin</span>
 
       {/* DROPDOWN */}
       <Dropdown menu={{ items }} placement="bottomRight" trigger={["click"]}>

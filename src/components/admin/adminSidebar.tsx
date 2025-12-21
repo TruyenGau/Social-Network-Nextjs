@@ -10,20 +10,24 @@ import {
   SafetyOutlined,
   SolutionOutlined,
   GroupOutlined,
+  StopOutlined,
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
+import { ReportOffOutlined } from "@mui/icons-material";
 
 export default function AdminSidebar() {
   const router = useRouter();
   const path = usePathname();
 
   const menuItems = [
-    { key: "/admin", label: "Dashboard", icon: <DashboardOutlined /> },
-    { key: "/admin/user", label: "User", icon: <UserOutlined /> },
+    { key: "/admin", label: "Trang Chủ", icon: <DashboardOutlined /> },
+    { key: "/admin/user", label: "Người Dùng", icon: <UserOutlined /> },
     { key: "/admin/post", label: "Post", icon: <SolutionOutlined /> },
-    { key: "/admin/community", label: "Community", icon: <GroupOutlined /> },
+    { key: "/admin/community", label: "Nhóm", icon: <GroupOutlined /> },
     { key: "/admin/permission", label: "Permission", icon: <SafetyOutlined /> },
     { key: "/admin/role", label: "Role", icon: <TeamOutlined /> },
+    { key: "/admin/report", label: "Report", icon: <ReportOffOutlined /> },
+    { key: "/admin/spam", label: "Spam", icon: <StopOutlined /> },
   ];
 
   return (

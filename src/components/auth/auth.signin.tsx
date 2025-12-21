@@ -22,7 +22,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { signIn } from "next-auth/react";
+import { getSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -78,6 +78,19 @@ export const AuthSignIn = () => {
       password,
       redirect: false,
     });
+
+    // ✅ LẤY SESSION SAU KHI LOGIN
+    const session = await getSession();
+
+    // 🚫 TÀI KHOẢN BỊ BLOCK
+    if (session?.user?.block) {
+      setOpenMessage(true);
+      setResMessage("Tài khoản của bạn đã bị chặn");
+
+      // 👉 đăng xuất lại ngay
+      await signOut({ redirect: false });
+      return;
+    }
     if (!res?.error) {
       //redirect to home
       route.refresh();

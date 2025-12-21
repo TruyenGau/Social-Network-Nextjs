@@ -28,6 +28,7 @@ interface IUser {
   followingCount: number;
   followersCount: number;
   birthday: string | null;
+  block: boolean;
 }
 
 declare module "next-auth/jwt" {

@@ -287,7 +287,11 @@ export default function AppHeader() {
             </IconButton>
 
             <Avatar
-              src={fetchDefaultImages(session.user?.type)}
+              src={
+                session?.user?.avatar
+                  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${session?.user?.avatar}`
+                  : "/user/default-user.png"
+              }
               sx={{ cursor: "pointer" }}
               onClick={(e) => setAnchorEl(e.currentTarget)}
             />
@@ -365,7 +369,7 @@ export default function AppHeader() {
         onClose={() => setAnchorEl(null)}
       >
         <MenuItem onClick={() => router.push(`/profile/${session?.user?._id}`)}>
-          Profile
+          Thông Tin Cá Nhân
         </MenuItem>
         {session?.user.role.name === "SUPER_ADMIN" && (
           <MenuItem>
@@ -383,7 +387,7 @@ export default function AppHeader() {
             redirect("/auth/signin");
           }}
         >
-          Logout
+          Đăng Xuất
         </MenuItem>
       </Menu>
     </AppBar>

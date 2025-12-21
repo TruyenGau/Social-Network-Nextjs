@@ -135,7 +135,7 @@ export default function StoryList() {
               width: 65,
               height: 65,
               cursor: "pointer",
-              bgcolor: "#f0f0f0",
+              bgcolor: "#d6d2d2ff",
               fontSize: 36,
             }}
           >
