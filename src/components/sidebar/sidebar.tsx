@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Avatar,
   Box,
@@ -7,34 +8,41 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Stack,
   Typography,
 } from "@mui/material";
+
 import HomeIcon from "@mui/icons-material/Home";
 import ArticleIcon from "@mui/icons-material/Article";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PeopleIcon from "@mui/icons-material/People";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
-import ProfileCard from "../profile/profile.card";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import ErrorIcon from "@mui/icons-material/Error";
 import { IUser } from "@/types/next-auth";
+import { useThemeMode } from "@/lib/theme.mode.context";
 
 interface IProps {
   data: IUser | null;
 }
 
+/* ================= STYLE ================= */
+
 const menuStyle = {
   borderRadius: "8px",
-  py: 1.25, // 👈 tăng chiều cao dòng
+  py: 1.25,
   minHeight: 44,
-  px: 1, // 👈 ép padding đồng bộ
+  px: 1,
   "&:hover": {
-    bgcolor: "#f0f2f5",
+    bgcolor: "action.hover",
   },
 };
 
 export default function Sidebar({ data }: IProps) {
   if (!data) return null;
+
+  const { mode, toggleMode } = useThemeMode();
 
   return (
     <Box
@@ -50,16 +58,12 @@ export default function Sidebar({ data }: IProps) {
         display: { xs: "none", md: "block" },
       }}
     >
-      {/* PROFILE + MENU */}
       <List>
-        {/* PROFILE */}
+        {/* ================= PROFILE ================= */}
         <ListItem disablePadding>
           <ListItemButton
             href={`/profile/${data._id}`}
-            sx={{
-              ...menuStyle,
-              mb: 0.5,
-            }}
+            sx={{ ...menuStyle, mb: 0.5 }}
           >
             <Avatar
               src={
@@ -71,23 +75,21 @@ export default function Sidebar({ data }: IProps) {
             />
             <ListItemText
               primary={data.name}
-              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+              primaryTypographyProps={{
+                fontSize: 14,
+                fontWeight: 500,
+              }}
             />
           </ListItemButton>
         </ListItem>
 
-        {/* MENU ITEM */}
+        {/* ================= MENU ================= */}
         <ListItem disablePadding>
           <ListItemButton href="/" sx={menuStyle}>
             <ListItemIcon sx={{ minWidth: 28 }}>
-              {" "}
-              {/* 👈 MẤU CHỐT */}
               <HomeIcon sx={{ color: "#1877F2", fontSize: 22 }} />
             </ListItemIcon>
-            <ListItemText
-              primary="Trang Chủ"
-              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
-            />
+            <ListItemText primary="Trang Chủ" />
           </ListItemButton>
         </ListItem>
 
@@ -96,10 +98,7 @@ export default function Sidebar({ data }: IProps) {
             <ListItemIcon sx={{ minWidth: 28 }}>
               <ArticleIcon sx={{ color: "#f02849", fontSize: 22 }} />
             </ListItemIcon>
-            <ListItemText
-              primary="Bài Viết"
-              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
-            />
+            <ListItemText primary="Bài Viết" />
           </ListItemButton>
         </ListItem>
 
@@ -108,10 +107,7 @@ export default function Sidebar({ data }: IProps) {
             <ListItemIcon sx={{ minWidth: 28 }}>
               <GroupsIcon sx={{ color: "#42b72a", fontSize: 22 }} />
             </ListItemIcon>
-            <ListItemText
-              primary="Nhóm"
-              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
-            />
+            <ListItemText primary="Nhóm" />
           </ListItemButton>
         </ListItem>
 
@@ -120,10 +116,7 @@ export default function Sidebar({ data }: IProps) {
             <ListItemIcon sx={{ minWidth: 28 }}>
               <PeopleIcon sx={{ color: "#1877F2", fontSize: 22 }} />
             </ListItemIcon>
-            <ListItemText
-              primary="Bạn Bè"
-              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
-            />
+            <ListItemText primary="Bạn Bè" />
           </ListItemButton>
         </ListItem>
 
@@ -132,10 +125,7 @@ export default function Sidebar({ data }: IProps) {
             <ListItemIcon sx={{ minWidth: 28 }}>
               <GroupAddIcon sx={{ color: "#8b6be8", fontSize: 22 }} />
             </ListItemIcon>
-            <ListItemText
-              primary="Lời Mời Vào Nhóm"
-              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
-            />
+            <ListItemText primary="Lời Mời Vào Nhóm" />
           </ListItemButton>
         </ListItem>
 
@@ -144,18 +134,26 @@ export default function Sidebar({ data }: IProps) {
             <ListItemIcon sx={{ minWidth: 28 }}>
               <OndemandVideoIcon sx={{ color: "#f5533d", fontSize: 22 }} />
             </ListItemIcon>
-            <ListItemText
-              primary="Giải trí"
-              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
-            />
+            <ListItemText primary="Giải Trí" />
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton href="/spam" sx={menuStyle}>
+            <ListItemIcon sx={{ minWidth: 28 }}>
+              <ErrorIcon sx={{ color: "#f5533d", fontSize: 22 }} />
+            </ListItemIcon>
+            <ListItemText primary="Cảnh Báo" />
           </ListItemButton>
         </ListItem>
       </List>
+
+      {/* ================= SHORTCUT ================= */}
       <Box mt={2}>
         <Typography
           fontSize={15}
           fontWeight={600}
-          color="#65676B"
+          color="text.secondary"
           sx={{ px: 1, mb: 1 }}
         >
           Lối tắt
@@ -171,14 +169,14 @@ export default function Sidebar({ data }: IProps) {
               key={item.label}
               sx={{
                 borderRadius: "8px",
-                minHeight: 44, // 👈 QUAN TRỌNG
+                minHeight: 44,
                 px: 1,
-                "&:hover": { bgcolor: "#f0f2f5" },
+                "&:hover": { bgcolor: "action.hover" },
               }}
             >
               <Box
                 sx={{
-                  minWidth: 28, // 👈 GIỐNG ListItemIcon
+                  minWidth: 28,
                   display: "flex",
                   justifyContent: "center",
                   mr: 1,
@@ -187,7 +185,6 @@ export default function Sidebar({ data }: IProps) {
               >
                 {item.icon}
               </Box>
-
               <Typography fontSize={14} fontWeight={500}>
                 {item.label}
               </Typography>
@@ -195,6 +192,28 @@ export default function Sidebar({ data }: IProps) {
           ))}
         </List>
       </Box>
+
+      {/* ================= THEME TOGGLE ================= */}
+      {/* <Box mt={3} px={1}>
+        <ListItemButton
+          onClick={toggleMode}
+          sx={{
+            borderRadius: "8px",
+            minHeight: 44,
+            px: 1,
+            bgcolor: "background.paper",
+            "&:hover": { bgcolor: "action.hover" },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 28 }}>
+            {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
+          </ListItemIcon>
+          <ListItemText
+            primary={mode === "light" ? "Chế độ tối" : "Chế độ sáng"}
+            primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+          />
+        </ListItemButton>
+      </Box> */}
     </Box>
   );
 }

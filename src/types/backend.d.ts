@@ -187,4 +187,6 @@ declare global {
     avatar?: string;
     membersCount: number;
   }
+
+  // ===== TARGET =====
 }

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { sendRequest } from "@/utils/api";
 import { useSession } from "next-auth/react";
+import DashboardBarChart from "./dasboard.chart";
 // import DashboardChart from "./dasboard.chart";
 
 export default function Dashboard() {
@@ -50,12 +51,12 @@ export default function Dashboard() {
       </Row>
 
       {/* BIỂU ĐỒ */}
-      {/* <div className="mt-6">
-        <DashboardChart
+      <div className="mt-6">
+        <DashboardBarChart
           usersByMonth={summary.usersByMonth}
           postsByMonth={summary.postsByMonth}
         />
-      </div> */}
+      </div>
     </div>
   );
 }

@@ -35,6 +35,7 @@ import { useToast } from "@/utils/toast";
 import UpdatePostModal from "./post.update";
 import SharePostModal from "./post.share";
 import SharedPostCard from "./post.shared";
+import ReportPostModal from "../report/report.post.modal";
 
 interface IProps {
   session: any;
@@ -60,6 +61,7 @@ const PostList = ({ session, initPostId }: IProps) => {
   const [editPostId, setEditPostId] = useState<string | null>(null);
   const [sharePostId, setSharePostId] = useState<string | null>(null);
   const [shareContent, setShareContent] = useState("");
+  const [reportPostId, setReportPostId] = useState<string | null>(null);
 
   useEffect(() => {
     if (initPostId) {
@@ -147,16 +149,8 @@ const PostList = ({ session, initPostId }: IProps) => {
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "right",
-      }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
       open={isMenuOpen}
       onClose={handleMenuClose}
       PaperProps={{
@@ -167,30 +161,53 @@ const PostList = ({ session, initPostId }: IProps) => {
         },
       }}
     >
-      <MenuItem
-        onClick={() => {
-          setEditPostId(selectedPostIdForMenu!);
-          handleMenuClose();
-        }}
-      >
-        <IconButton size="small">
-          <Edit />
-        </IconButton>
-        Chỉnh sửa bài viết
-      </MenuItem>
+      {/* ===== CHỦ BÀI VIẾT ===== */}
+      {selectedPostIdForMenu &&
+        posts.find((p) => p._id === selectedPostIdForMenu)?.userId._id ===
+          session.user._id && (
+          <>
+            <MenuItem
+              onClick={() => {
+                setEditPostId(selectedPostIdForMenu);
+                handleMenuClose();
+              }}
+            >
+              <IconButton size="small">
+                <Edit />
+              </IconButton>
+              Chỉnh sửa bài viết
+            </MenuItem>
 
-      <MenuItem
-        onClick={() => {
-          handleDeletePost(selectedPostIdForMenu!);
-        }}
-      >
-        <IconButton size="small">
-          <Delete />
-        </IconButton>
-        Xóa Bài Viết
-      </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleDeletePost(selectedPostIdForMenu);
+              }}
+            >
+              <IconButton size="small">
+                <Delete />
+              </IconButton>
+              Xóa bài viết
+            </MenuItem>
+          </>
+        )}
+
+      {/* ===== KHÔNG PHẢI CHỦ BÀI VIẾT ===== */}
+      {selectedPostIdForMenu &&
+        posts.find((p) => p._id === selectedPostIdForMenu)?.userId._id !==
+          session.user._id && (
+          <MenuItem
+            onClick={() => {
+              setReportPostId(selectedPostIdForMenu);
+              handleMenuClose();
+            }}
+          >
+            <IconButton size="small">🚩</IconButton>
+            Báo cáo bài viết
+          </MenuItem>
+        )}
     </Menu>
   );
+
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -225,7 +242,7 @@ const PostList = ({ session, initPostId }: IProps) => {
               </Link>
             }
             action={
-              session.user._id === post.userId._id && (
+              session && (
                 <IconButton
                   onClick={(e) => {
                     handleProfileMenuOpen(e);
@@ -536,6 +553,14 @@ const PostList = ({ session, initPostId }: IProps) => {
             setSharePostId(null);
             route.refresh();
           }}
+        />
+      )}
+      {reportPostId && (
+        <ReportPostModal
+          postId={reportPostId}
+          open={!!reportPostId}
+          onClose={() => setReportPostId(null)}
+          session={session}
         />
       )}
     </>

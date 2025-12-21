@@ -16,6 +16,7 @@ import { UserContext } from "@/lib/track.wrapper";
 import { IUser } from "@/types/next-auth";
 import ProfileUpdateModal from "./profile.update.modal";
 import { useRouter } from "next/navigation";
+import ReportUserModal from "../report/report.user.modal";
 
 /* ================= INFO ROW ================= */
 const InfoRow = ({
@@ -44,6 +45,7 @@ const ProfileInfomation = () => {
   const { data: session } = useSession();
   const [openModal, setOpenModal] = useState(false);
   const router = useRouter();
+  const [openReport, setOpenReport] = useState(false);
 
   /* FETCH USER */
   useEffect(() => {
@@ -244,8 +246,9 @@ const ProfileInfomation = () => {
             color="#e41e3f"
             textAlign="right"
             sx={{ mt: 1, cursor: "pointer" }}
+            onClick={() => setOpenReport(true)}
           >
-            Chặn người dùng
+            Báo cáo người dùng
           </Typography>
         </>
       )}
@@ -257,6 +260,14 @@ const ProfileInfomation = () => {
           user={user}
           token={session?.access_token!}
           route={router}
+        />
+      )}
+
+      {openReport && (
+        <ReportUserModal
+          open={openReport}
+          onClose={() => setOpenReport(false)}
+          userId={userInfoId + ""}
         />
       )}
     </Box>
