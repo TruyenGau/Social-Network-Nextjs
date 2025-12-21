@@ -259,10 +259,11 @@ const PostListMock = ({
           <Card
             key={post._id}
             sx={{
-              margin: "24px auto",
-              maxWidth: 600,
+              margin: "28px auto",
+              maxWidth: 720, // ⬅️ TO HƠN (Facebook ~680–720)
+              width: "100%", // ⬅️ đảm bảo full trong container
               borderRadius: 3,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
+              boxShadow: "0 6px 18px rgba(0,0,0,0.14)",
             }}
           >
             {/* HEADER */}

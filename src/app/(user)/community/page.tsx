@@ -5,6 +5,7 @@ import { sendRequest } from "@/utils/api";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
+
 const Community = async () => {
   const session = await getServerSession(authOptions);
   const groups = await sendRequest<IBackendRes<IModelPaginate<IGroups>>>({
@@ -17,45 +18,39 @@ const Community = async () => {
   });
   return (
     <Box
-      flex={4}
-      p={3}
       sx={{
-        // marginTop: "10px",
         width: "100%",
         display: "flex",
         justifyContent: "center",
+        px: 3,
       }}
     >
-      {/* WRAPPER CHÍNH — GIỐNG FB */}
+      {/* KHUNG TỔNG */}
       <Box
         sx={{
           width: "100%",
-          maxWidth: "1500px", // MỞ RỘNG KHUNG TỔNG → ĐẸP VÀ CÂN
+          maxWidth: "1500px",
           display: "flex",
-          gap: 4,
           justifyContent: "center",
-          paddingRight: 2,
+          position: "relative",
         }}
       >
-        {/* POST FEED ở giữa */}
+        {/* FEED - CHÍNH GIỮA */}
         <Box
           sx={{
-            flexShrink: 0,
-            width: "750px", // CHUẨN FACEBOOK FEED
-            margin: "0 auto",
+            width: 650, // chuẩn FB feed
           }}
         >
           <PostList />
         </Box>
 
-        {/* GROUP LIST SÁT MÉP PHẢI */}
+        {/* GROUP LIST - MÉP PHẢI */}
         <Box
           sx={{
-            flexShrink: 0,
-            width: "330px",
-            position: "sticky",
+            width: 330,
+            position: "fixed", // 👈 MẤU CHỐT
+            right: 24,
             top: 90,
-            marginLeft: "auto",
           }}
         >
           <GroupList groups={groups.data?.result ?? null} />

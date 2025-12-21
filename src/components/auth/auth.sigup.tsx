@@ -207,7 +207,7 @@ export const AuthSignUp = () => {
         sx={{
           minHeight: "100vh",
           backgroundImage: `url("/auth/signin-bg.jpg")`,
-          backgroundSize: { xs: "cover", md: "90%" },
+          backgroundSize: { xs: "cover", md: "100%" },
           backgroundPosition: { xs: "center", md: "left center" },
           backgroundRepeat: "no-repeat",
           position: "relative",
@@ -215,7 +215,7 @@ export const AuthSignUp = () => {
           alignItems: "center",
           justifyContent: { xs: "center", md: "flex-end" },
           px: { xs: 2, md: 8 },
-          pr: { xs: 2, md: 16 }, // ✅ vào trong giống signin
+          // ✅ vào trong giống signin
           py: { xs: 2, md: 0 },
         }}
       >

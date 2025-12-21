@@ -1,11 +1,14 @@
 "use client";
+
 import { Box } from "@mui/material";
-import React from "react";
 import { usePathname } from "next/navigation";
 import ProfileInfomation from "../../components/profile/profile.info";
 import SuggestionsFriend from "./friend";
 import BirthdayUser from "./birthday";
 import SponsoredAds from "./advertisement";
+import JoinedGroupsMock from "../profile/profile.joinedgroupsmock";
+import GroupInfoPanel from "@/components/community/group.info.panel";
+import GroupRightPanelMock from "../community/group.rightpanelmock";
 
 interface IProps {
   suggesionFriend: IFriend[] | null;
@@ -13,12 +16,9 @@ interface IProps {
 
 const Rightbar = ({ suggesionFriend }: IProps) => {
   const pathname = usePathname();
+
   const isProfilePage = pathname.startsWith("/profile");
   const isCommunityPage = pathname.startsWith("/community");
-  const isMusicPage = pathname.startsWith("/music");
-
-  if (isCommunityPage) return <></>;
-
   const isChatPage = pathname.startsWith("/chat");
 
   if (isChatPage) return null;
@@ -27,25 +27,23 @@ const Rightbar = ({ suggesionFriend }: IProps) => {
     <Box
       flex={2}
       sx={{
-        display: { xs: "none", sm: "block" },
+        display: { xs: "none", md: "block" },
         pl: 2,
       }}
     >
-      {/* FIXED SIDEBAR */}
+      {/* FIXED RIGHT SIDEBAR */}
       <Box
         sx={{
           position: "fixed",
-          right: 20,
-          top: 80,
-          width: "28%",
-          height: "calc(100vh - 100px)",
+          top: 75,
+          right: 0,
+          width: 320,
+          height: "calc(100vh - 75px)",
+          pr: 2,
+          pl: 1,
           overflowY: "auto",
-          pb: 5,
 
-          /* CUSTOM SCROLLBAR */
-          "&::-webkit-scrollbar": {
-            width: "6px",
-          },
+          "&::-webkit-scrollbar": { width: "6px" },
           "&::-webkit-scrollbar-track": {
             background: "#f1f1f1",
             borderRadius: "10px",
@@ -59,18 +57,30 @@ const Rightbar = ({ suggesionFriend }: IProps) => {
           },
         }}
       >
-        {isProfilePage ? (
-          <ProfileInfomation />
-        ) : (
+        {/* 👉 COMMUNITY PAGE */}
+        {isCommunityPage && (
+          <>
+            <GroupInfoPanel />
+          </>
+        )}
+
+        {/* 👉 PROFILE PAGE */}
+        {isProfilePage && (
+          <>
+            <ProfileInfomation />
+            <JoinedGroupsMock />
+          </>
+        )}
+
+        {/* 👉 NORMAL FEED */}
+        {!isCommunityPage && !isProfilePage && (
           <>
             <Box mb={3}>
               <SuggestionsFriend suggesionFriend={suggesionFriend} />
             </Box>
-
             <Box mb={3}>
               <BirthdayUser />
             </Box>
-
             <Box mb={3}>
               <SponsoredAds />
             </Box>

@@ -772,24 +772,34 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
 
   return (
     <>
-      <Box sx={{ p: 2, display: "flex", mt: "40px", height: "80vh", gap: 8 }}>
+      <Box
+        sx={{
+          display: "flex",
+          height: "calc(100vh - 60px)", // trừ AppHeader
+          px: 2,
+          py: 1.5,
+          gap: 2,
+          bgcolor: "#f0f2f5",
+        }}
+      >
         {/* CỘT GIỮA: KHUNG CHAT */}
         <Box
           sx={{
-            flex: 0.9,
-            borderRadius: 2,
-            border: "1px solid #eee",
+            flex: 1,
+            borderRadius: 3,
             display: "flex",
             flexDirection: "column",
-            bgcolor: "#fafafa", // nền xám nhạt
-            boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+            bgcolor: "#ffffff",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+            overflow: "hidden",
           }}
         >
           <Box
             sx={{
-              p: 2,
-              borderBottom: "1px solid #eee",
-              bgcolor: "#fff",
+              px: 2,
+              py: 1.5,
+              borderBottom: "1px solid #e4e6eb",
+              bgcolor: "#ffffff",
               display: "flex",
               alignItems: "center",
               gap: 1.5,
@@ -875,10 +885,110 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
                 <CircularProgress size={24} />
               </Box>
             ) : !currentRoom ? (
-              <Typography fontSize={14} color="text.secondary">
-                Hãy chọn một người bạn hoặc nhóm ở bên trái để bắt đầu cuộc trò
-                chuyện.
-              </Typography>
+              <Box
+                sx={{
+                  flex: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bgcolor: "#f7f8fa",
+                }}
+              >
+                {/* CARD TRUNG TÂM */}
+                <Box
+                  sx={{
+                    width: "100%",
+                    maxWidth: 420,
+                    px: 4,
+                    py: 5,
+                    borderRadius: 4,
+                    bgcolor: "#ffffff",
+                    boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    gap: 2,
+                  }}
+                >
+                  {/* ICON */}
+                  <Box
+                    sx={{
+                      width: 88,
+                      height: 88,
+                      borderRadius: "50%",
+                      background:
+                        "linear-gradient(135deg, #42a5f5, #478ed1, #1976d2)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 40,
+                      color: "#fff",
+                      boxShadow: "0 10px 20px rgba(25,118,210,0.35)",
+                    }}
+                  >
+                    💬
+                  </Box>
+
+                  {/* TITLE */}
+                  <Typography fontSize={20} fontWeight={700}>
+                    Chưa có cuộc trò chuyện
+                  </Typography>
+
+                  {/* SUBTITLE */}
+                  <Typography fontSize={14} color="text.secondary">
+                    Bắt đầu kết nối với bạn bè hoặc tham gia nhóm chat để trò
+                    chuyện theo thời gian thực.
+                  </Typography>
+
+                  {/* HƯỚNG DẪN */}
+                  <Box
+                    sx={{
+                      mt: 1,
+                      width: "100%",
+                      textAlign: "left",
+                      fontSize: 14,
+                      color: "#65676b",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 1,
+                    }}
+                  >
+                    <Box display="flex" gap={1}>
+                      <span>👉</span>
+                      <span>
+                        Chọn <b>Bạn bè</b> để nhắn tin riêng
+                      </span>
+                    </Box>
+                    <Box display="flex" gap={1}>
+                      <span>👉</span>
+                      <span>
+                        Chọn <b>Nhóm chat</b> để trò chuyện nhiều người
+                      </span>
+                    </Box>
+                    <Box display="flex" gap={1}>
+                      <span>👉</span>
+                      <span>Tạo nhóm mới nếu bạn chưa có nhóm nào</span>
+                    </Box>
+                  </Box>
+
+                  {/* CTA NHẸ */}
+                  <Box
+                    sx={{
+                      mt: 2,
+                      px: 3,
+                      py: 1,
+                      borderRadius: 999,
+                      bgcolor: "#e7f3ff",
+                      color: "#1877f2",
+                      fontWeight: 600,
+                      fontSize: 14,
+                    }}
+                  >
+                    👈 Chọn một cuộc trò chuyện để bắt đầu
+                  </Box>
+                </Box>
+              </Box>
             ) : messages.length === 0 ? (
               <Typography fontSize={14} color="text.secondary">
                 Chưa có tin nhắn nào.
@@ -972,11 +1082,13 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
           {/* Ô NHẬP TIN NHẮN */}
           <Box
             sx={{
-              borderTop: "1px solid #eee",
-              p: 1,
+              px: 1.5,
+              py: 1,
+              borderTop: "1px solid #e4e6eb",
               display: "flex",
               alignItems: "center",
               gap: 1,
+              bgcolor: "#fff",
             }}
           >
             <input
@@ -1038,6 +1150,12 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
               value={input}
               disabled={!currentRoom}
               onChange={(e) => setInput(e.target.value)}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 999,
+                  bgcolor: "#f0f2f5",
+                },
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -1055,7 +1173,7 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
         {/* CỘT PHẢI: trên = Bạn bè/Nhóm, dưới = Tin nhắn chờ */}
         <Box
           sx={{
-            width: 460,
+            width: 360,
             display: "flex",
             flexDirection: "column",
             gap: 2,

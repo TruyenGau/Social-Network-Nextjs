@@ -77,6 +77,15 @@ export default function CreatePostGroup({
           }
         );
 
+        const uploadData = uploadRes.data?.data;
+
+        // ❌ MEDIA BỊ CHẶN
+        if (uploadData?.success === false) {
+          toast.error(uploadData.message || "Ảnh/video không hợp lệ");
+          setIsLoading(false);
+          return;
+        }
+
         uploadedImages = uploadRes.data?.data?.images || [];
         uploadedVideos = uploadRes.data?.data?.videos || [];
       }

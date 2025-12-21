@@ -1,12 +1,10 @@
 "use client";
 
-import { FC, useContext, useEffect, useState } from "react";
-import { Avatar, Box, Typography, Divider, Grid, Paper } from "@mui/material";
+import { useContext, useEffect } from "react";
+import { Avatar, Box, Typography, Divider, Paper, Stack } from "@mui/material";
 import { IUser } from "@/types/next-auth";
-import { useSession } from "next-auth/react";
-import { sendRequest } from "@/utils/api";
 import { UserContext } from "@/lib/track.wrapper";
-import { useRouter } from "next/navigation";
+import PostCard from "./profile.post";
 
 interface IProps {
   userId: string;
@@ -14,30 +12,44 @@ interface IProps {
   posts: IPost[] | null;
 }
 
-const ProfileDetail = (props: IProps) => {
-  const { data: session } = useSession();
-  const userId = props.userId;
-  const route = useRouter();
-  const { userInfoId, setUserInfoId } = useContext(UserContext) as IContext;
+const StatItem = ({ label, value }: { label: string; value: number }) => (
+  <Box textAlign="center">
+    <Typography fontWeight={700} fontSize={16}>
+      {value}
+    </Typography>
+    <Typography fontSize={13} color="text.secondary">
+      {label}
+    </Typography>
+  </Box>
+);
+
+const ProfileDetail = ({ userId, users, posts }: IProps) => {
+  const { setUserInfoId } = useContext(UserContext) as IContext;
 
   useEffect(() => {
     setUserInfoId(userId);
   }, [userId]);
 
-  const user = props.users;
-  const posts = props.posts;
+  if (!users) return null;
 
-  if (!user) return <p>Loading...</p>;
+  const user = users;
 
   return (
-    <Box sx={{ maxWidth: 600, mx: "auto", mt: 4, px: 2 }}>
-      {/* COVER */}
+    <Box
+      sx={{
+        maxWidth: 1000,
+        mx: "auto",
+        px: 2,
+        pb: 6,
+      }}
+    >
+      {/* ================= COVER ================= */}
       <Box
         sx={{
-          height: 220,
-          width: "100%",
+          height: 320,
           borderRadius: 2,
-          position: "relative", // bỏ overflow: hidden
+          position: "relative",
+          backgroundColor: "#e4e6eb",
         }}
       >
         <img
@@ -46,116 +58,82 @@ const ProfileDetail = (props: IProps) => {
               ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${user.coverPhoto}`
               : "/default-cover.jpg"
           }
-          alt="Cover"
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          alt="cover"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
         />
 
         {/* AVATAR */}
         <Avatar
           src={
-            user?.avatar
+            user.avatar
               ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${user.avatar}`
               : "/user/default-user.png"
           }
           sx={{
-            width: 128,
-            height: 128,
-            border: "4px solid white",
+            width: 180, // 👈 TO HƠN
+            height: 180, // 👈 TO HƠN
+            borderRadius: "50%", // 👈 TRÒN TUYỆT ĐỐI
+            border: "6px solid white", // 👈 viền trắng dày như FB
             position: "absolute",
-            bottom: -64,
+            bottom: -90, // 👈 đẩy xuống cho cân
             left: "50%",
             transform: "translateX(-50%)",
+            backgroundColor: "#fff",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.25)", // 👈 nổi khối
             zIndex: 10,
           }}
         />
       </Box>
 
-      {/* NAME & STATS */}
-      <Box sx={{ mt: 8, textAlign: "center" }}>
-        <Typography variant="h5" fontWeight="bold">
+      <Box
+        sx={{
+          mt: 11,
+          textAlign: "center",
+        }}
+      >
+        {/* NAME */}
+        <Typography fontSize={28} fontWeight={700} lineHeight={1.2}>
           {user.name}
         </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            gap: 6,
-            mt: 2,
-          }}
-        >
-          <Box sx={{ textAlign: "center" }}>
-            <Typography fontWeight="bold">{posts?.length}</Typography>
-            <Typography variant="body2" color="text.secondary">
-              Posts
-            </Typography>
-          </Box>
-          <Box sx={{ textAlign: "center" }}>
-            <Typography fontWeight="bold">{user.followersCount}</Typography>
-            <Typography variant="body2" color="text.secondary">
-              Followers
-            </Typography>
-          </Box>
-          <Box sx={{ textAlign: "center" }}>
-            <Typography fontWeight="bold">{user.followingCount}</Typography>
-            <Typography variant="body2" color="text.secondary">
-              Following
-            </Typography>
-          </Box>
-        </Box>
+
+        {/* USERNAME */}
+        <Typography fontSize={14} color="text.secondary" sx={{ mt: 0.5 }}>
+          @{user.email.split("@")[0]}
+        </Typography>
+
+        {/* STATS */}
+        <Stack direction="row" justifyContent="center" spacing={6} mt={3}>
+          <StatItem label="Bài viết" value={posts?.length || 0} />
+          <StatItem label="Người theo dõi" value={user.followersCount || 0} />
+          <StatItem label="Đang theo dõi" value={user.followingCount || 0} />
+        </Stack>
       </Box>
 
       <Divider sx={{ my: 4 }} />
 
-      {/* POSTS */}
-      <Box sx={{ mt: 2 }}>
-        <Typography variant="h6" fontWeight="bold" mb={2}>
-          Bài viết của bạn ({posts?.length})
+      {/* ================= POSTS FEED ================= */}
+      <Box sx={{ maxWidth: 600, mx: "auto" }}>
+        <Typography fontSize={18} fontWeight={700} mb={2}>
+          Bài viết
         </Typography>
-        <Grid container spacing={2}>
-          {posts?.length ? (
-            posts.map((post) => (
-              <Grid item xs={12} key={post._id}>
-                <Paper sx={{ p: 2, borderRadius: 2 }}>
-                  <Typography mt={0.5}>{post.content}</Typography>
-                  {post.images && post.images.length > 0 && (
-                    <Box mt={1}>
-                      {post.images.map((img, idx) => (
-                        <img
-                          key={idx}
-                          src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
-                          alt={`Post image ${idx}`}
-                          style={{
-                            maxWidth: "100%",
-                            borderRadius: 8,
-                            marginTop: 4,
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  )}
-                  {post.videos && post.videos.length > 0 && (
-                    <Box mt={1}>
-                      {post.videos.map((video, idx) => (
-                        <video
-                          key={idx}
-                          src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/videos/${video}`}
-                          controls
-                          style={{
-                            maxWidth: "100%",
-                            borderRadius: 8,
-                            marginTop: 4,
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  )}
-                </Paper>
-              </Grid>
-            ))
-          ) : (
-            <Typography ml={1}>Bạn chưa có bài viết nào.</Typography>
-          )}
-        </Grid>
+
+        {posts && posts.length > 0 ? (
+          posts.map((post) => (
+            <PostCard
+              key={post._id}
+              post={post}
+              session={null} // profile xem công khai
+            />
+          ))
+        ) : (
+          <Typography color="text.secondary">
+            Bạn chưa có bài viết nào.
+          </Typography>
+        )}
       </Box>
     </Box>
   );

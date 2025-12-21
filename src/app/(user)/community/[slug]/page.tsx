@@ -3,6 +3,7 @@ import { sendRequest } from "@/utils/api";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { IUser } from "@/types/next-auth";
+import GroupInfoPanel from "@/components/community/group.info.panel";
 
 const GroupPage = async ({ params }: { params: { slug: string } }) => {
   const { slug } = params;
@@ -18,7 +19,11 @@ const GroupPage = async ({ params }: { params: { slug: string } }) => {
     },
   });
 
-  return <GroupDetailPage groupId={slug} user={user.data ?? null} />;
+  return (
+    <>
+      <GroupDetailPage groupId={slug} user={user.data ?? null} />
+    </>
+  );
 };
 
 export default GroupPage;

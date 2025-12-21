@@ -24,6 +24,7 @@ import { useEffect, useState } from "react";
 import { sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import ImageViewer from "./image.view";
+import { useToast } from "@/utils/toast";
 
 export default function PostDetailModal({
   postId,
@@ -38,7 +39,7 @@ export default function PostDetailModal({
   const [replyToCommentId, setReplyToCommentId] = useState<string | null>(null);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
-
+  const toast = useToast();
   const router = useRouter();
 
   if (postId === "") return null;
@@ -79,12 +80,19 @@ export default function PostDetailModal({
     if (!session) return alert("Bạn phải đăng nhập!");
     if (!commentText.trim()) return;
 
-    await sendRequest({
+    const res = await sendRequest<IBackendRes<any>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/comments`,
       method: "POST",
       headers: { Authorization: `Bearer ${session?.access_token}` },
       body: { content: commentText, postId },
     });
+
+    if (res?.data?.success === true) {
+      toast.success("Bình luận thành công");
+    }
+    if (res?.data?.success === false) {
+      toast.error(res?.data?.message);
+    }
 
     setCommentText("");
     fetchData();
@@ -238,11 +246,14 @@ export default function PostDetailModal({
           bgcolor: "white",
           borderRadius: 3,
           boxShadow: 24,
-          p: 2,
-          width: "85%",
-          maxWidth: 600,
-          maxHeight: "90vh",
+
+          width: "92%", // 👈 chiếm gần full
+          maxWidth: 760, // 👈 CHUẨN FB
+          height: "92vh", // 👈 cao hơn
+          maxHeight: "92vh",
+
           overflowY: "auto",
+          p: 2.5,
         }}
       >
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -275,6 +286,9 @@ export default function PostDetailModal({
         <Divider sx={{ my: 1 }} />
         {/* ===== HÌNH POST ===== */}
         {/* ⭐ HIỂN THỊ NHIỀU ẢNH THEO GRID GIỐNG FACEBOOK ⭐ */}
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          {post?.content}
+        </Typography>
         {post?.images && post.images.length > 0 && (
           <Box
             sx={{
@@ -350,10 +364,6 @@ export default function PostDetailModal({
             style={{ width: "100%", maxHeight: "600px", borderRadius: "8px" }}
           />
         )}
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          {post?.namePost}
-        </Typography>
-        <Typography>{post?.content}</Typography>
         <Divider sx={{ my: 2 }} />
         <Box sx={{ display: "flex", justifyContent: "space-around", mb: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>

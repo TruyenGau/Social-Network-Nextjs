@@ -1,20 +1,37 @@
-import { Roboto } from "next/font/google";
 import { createTheme } from "@mui/material/styles";
-
-const roboto = Roboto({
-  weight: ["300", "400", "500", "700"],
-  subsets: ["latin"],
-  display: "swap",
-});
 
 const theme = createTheme({
   palette: {
     mode: "light",
+    background: {
+      default: "#f0f2f5", // 👈 nền Facebook
+    },
   },
+
   typography: {
-    fontFamily: roboto.style.fontFamily,
+    fontFamily: [
+      "Segoe UI",
+      "Helvetica Neue",
+      "Helvetica",
+      "Arial",
+      "sans-serif",
+    ].join(","),
+
+    fontSize: 15, // 👈 Facebook ~15px
+    body1: {
+      lineHeight: 1.34, // 👈 Facebook chuẩn
+    },
   },
+
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          fontFamily: '"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif',
+        },
+      },
+    },
+
     MuiAlert: {
       styleOverrides: {
         root: ({ ownerState }) => ({

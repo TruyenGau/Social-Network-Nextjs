@@ -1,13 +1,14 @@
 "use client";
-import {
-  Avatar,
-  Box,
-  Typography,
-  Divider,
-  Button,
-  Paper,
-  Stack,
-} from "@mui/material";
+
+import { Box, Typography, Divider, Button, Paper, Stack } from "@mui/material";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import CakeIcon from "@mui/icons-material/Cake";
+import WcIcon from "@mui/icons-material/Wc";
+import SchoolIcon from "@mui/icons-material/School";
+import WorkIcon from "@mui/icons-material/Work";
+import PhoneIcon from "@mui/icons-material/Phone";
+import EventIcon from "@mui/icons-material/Event";
+
 import { useSession } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
 import { sendRequest } from "@/utils/api";
@@ -16,18 +17,35 @@ import { IUser } from "@/types/next-auth";
 import ProfileUpdateModal from "./profile.update.modal";
 import { useRouter } from "next/navigation";
 
+/* ================= INFO ROW ================= */
+const InfoRow = ({
+  icon,
+  text,
+}: {
+  icon: React.ReactNode;
+  text: React.ReactNode;
+}) => (
+  <Box display="flex" alignItems="center" gap={1.5}>
+    <Box sx={{ color: "#65676B", display: "flex" }}>{icon}</Box>
+    <Typography fontSize={14} color="#050505">
+      {text}
+    </Typography>
+  </Box>
+);
+
+/* ================= MAIN ================= */
 const ProfileInfomation = () => {
   const { userInfoId } = useContext(UserContext) as IContext;
   const [user, setUser] = useState<IUser | null>(null);
 
-  // 🆕 STATE CHECK FOLLOW
-  const [isFollowed, setIsFollowed] = useState<boolean>(false);
-  const [loadingFollow, setLoadingFollow] = useState<boolean>(false);
+  const [isFollowed, setIsFollowed] = useState(false);
+  const [loadingFollow, setLoadingFollow] = useState(false);
 
   const { data: session } = useSession();
-  const [openModal, setOpenModal] = useState<boolean>(false);
-  const route = useRouter();
+  const [openModal, setOpenModal] = useState(false);
+  const router = useRouter();
 
+  /* FETCH USER */
   useEffect(() => {
     if (!userInfoId) return;
 
@@ -37,46 +55,47 @@ const ProfileInfomation = () => {
         method: "GET",
         headers: { Authorization: `Bearer ${session?.access_token}` },
       });
-
       if (res.data) setUser(res.data);
     };
 
     fetchProfile();
   }, [userInfoId, session?.access_token, openModal]);
 
+  /* CHECK FOLLOW */
   useEffect(() => {
     if (!session?.access_token || !userInfoId) return;
 
-    const checkFollow = async () => {
-      const res = await sendRequest<IBackendRes<{ isFollowed: boolean }>>({
-        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/follow/check/${userInfoId}`,
-        method: "GET",
-        headers: { Authorization: `Bearer ${session?.access_token}` },
-      });
-
-      setIsFollowed(res?.data?.isFollowed || false);
-    };
-
-    checkFollow();
+    sendRequest<IBackendRes<{ isFollowed: boolean }>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/follow/check/${userInfoId}`,
+      method: "GET",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    }).then((res) => setIsFollowed(res?.data?.isFollowed || false));
   }, [session?.access_token, userInfoId]);
 
   if (!user) return null;
 
   return (
-    <Paper
-      elevation={3}
-      sx={{ p: 2, borderRadius: 3, width: "100%", maxWidth: 400, mx: "auto" }}
+    <Box
+      sx={{
+        p: 2.5,
+        maxWidth: 360,
+        borderRadius: 3,
+        backgroundColor: "#f7f8fa", // 👈 nền xám rất nhẹ
+        border: "1px solid #e4e6eb",
+      }}
     >
-      {/* TITLE */}
+      {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="subtitle2" fontWeight={600} color="text.secondary">
-          Thông tin chi tiết
+        <Typography fontSize={15} fontWeight={700}>
+          Giới thiệu
         </Typography>
 
         {session?.user._id === userInfoId && (
           <Typography
-            sx={{ cursor: "pointer", color: "red" }}
+            fontSize={14}
+            color="#1877F2"
             fontWeight={600}
+            sx={{ cursor: "pointer" }}
             onClick={() => setOpenModal(true)}
           >
             Cập nhật
@@ -85,153 +104,162 @@ const ProfileInfomation = () => {
       </Box>
 
       {/* NAME */}
-      <Box display="flex" flexDirection="column" alignItems="center" mt={1}>
-        <Typography variant="h6" fontWeight={600}>
+      <Box textAlign="center" mt={1.5}>
+        <Typography fontSize={18} fontWeight={700}>
           {user.name}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography fontSize={14} color="#65676B">
           @{user.email.split("@")[0]}
         </Typography>
       </Box>
 
-      {/* DESCRIPTION */}
-      {user?.description && (
+      {/* BIO */}
+      {user.description && (
         <Typography
-          variant="body2"
-          sx={{ textAlign: "center", fontStyle: "italic", mt: 1 }}
+          fontSize={14}
+          color="#65676B"
+          textAlign="center"
+          sx={{ mt: 1 }}
         >
-          "{user.description}"
+          “{user.description}”
         </Typography>
       )}
 
       <Divider sx={{ my: 2 }} />
 
-      {/* INFO LIST */}
-      <Stack spacing={1.2}>
-        {user?.address && (
-          <Typography variant="body2">
-            📍 <b>{user.address}</b>
-          </Typography>
+      {/* INFO */}
+      <Stack spacing={1.6}>
+        {user.address && (
+          <InfoRow
+            icon={<LocationOnIcon fontSize="small" />}
+            text={
+              <>
+                Sống tại <b>{user.address}</b>
+              </>
+            }
+          />
         )}
-        {user?.age && (
-          <Typography variant="body2">
-            🎂 Tuổi: <b>{user.age}</b>
-          </Typography>
+
+        {user.age && (
+          <InfoRow
+            icon={<CakeIcon fontSize="small" />}
+            text={
+              <>
+                Tuổi <b>{user.age}</b>
+              </>
+            }
+          />
         )}
-        {user?.gender && (
-          <Typography variant="body2">
-            🧬 Giới tính: <b>{user.gender}</b>
-          </Typography>
+
+        {user.gender && (
+          <InfoRow
+            icon={<WcIcon fontSize="small" />}
+            text={
+              <>
+                Giới tính <b>{user.gender}</b>
+              </>
+            }
+          />
         )}
-        {user?.school && (
-          <Typography variant="body2">
-            🎓 Học tại <b>{user.school}</b>
-          </Typography>
+
+        {user.school && (
+          <InfoRow
+            icon={<SchoolIcon fontSize="small" />}
+            text={
+              <>
+                Học tại <b>{user.school}</b>
+              </>
+            }
+          />
         )}
-        {user?.work && (
-          <Typography variant="body2">
-            💼 Công việc: <b>{user.work}</b>
-          </Typography>
+
+        {user.work && (
+          <InfoRow
+            icon={<WorkIcon fontSize="small" />}
+            text={
+              <>
+                Công việc <b>{user.work}</b>
+              </>
+            }
+          />
         )}
-        {user?.phoneNumber && (
-          <Typography variant="body2">
-            📞 Phone: <b>{user.phoneNumber}</b>
-          </Typography>
+
+        {user.phoneNumber && (
+          <InfoRow
+            icon={<PhoneIcon fontSize="small" />}
+            text={
+              <>
+                Phone <b>{user.phoneNumber}</b>
+              </>
+            }
+          />
         )}
-        {user?.createdAt && (
-          <Typography variant="body2">
-            🗓 Tham gia từ:{" "}
-            <b>{new Date(user.createdAt).toLocaleDateString()}</b>
-          </Typography>
+
+        {user.createdAt && (
+          <InfoRow
+            icon={<EventIcon fontSize="small" />}
+            text={
+              <>
+                Tham gia <b>{new Date(user.createdAt).toLocaleDateString()}</b>
+              </>
+            }
+          />
         )}
       </Stack>
 
       <Divider sx={{ my: 2 }} />
 
+      {/* ACTION */}
       {session?.user._id !== userInfoId && (
         <>
           <Button
-            variant={isFollowed ? "outlined" : "contained"}
-            color={isFollowed ? "primary" : "success"}
             fullWidth
+            variant={isFollowed ? "outlined" : "contained"}
+            color="primary"
             disabled={loadingFollow}
-            sx={{ borderRadius: 2, fontWeight: 600 }}
+            sx={{
+              borderRadius: 2,
+              fontWeight: 600,
+              textTransform: "none",
+            }}
             onClick={async () => {
-              if (!session) return alert("Bạn phải đăng nhập!");
-
               setLoadingFollow(true);
-
-              try {
-                if (isFollowed) {
-                  await sendRequest({
-                    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/follow/${userInfoId}`,
-                    method: "DELETE",
-                    headers: {
-                      Authorization: `Bearer ${session?.access_token}`,
-                    },
-                  });
-                  setIsFollowed(false);
-                  await sendRequest<IBackendRes<any>>({
-                    url: "/api/revalidate",
-                    method: "POST",
-                    queryParams: {
-                      tag: "fetch-profile-info",
-                      secret: "levantruyen",
-                    },
-                  });
-                  route.refresh();
-                } else {
-                  await sendRequest({
-                    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/follow/${userInfoId}`,
-                    method: "POST",
-                    headers: {
-                      Authorization: `Bearer ${session?.access_token}`,
-                    },
-                  });
-                  await sendRequest<IBackendRes<any>>({
-                    url: "/api/revalidate",
-                    method: "POST",
-                    queryParams: {
-                      tag: "fetch-profile-info",
-                      secret: "levantruyen",
-                    },
-                  });
-
-                  route.refresh();
-                  setIsFollowed(true);
-                }
-              } catch (err) {
-                console.log("Follow error:", err);
-              }
-
+              await sendRequest({
+                url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/follow/${userInfoId}`,
+                method: isFollowed ? "DELETE" : "POST",
+                headers: {
+                  Authorization: `Bearer ${session?.access_token}`,
+                },
+              });
+              setIsFollowed(!isFollowed);
+              router.refresh();
               setLoadingFollow(false);
             }}
           >
-            {isFollowed ? "Đang theo dõi ✓" : "Theo dõi"}
+            {isFollowed ? "Đang theo dõi" : "Theo dõi"}
           </Button>
 
           <Typography
-            variant="body2"
-            color="error"
+            fontSize={13}
+            color="#e41e3f"
             textAlign="right"
-            sx={{ cursor: "pointer", marginTop: "10px" }}
+            sx={{ mt: 1, cursor: "pointer" }}
           >
             Chặn người dùng
           </Typography>
         </>
       )}
 
-      {/* MODAL UPDATE */}
       {openModal && (
         <ProfileUpdateModal
           open={openModal}
           onClose={() => setOpenModal(false)}
           user={user}
           token={session?.access_token!}
-          route={route}
+          route={router}
         />
       )}
-    </Paper>
+    </Box>
   );
 };
 

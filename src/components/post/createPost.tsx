@@ -80,7 +80,6 @@ export default function PostForm({ data }: IProps) {
 
         const uploadData = uploadRes.data?.data;
 
-        // ❌ MEDIA BỊ CHẶN
         if (uploadData?.success === false) {
           toast.error(uploadData.message || "Ảnh/video không hợp lệ");
           setIsLoading(false);
@@ -91,7 +90,6 @@ export default function PostForm({ data }: IProps) {
         uploadedVideos = uploadRes.data?.data?.videos || [];
       }
 
-      console.log("check image video", uploadedImages, uploadedVideos);
       // 🟩 Tạo POST
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts`,
@@ -130,8 +128,7 @@ export default function PostForm({ data }: IProps) {
         p: 2,
         mb: 3,
         borderRadius: 3,
-        maxWidth: "600px",
-        margin: "0 auto",
+        maxWidth: "100%",
         width: "100%",
       }}
     >
@@ -210,18 +207,29 @@ export default function PostForm({ data }: IProps) {
             />
           </Button>
         </Stack>
-
         <Button
           variant="contained"
           sx={{
-            px: 2,
-            py: 0.5,
-            fontSize: "0.85rem",
-            height: "36px",
+            px: 3,
+            height: 40,
+            minWidth: 120,
+            borderRadius: "999px", // 👈 pill
+            textTransform: "none", // 👈 giống FB
+            fontSize: "14px",
+            fontWeight: 600,
             backgroundColor: "#1877F2",
-            borderRadius: "16px",
+            boxShadow: "0 2px 6px rgba(24,119,242,0.35)",
+            "&:hover": {
+              backgroundColor: "#166FE5",
+              boxShadow: "0 4px 10px rgba(24,119,242,0.45)",
+            },
+            "&:disabled": {
+              backgroundColor: "#E4E6EB",
+              color: "#BCC0C4",
+              boxShadow: "none",
+            },
           }}
-          disabled={isLoading}
+          disabled={isLoading || (!content.trim() && files.length === 0)}
           onClick={handleSubmit}
         >
           {isLoading ? "Đang đăng..." : "Đăng bài viết"}

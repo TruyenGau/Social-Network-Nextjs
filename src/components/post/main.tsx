@@ -87,28 +87,6 @@ const PostList = ({ session, initPostId }: IProps) => {
     fetchData();
   }, [session]); // fetch lại khi session thay đổi
 
-  const handleSharePost = async () => {
-    if (!sharePostId) return;
-
-    try {
-      await sendRequest({
-        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/${sharePostId}/share`,
-        method: "POST",
-        headers: { Authorization: `Bearer ${session?.access_token}` },
-        body: {
-          content: shareContent,
-        },
-      });
-
-      toast.success("Đã chia sẻ bài viết");
-      setSharePostId(null);
-      setShareContent("");
-      route.refresh();
-    } catch (err) {
-      toast.error("Chia sẻ thất bại");
-    }
-  };
-
   const handleLikes = async (postId: string) => {
     if (!session) return alert("Bạn cần đăng nhập!");
     await sendRequest({
@@ -123,12 +101,19 @@ const PostList = ({ session, initPostId }: IProps) => {
     if (!session) return alert("Bạn cần đăng nhập!");
     if (!commentText.trim()) return;
 
-    await sendRequest({
+    const res = await sendRequest<IBackendRes<any>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/comments`,
       method: "POST",
       headers: { Authorization: `Bearer ${session?.access_token}` },
       body: { content: commentText, postId: postId },
     });
+
+    if (res?.data?.success === true) {
+      toast.success("Bình luận thành công");
+    }
+    if (res?.data?.success === false) {
+      toast.error(res?.data?.message);
+    }
 
     setCommentText("");
     setOpenCommentBox(null);
@@ -217,7 +202,7 @@ const PostList = ({ session, initPostId }: IProps) => {
           key={post._id}
           sx={{
             margin: "24px auto",
-            maxWidth: 600,
+            maxWidth: "100%", // 👈 cho card ăn theo feed
             borderRadius: 3,
             boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
             overflow: "hidden",
@@ -358,53 +343,58 @@ const PostList = ({ session, initPostId }: IProps) => {
               sx={{
                 display: "grid",
                 gridTemplateColumns:
-                  post.images.length === 1
-                    ? "1fr"
-                    : post.images.length === 2
-                    ? "1fr 1fr"
-                    : "1fr 1fr", // 3 ảnh trở lên sẽ grid 2 cột
-                gap: 1,
-                backgroundColor: "#fafafa",
-                p: 1,
-                borderRadius: "8px",
+                  post.images.length === 1 ? "1fr" : "1fr 1fr",
+                gap: "4px",
+                bgcolor: "#f0f2f5",
+                borderRadius: "12px",
+                overflow: "hidden",
+                cursor: "pointer",
               }}
             >
-              {post.images.slice(0, 4).map((img, idx) => (
-                <Box key={idx} sx={{ position: "relative" }}>
-                  <img
-                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
-                    style={{
-                      width: "100%",
-                      height: post.images.length === 1 ? "auto" : "220px",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                    }}
-                  />
+              {post.images.slice(0, 4).map((img, idx) => {
+                const isSingle = post.images.length === 1;
 
-                  {/* Nếu nhiều hơn 4 ảnh → overlay " + x ảnh " */}
-                  {idx === 3 && post.images.length > 4 && (
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
+                return (
+                  <Box
+                    key={idx}
+                    sx={{
+                      position: "relative",
+                      width: "100%",
+                      height: isSingle ? 480 : 240, // 👈 MẤU CHỐT
+                      overflow: "hidden",
+                    }}
+                  >
+                    <img
+                      src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
+                      style={{
                         width: "100%",
                         height: "100%",
-                        backgroundColor: "rgba(0,0,0,0.55)",
-                        borderRadius: "8px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "white",
-                        fontSize: "32px",
-                        fontWeight: "bold",
+                        objectFit: "cover", // 👈 giống FB
+                        display: "block",
                       }}
-                    >
-                      +{post.images.length - 4}
-                    </Box>
-                  )}
-                </Box>
-              ))}
+                    />
+
+                    {/* Overlay +x */}
+                    {idx === 3 && post.images.length > 4 && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          inset: 0,
+                          bgcolor: "rgba(0,0,0,0.5)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#fff",
+                          fontSize: 32,
+                          fontWeight: 700,
+                        }}
+                      >
+                        +{post.images.length - 4}
+                      </Box>
+                    )}
+                  </Box>
+                );
+              })}
             </Box>
           )}
 

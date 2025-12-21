@@ -91,7 +91,7 @@ export const AuthSignIn = () => {
         minHeight: "100vh",
         // ✅ Ảnh nền (đặt file vào public/auth/signin-bg.jpg)
         backgroundImage: `url("/auth/signin-bg.jpg")`,
-        backgroundSize: { xs: "cover", md: "90%" },   // ✅ thu nhỏ ảnh ở màn hình lớn
+        backgroundSize: { xs: "cover", md: "100%" },   // ✅ thu nhỏ ảnh ở màn hình lớn
         backgroundPosition: { xs: "center", md: "left center" }, // ✅ canh trái để phần trắng bên phải rộng hơn
         backgroundRepeat: "no-repeat",
         position: "relative",
@@ -99,7 +99,7 @@ export const AuthSignIn = () => {
         alignItems: "center",
         justifyContent: { xs: "center", md: "flex-end" }, // ✅ form nằm vùng trắng bên phải
         px: { xs: 2, md: 8 },
-        pr: { xs: 2, md: 16 }, // ✅ khung vào trong
+        pr: { xs: 2, md: 7 }, // ✅ khung vào trong
       }}
     >
       {/* lớp phủ nhẹ để chữ/form nổi hơn (tuỳ thích) */}
