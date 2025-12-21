@@ -743,10 +743,7 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
 
       if (!type || !filename) return;
 
-      const url =
-        type === "image"
-          ? `${BACKEND_URL}/post/images/${filename}`
-          : `${BACKEND_URL}/post/videos/${filename}`;
+      const url = type === "image" ? filename : filename;
 
       if (currentRoom.type === "private") {
         if (!currentFriend) return;
