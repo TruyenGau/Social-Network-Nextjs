@@ -65,17 +65,9 @@ export default function UpdateGroupModal({
     setDescription(group.description || "");
     setVisibility(group.visibility);
 
-    setAvatarPreview(
-      group.avatar
-        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/group/images/${group.avatar}`
-        : null
-    );
+    setAvatarPreview(group.avatar ? group.avatar : null);
 
-    setCoverPreview(
-      group.coverPhoto
-        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/group/images/${group.coverPhoto}`
-        : null
-    );
+    setCoverPreview(group.coverPhoto ? group.coverPhoto : null);
   }, [group, open]);
 
   /* ================= PREVIEW ================= */

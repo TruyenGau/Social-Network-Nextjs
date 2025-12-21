@@ -78,11 +78,7 @@ export default function StoryViewer({ story, onClose }: StoryViewerProps) {
         }}
       >
         <Avatar
-          src={
-            story.avatar
-              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${story.avatar}`
-              : "/user/default-user.png"
-          }
+          src={story.avatar ? story.avatar : "/user/default-user.png"}
           sx={{ width: 36, height: 36, border: "2px solid white" }}
         />
         <Typography sx={{ color: "white", fontSize: 16, fontWeight: 600 }}>
@@ -93,11 +89,7 @@ export default function StoryViewer({ story, onClose }: StoryViewerProps) {
       {/* Ảnh Story */}
       <Box sx={{ width: "90%", maxWidth: "400px", textAlign: "center" }}>
         <img
-          src={
-            story.image
-              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/story/images/${story.image}`
-              : "/user/default-user.png"
-          }
+          src={story.image ? story.image : "/user/default-user.png"}
           alt="story"
           style={{
             width: "100%",

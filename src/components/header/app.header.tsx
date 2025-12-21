@@ -289,7 +289,7 @@ export default function AppHeader() {
             <Avatar
               src={
                 session?.user?.avatar
-                  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${session?.user?.avatar}`
+                  ? session?.user?.avatar
                   : "/user/default-user.png"
               }
               sx={{ cursor: "pointer" }}
@@ -352,7 +352,7 @@ export default function AppHeader() {
             <Avatar
               src={
                 n.fromUserId?.avatar
-                  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${n.fromUserId.avatar}`
+                  ? n.fromUserId.avatar
                   : "/user/default-user.png"
               }
               sx={{ mr: 1 }}

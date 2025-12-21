@@ -145,11 +145,7 @@ export default function PostDetailModal({
         <Box sx={{ display: "flex", alignItems: "flex-start" }}>
           <Avatar
             sx={{ mr: 2, width: 34, height: 34 }}
-            src={
-              c.user.avatar
-                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${c.user.avatar}`
-                : "/user/default-user.png"
-            }
+            src={c.user.avatar ? c.user.avatar : "/user/default-user.png"}
           />
 
           <Box sx={{ flex: 1 }}>
@@ -271,7 +267,7 @@ export default function PostDetailModal({
             sx={{ bgcolor: "#c0c9d3ff" }}
             src={
               post?.author?.avatar
-                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post.author.avatar}`
+                ? post.author.avatar
                 : "/user/default-user.png"
             }
           />
@@ -313,7 +309,7 @@ export default function PostDetailModal({
                 }}
               >
                 <img
-                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
+                  src={img}
                   style={{
                     width: "100%",
                     height: post.images.length === 1 ? "auto" : "260px",
@@ -349,9 +345,7 @@ export default function PostDetailModal({
         )}{" "}
         {viewerOpen && (
           <ImageViewer
-            images={post?.images.map(
-              (i) => `${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${i}`
-            )}
+            images={post?.images.map((i) => i)}
             index={viewerIndex}
             onClose={() => setViewerOpen(false)}
           />
@@ -360,7 +354,7 @@ export default function PostDetailModal({
         {Array.isArray(post?.videos) && post!.videos!.length > 0 && (
           <video
             controls
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/videos/${post?.videos?.[0]}`}
+            src={post?.videos?.[0]}
             style={{ width: "100%", maxHeight: "600px", borderRadius: "8px" }}
           />
         )}
@@ -402,7 +396,7 @@ export default function PostDetailModal({
             sx={{ mr: 1 }}
             src={
               session.user.avatar
-                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${session.user.avatar}`
+                ? session.user.avatar
                 : "/user/default-user.png"
             }
           />

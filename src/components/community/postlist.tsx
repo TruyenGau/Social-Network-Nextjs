@@ -136,7 +136,7 @@ const PostList = () => {
                 <Avatar
                   src={
                     post.userId.avatar
-                      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post.userId.avatar}`
+                      ? post.userId.avatar
                       : "/user/default-user.png"
                   }
                   sx={{ cursor: "pointer" }}
@@ -159,7 +159,7 @@ const PostList = () => {
                 {post.communityId && (
                   <Box sx={{ display: "flex", alignItems: "center", mt: 0.3 }}>
                     <Avatar
-                      src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/group/images/${post.communityId.avatar}`}
+                      src={post.communityId.avatar}
                       sx={{ width: 22, height: 22, mr: 1 }}
                     />
 
@@ -192,7 +192,7 @@ const PostList = () => {
               {post.images.slice(0, 4).map((img, index) => (
                 <Box key={index} sx={{ position: "relative" }}>
                   <img
-                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
+                    src={img}
                     style={{
                       width: "100%",
                       height: "400px",
@@ -230,7 +230,7 @@ const PostList = () => {
             <video
               controls
               style={{ width: "100%", maxHeight: 600 }}
-              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/videos/${post.videos[0]}`}
+              src={post.videos[0]}
             />
           )}
 

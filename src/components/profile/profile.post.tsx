@@ -45,7 +45,7 @@ const PostCard = ({ post, session, onLike, onComment, onShare }: Props) => {
             <Avatar
               src={
                 post.userId.avatar
-                  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post.userId.avatar}`
+                  ? post.userId.avatar
                   : "/user/default-user.png"
               }
             />
@@ -90,7 +90,7 @@ const PostCard = ({ post, session, onLike, onComment, onShare }: Props) => {
               sx={{ height: post.images.length === 1 ? 480 : 240 }}
             >
               <img
-                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
+                src={img}
                 style={{
                   width: "100%",
                   height: "100%",

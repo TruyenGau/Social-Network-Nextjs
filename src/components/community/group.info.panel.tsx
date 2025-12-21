@@ -102,11 +102,7 @@ const GroupInfoPanel = () => {
           {group.members?.slice(0, 6).map((m: any, i: number) => (
             <Avatar
               key={i}
-              src={
-                m.avatar
-                  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${m.avatar}`
-                  : "/user/default-user.png"
-              }
+              src={m.avatar ? m.avatar : "/user/default-user.png"}
               sx={{ width: 40, height: 40 }}
             />
           ))}

@@ -112,11 +112,7 @@ export default function InvitedGroups() {
             {/* INFO */}
             <Stack direction="row" spacing={2} alignItems="center">
               <Avatar
-                src={
-                  g.avatar
-                    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/group/images/${g.avatar}`
-                    : "/group/default-group.png"
-                }
+                src={g.avatar ? g.avatar : "/group/default-group.png"}
                 sx={{
                   width: 64,
                   height: 64,

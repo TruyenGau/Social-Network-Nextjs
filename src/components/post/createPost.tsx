@@ -133,13 +133,7 @@ export default function PostForm({ data }: IProps) {
       }}
     >
       <Box display="flex" gap={2}>
-        <Avatar
-          src={
-            user?.avatar
-              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${user.avatar}`
-              : ""
-          }
-        />
+        <Avatar src={user?.avatar ? user.avatar : ""} />
         <TextField
           placeholder="Bạn đang nghĩ gì?"
           multiline

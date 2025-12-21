@@ -66,11 +66,7 @@ export default function Sidebar({ data }: IProps) {
             sx={{ ...menuStyle, mb: 0.5 }}
           >
             <Avatar
-              src={
-                data.avatar
-                  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${data.avatar}`
-                  : "/user/default-user.png"
-              }
+              src={data.avatar ? data.avatar : "/user/default-user.png"}
               sx={{ width: 36, height: 36, mr: 1.5 }}
             />
             <ListItemText

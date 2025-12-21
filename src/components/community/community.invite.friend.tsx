@@ -144,11 +144,7 @@ const InviteFriendsDialog = ({
                 {/* LEFT */}
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                   <Avatar
-                    src={
-                      u.avatar
-                        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${u.avatar}`
-                        : "/user/default-user.png"
-                    }
+                    src={u.avatar ? u.avatar : "/user/default-user.png"}
                     sx={{ width: 42, height: 42 }}
                   />
                   <Typography fontWeight={500}>{u.name}</Typography>

@@ -51,7 +51,7 @@ export default function CommunityDetailDrawer({
         <Descriptions.Item label="Ảnh bìa">
           {group.coverPhoto ? (
             <Image
-              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/group/covers/${group.coverPhoto}`}
+              src={group.coverPhoto}
               width="100%"
               height={150}
               style={{ objectFit: "cover", borderRadius: 6 }}
@@ -62,10 +62,7 @@ export default function CommunityDetailDrawer({
         </Descriptions.Item>
 
         <Descriptions.Item label="Avatar">
-          <Avatar
-            size={80}
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/group/images/${group.avatar}`}
-          />
+          <Avatar size={80} src={group.avatar} />
         </Descriptions.Item>
 
         <Descriptions.Item label="Tên">{group.name}</Descriptions.Item>
@@ -82,10 +79,7 @@ export default function CommunityDetailDrawer({
         <Descriptions.Item label="Quản trị viên">
           {group.admins?.map((a) => (
             <Space key={a._id} style={{ marginBottom: 10, display: "block" }}>
-              <Avatar
-                style={{ border: "2px solid gold" }}
-                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/${a.avatar}`}
-              />
+              <Avatar style={{ border: "2px solid gold" }} src={a.avatar} />
               <span>
                 {a.name} <Tag color="gold">Admin</Tag>
               </span>
@@ -110,12 +104,7 @@ export default function CommunityDetailDrawer({
         renderItem={(m) => (
           <List.Item>
             <List.Item.Meta
-              avatar={
-                <Avatar
-                  size={48}
-                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/${m.avatar}`}
-                />
-              }
+              avatar={<Avatar size={48} src={m.avatar} />}
               title={<strong>{m.name}</strong>}
               description={m.email ?? "-"}
             />

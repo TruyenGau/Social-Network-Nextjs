@@ -273,7 +273,7 @@ const PostListMock = ({
                   <Avatar
                     src={
                       post.userId.avatar
-                        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post.userId.avatar}`
+                        ? post.userId.avatar
                         : "/user/default-user.png"
                     }
                   />
@@ -345,7 +345,7 @@ const PostListMock = ({
                 {post.images.slice(0, 4).map((img, idx) => (
                   <img
                     key={idx}
-                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
+                    src={img}
                     style={{
                       width: "100%",
                       height: post.images.length === 1 ? 400 : 220,

@@ -234,7 +234,7 @@ const PostList = ({ session, initPostId }: IProps) => {
                 <Avatar
                   src={
                     post.userId.avatar
-                      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post.userId.avatar}`
+                      ? post.userId.avatar
                       : "/user/default-user.png"
                   }
                   sx={{ cursor: "pointer" }} // 👈 THÊM ĐỂ BIẾT LÀ CLICK ĐƯỢC
@@ -311,7 +311,7 @@ const PostList = ({ session, initPostId }: IProps) => {
                   <Avatar
                     src={
                       post.taggedUserIds[0].avatar
-                        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post.taggedUserIds[0].avatar}`
+                        ? post.taggedUserIds[0].avatar
                         : "/user/default-user.png"
                     }
                     sx={{
@@ -382,7 +382,7 @@ const PostList = ({ session, initPostId }: IProps) => {
                     }}
                   >
                     <img
-                      src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
+                      src={img}
                       style={{
                         width: "100%",
                         height: "100%",
@@ -428,7 +428,7 @@ const PostList = ({ session, initPostId }: IProps) => {
                   maxHeight: "600px",
                   borderRadius: "8px",
                 }}
-                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/videos/${post.videos[0]}`}
+                src={post.videos[0]}
               />
             </Box>
           )}

@@ -22,11 +22,7 @@ const ProfileCard = ({ id, name, avatarUrl }: ProfileCardProps) => {
       }}
     >
       <Avatar
-        src={
-          avatarUrl
-            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${avatarUrl}`
-            : "/user/default-user.png"
-        }
+        src={avatarUrl ? avatarUrl : "/user/default-user.png"}
         sx={{ width: 36, height: 36, mr: 1.5 }}
       />
       <Typography fontSize={14} fontWeight={500}>

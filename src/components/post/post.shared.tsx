@@ -19,9 +19,7 @@ export default function SharedPostCard({ post }: { post: any }) {
       <Box display="flex" alignItems="center" gap={1} mb={1}>
         <Avatar
           src={
-            post.userId?.avatar
-              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${post.userId.avatar}`
-              : "/user/default-user.png"
+            post.userId?.avatar ? post.userId.avatar : "/user/default-user.png"
           }
           sx={{ width: 36, height: 36 }}
         />
@@ -62,7 +60,7 @@ export default function SharedPostCard({ post }: { post: any }) {
           {post.images.slice(0, 4).map((img: string, i: number) => (
             <Box key={i} sx={{ position: "relative" }}>
               <img
-                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
+                src={img}
                 style={{
                   width: "100%",
                   height: post.images.length === 1 ? "350" : "160px",
@@ -98,7 +96,7 @@ export default function SharedPostCard({ post }: { post: any }) {
         <Box mt={1}>
           <video
             controls
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/videos/${post.videos[0]}`}
+            src={post.videos[0]}
             style={{
               width: "100%",
               borderRadius: 8,

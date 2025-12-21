@@ -136,13 +136,7 @@ export default function CreatePostGroup({
     >
       {/* INPUT */}
       <Box display="flex" gap={2} alignItems="flex-start">
-        <Avatar
-          src={
-            user?.avatar
-              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${user.avatar}`
-              : "/user/default-user.png"
-          }
-        />
+        <Avatar src={user?.avatar ? user.avatar : "/user/default-user.png"} />
 
         <TextField
           placeholder="Bạn đang nghĩ gì?"

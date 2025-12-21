@@ -156,7 +156,7 @@ export default function UpdatePostModal({
           <Avatar
             src={
               session?.user?.avatar
-                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${session.user.avatar}`
+                ? session.user.avatar
                 : "/user/default-user.png"
             }
           />
@@ -173,10 +173,7 @@ export default function UpdatePostModal({
         <Stack gap={1}>
           {existingImages.map((img, i) => (
             <Box key={i} position="relative">
-              <img
-                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/images/${img}`}
-                style={{ width: "100%", borderRadius: 8 }}
-              />
+              <img src={img} style={{ width: "100%", borderRadius: 8 }} />
               <IconButton
                 onClick={() => removeExistingImage(i)}
                 sx={{
@@ -195,7 +192,7 @@ export default function UpdatePostModal({
             <Box key={i} position="relative">
               <video
                 controls
-                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/videos/${vid}`}
+                src={vid}
                 style={{ width: "100%", borderRadius: 8 }}
               />
               <IconButton

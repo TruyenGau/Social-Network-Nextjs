@@ -78,7 +78,7 @@ const BirthdayUser = () => {
               <Avatar
                 src={
                   birthdays[0].avatar
-                    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/avatar/images/${birthdays[0].avatar}`
+                    ? birthdays[0].avatar
                     : "/user/default-user.png"
                 }
                 sx={{ width: 40, height: 40 }}
