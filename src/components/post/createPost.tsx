@@ -125,11 +125,18 @@ export default function PostForm({ data }: IProps) {
     <Paper
       elevation={3}
       sx={{
-        p: 2,
-        mb: 3,
-        borderRadius: 3,
-        maxWidth: "100%",
+        mx: "auto", // 👈 căn giữa giống post
+        mb: { xs: 1.5, sm: 2.5 },
+        p: { xs: 1.5, sm: 2 },
         width: "100%",
+        maxWidth: {
+          xs: "100%",
+          sm: 620,
+          md: 720,
+          lg: 820,
+          xl: 920,
+        },
+        borderRadius: { xs: 1.5, sm: 3 },
       }}
     >
       <Box display="flex" gap={2}>
@@ -153,8 +160,16 @@ export default function PostForm({ data }: IProps) {
       </Box>
 
       {/* ACTION BUTTONS */}
-      <Stack direction="row" justifyContent="space-between" mt={2}>
-        <Stack direction="row" gap={2}>
+      <Stack
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          mt: 2,
+          flexDirection: { xs: "column", sm: "row" },
+          gap: { xs: 1.5, sm: 0 },
+        }}
+      >
+        <Stack direction="row" gap={2} sx={{ flexWrap: "wrap" }}>
           {/* 🟦 CHỌN ẢNH */}
           <Button
             startIcon={
@@ -206,7 +221,8 @@ export default function PostForm({ data }: IProps) {
           sx={{
             px: 3,
             height: 40,
-            minWidth: 120,
+            minWidth: { xs: 80, sm: 120 },
+            width: { xs: "100%", sm: "auto" },
             borderRadius: "999px", // 👈 pill
             textTransform: "none", // 👈 giống FB
             fontSize: "14px",

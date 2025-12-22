@@ -27,6 +27,8 @@ import SendIcon from "@mui/icons-material/Send";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import { useSearchParams } from "next/navigation";
+import MobileChatDrawer from "./mobile.chat.drawer";
+import { IRoom, IRoomMember, RoomType } from "./chat.type";
 
 interface IFollowItem {
   _id: string;
@@ -37,22 +39,6 @@ interface IFollowItem {
     avatar?: string;
     online?: boolean;
   };
-}
-
-type RoomType = "private" | "group";
-
-interface IRoomMember {
-  _id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-}
-
-interface IRoom {
-  _id: string;
-  type: RoomType;
-  name?: string;
-  members: IRoomMember[];
 }
 
 interface IMessage {
@@ -769,14 +755,34 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
 
   return (
     <>
+      {/* Mobile chat drawer trigger */}
+      <MobileChatDrawer
+        followings={followings}
+        friendsLoading={friendsLoading}
+        groups={groups}
+        groupsLoading={groupsLoading}
+        onSelectFriend={handleSelectFriend}
+        onSelectGroup={handleSelectGroup}
+        onCreateGroup={() => setCreateGroupOpen(true)}
+      />
+
       <Box
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", md: "row" },
           height: "calc(100vh - 60px)", // trừ AppHeader
-          px: 2,
+          px: { xs: 0, md: 2 },
           py: 1.5,
           gap: 2,
           bgcolor: "#f0f2f5",
+          // center content on small screens (no viewport break-out)
+          justifyContent: { xs: "center", md: "flex-start" },
+          width: "100%",
+          position: "relative",
+          left: "0",
+          right: "0",
+          marginLeft: 0,
+          marginRight: 0,
         }}
       >
         {/* CỘT GIỮA: KHUNG CHAT */}
@@ -882,7 +888,7 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
                 sx={{
                   flex: 1,
                   display: "flex",
-                  alignItems: "center",
+                  alignItems: { xs: "stretch", md: "center" },
                   justifyContent: "center",
                   bgcolor: "#f7f8fa",
                 }}
@@ -891,17 +897,19 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
                 <Box
                   sx={{
                     width: "100%",
-                    maxWidth: 420,
-                    px: 4,
-                    py: 5,
-                    borderRadius: 4,
+                    maxWidth: { xs: "100%", sm: 520, md: 600 },
+                    mx: "auto",
+                    px: { xs: 2, sm: 4 },
+                    py: { xs: 3, sm: 5 },
+                    borderRadius: { xs: 2, sm: 4 },
                     bgcolor: "#ffffff",
                     boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
                     display: "flex",
                     flexDirection: "column",
-                    alignItems: "center",
+                    alignItems: { xs: "stretch", sm: "center" },
                     textAlign: "center",
                     gap: 2,
+                    boxSizing: "border-box",
                   }}
                 >
                   {/* ICON */}
@@ -1166,8 +1174,8 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
         {/* CỘT PHẢI: trên = Bạn bè/Nhóm, dưới = Tin nhắn chờ */}
         <Box
           sx={{
-            width: 360,
-            display: "flex",
+            width: { xs: "100%", md: 360 },
+            display: { xs: "none", md: "flex" },
             flexDirection: "column",
             gap: 2,
           }}
@@ -1651,7 +1659,7 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
               px: 2,
               pt: 1,
               pb: 2,
-              minWidth: 360,
+              minWidth: { xs: "90%", sm: 360 },
               boxShadow: "0 18px 45px rgba(0,0,0,0.25)",
             },
           }}

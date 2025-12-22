@@ -123,8 +123,8 @@ const PostList = () => {
         <Card
           key={post._id}
           sx={{
-            margin: "20px auto",
-            maxWidth: 650,
+            my: 2,
+            width: "100%",
             borderRadius: 3,
             boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
           }}
@@ -191,13 +191,16 @@ const PostList = () => {
             >
               {post.images.slice(0, 4).map((img, index) => (
                 <Box key={index} sx={{ position: "relative" }}>
-                  <img
+                  <Box
+                    component="img"
                     src={img}
-                    style={{
+                    sx={{
                       width: "100%",
-                      height: "400px",
-                      objectFit: "contain",
-                      borderRadius: 8,
+                      // Prevent extremely tall images from breaking layout
+                      height: { xs: "40vh", sm: "48vh", md: "56vh" },
+                      maxHeight: { xs: "40vh", md: "60vh" },
+                      objectFit: "cover",
+                      borderRadius: 2,
                     }}
                   />
                   {index === 3 && post.images.length > 4 && (
@@ -227,15 +230,16 @@ const PostList = () => {
 
           {/* ---------------- VIDEO ---------------- */}
           {post.videos?.length > 0 && (
-            <video
+            <Box
+              component="video"
               controls
-              style={{ width: "100%", maxHeight: 600 }}
               src={post.videos[0]}
+              sx={{ width: "100%", maxHeight: { xs: "40vh", md: "60vh" }, borderRadius: 2 }}
             />
           )}
 
           {/* ---------------- ACTIONS ---------------- */}
-          <CardActions sx={{ justifyContent: "space-around" }}>
+          <CardActions sx={{ justifyContent: "space-around", flexWrap: "wrap", gap: 1 }}>
             <Box>
               <Checkbox
                 checked={post.isLiked}

@@ -103,72 +103,88 @@ export default function StoryList() {
   return (
     <>
       {/* ====== STORY HORIZONTAL LIST ====== */}
-      <Stack
-        ref={scrollRef}
-        direction="row"
-        spacing={2}
+      <Box
         sx={{
-          p: 2,
-          overflowX: "auto",
-          overflowY: "hidden",
+          mx: "auto",
+          mb: { xs: 1.5, sm: 2.5 },
+          px: { xs: 1, sm: 0 },
           width: "100%",
-          whiteSpace: "nowrap",
-          display: "flex",
-          alignItems: "center",
-          cursor: isDragging.current ? "grabbing" : "grab",
-          "& > *": { flexShrink: 0 },
-          "::-webkit-scrollbar": { display: "none" },
+          maxWidth: {
+            xs: "100%",
+            sm: 620,
+            md: 720,
+            lg: 820,
+            xl: 920,
+          },
         }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={stopDrag}
-        onMouseLeave={stopDrag}
       >
-        {/* ===== ADD STORY BUTTON ===== */}
-        <Box
-          textAlign="center"
-          sx={{ width: 70 }}
-          onClick={() => setOpenCreate(true)}
+        <Stack
+          ref={scrollRef}
+          direction="row"
+          spacing={2}
+          sx={{
+            p: 2,
+            overflowX: "auto",
+            overflowY: "hidden",
+            width: "100%",
+            whiteSpace: "nowrap",
+            display: "flex",
+            alignItems: "center",
+            cursor: isDragging.current ? "grabbing" : "grab",
+            "& > *": { flexShrink: 0 },
+            "::-webkit-scrollbar": { display: "none" },
+          }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={stopDrag}
+          onMouseLeave={stopDrag}
         >
-          <Avatar
-            sx={{
-              width: 65,
-              height: 65,
-              cursor: "pointer",
-              bgcolor: "#d6d2d2ff",
-              fontSize: 36,
-            }}
-          >
-            +
-          </Avatar>
-          <Typography fontSize={12} mt={0.5}>
-            Add Story
-          </Typography>
-        </Box>
-
-        {/* ===== STORY ITEMS ===== */}
-        {stories.map((story) => (
+          {/* ===== ADD STORY BUTTON ===== */}
           <Box
-            key={story._id}
             textAlign="center"
             sx={{ width: 70 }}
-            onClick={() => handleOpenStory(story)}
+            onClick={() => setOpenCreate(true)}
           >
             <Avatar
-              src={story.image ? story.image : "/user/default-user.png"}
               sx={{
                 width: 65,
                 height: 65,
-                border: "2px solid #4c74ff",
                 cursor: "pointer",
+                bgcolor: "#d6d2d2ff",
+                fontSize: 36,
               }}
-            />
+            >
+              +
+            </Avatar>
             <Typography fontSize={12} mt={0.5}>
-              {story.userName}
+              Add Story
             </Typography>
           </Box>
-        ))}
-      </Stack>
+
+          {/* ===== STORY ITEMS ===== */}
+          {stories.map((story) => (
+            <Box
+              key={story._id}
+              textAlign="center"
+              sx={{ width: 70 }}
+              onClick={() => handleOpenStory(story)}
+            >
+              <Avatar
+                src={story.image ? story.image : "/user/default-user.png"}
+                sx={{
+                  width: 65,
+                  height: 65,
+                  border: "2px solid #4c74ff",
+                  cursor: "pointer",
+                }}
+              />
+              <Typography fontSize={12} mt={0.5}>
+                {story.userName}
+              </Typography>
+            </Box>
+          ))}
+        </Stack>
+      </Box>
 
       {/* ===== STORY VIEWER ===== */}
       {openViewer && selectedStory && (

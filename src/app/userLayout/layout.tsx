@@ -20,9 +20,12 @@ export default function UserLayout({
       <Box
         sx={{
           mt: "60px",
-          maxWidth: 760,
+          maxWidth: { xs: "100%", sm: 760, md: 960, lg: 1100, xl: 1200 },
           mx: "auto", // 👈 CHỈ FEED ĐƯỢC CENTER
-          px: 1,
+          px: { xs: 1, sm: 2 },
+          // reserve space for fixed sidebars at larger breakpoints using margins so the feed stays centered
+          ml: { md: "260px", lg: "300px", xl: "320px" },
+          mr: { lg: "320px", xl: "360px" },
         }}
       >
         {children}

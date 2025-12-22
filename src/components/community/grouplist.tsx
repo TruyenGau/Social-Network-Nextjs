@@ -8,9 +8,10 @@ import CreateGroupModal from "./create.community.modal";
 
 interface IProps {
   groups: IGroups[] | null;
+  compact?: boolean; // when true render for drawer/mobile (no sticky behavior)
 }
 
-const GroupList = ({ groups }: IProps) => {
+const GroupList = ({ groups, compact = false }: IProps) => {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -27,9 +28,9 @@ const GroupList = ({ groups }: IProps) => {
 
       <Box
         sx={{
-          position: "sticky",
-          top: 80,
-          maxHeight: "calc(100vh - 100px)",
+          position: compact ? "relative" : "sticky",
+          top: compact ? "auto" : 80,
+          maxHeight: compact ? "none" : "calc(100vh - 100px)",
           overflowY: "auto",
           pr: 1,
           "&::-webkit-scrollbar": { width: "6px" },
@@ -39,9 +40,15 @@ const GroupList = ({ groups }: IProps) => {
           },
         }}
       >
-        <Typography variant="h5" fontWeight={700} mb={2}>
+        <Typography variant="h5" fontWeight={700} mb={2} sx={{ display: { xs: "none", sm: "block" } }}>
           Nhóm
         </Typography>
+        {/* on compact drawer view we show a small header so users know what this panel is */}
+        {compact && (
+          <Typography variant="subtitle1" fontWeight={700} mb={1} sx={{ display: { xs: "block", sm: "none" } }}>
+            Nhóm của bạn
+          </Typography>
+        )}
 
         {/* Search */}
         <Box

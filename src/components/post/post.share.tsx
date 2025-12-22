@@ -65,8 +65,9 @@ export default function SharePostModal({
       maxWidth="sm"
       PaperProps={{
         sx: {
-          borderRadius: 3,
+          borderRadius: { xs: 2, sm: 3 },
           boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+          width: { xs: "95%", sm: "90%" },
         },
       }}
     >
@@ -75,6 +76,7 @@ export default function SharePostModal({
         sx={{
           textAlign: "center",
           fontWeight: "bold",
+          fontSize: { xs: 16, sm: 18 },
           borderBottom: "1px solid #eee",
         }}
       >
@@ -134,9 +136,11 @@ export default function SharePostModal({
       {/* ===== ACTIONS ===== */}
       <DialogActions
         sx={{
-          px: 3,
+          px: { xs: 2, sm: 3 },
           pb: 2,
           gap: 1,
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: "center",
         }}
       >
         <Button
@@ -144,6 +148,7 @@ export default function SharePostModal({
           sx={{
             textTransform: "none",
             fontWeight: 500,
+            width: { xs: "100%", sm: "auto" },
           }}
         >
           Hủy
@@ -158,6 +163,7 @@ export default function SharePostModal({
             px: 3,
             borderRadius: 2,
             backgroundColor: "#1877F2",
+            width: { xs: "100%", sm: "auto" },
           }}
         >
           {loading ? "Đang chia sẻ..." : "Chia sẻ"}

@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import PostList from "@/components/community/postlist";
 import GroupList from "@/components/community/grouplist";
+import MobileGroupDrawer from "@/components/community/mobile.group.drawer";
 import { sendRequest } from "@/utils/api";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -34,10 +35,13 @@ const Community = async () => {
           position: "relative",
         }}
       >
+        {/* MOBILE - GROUP CONTROL */}
+        <MobileGroupDrawer groups={groups.data?.result ?? null} />
+
         {/* FEED - CHÍNH GIỮA */}
         <Box
           sx={{
-            width: 650, // chuẩn FB feed
+            width: { xs: "100%", sm: 760, md: 650 }, // responsive feed width
           }}
         >
           <PostList />
@@ -46,10 +50,11 @@ const Community = async () => {
         {/* GROUP LIST - MÉP PHẢI */}
         <Box
           sx={{
-            width: 330,
-            position: "fixed", // 👈 MẤU CHỐT
-            right: 24,
-            top: 90,
+            display: { xs: "none", lg: "block" },
+            width: { lg: 330 },
+            position: { lg: "fixed" }, // only fixed on large screens
+            right: { lg: 24 },
+            top: { lg: 90 },
           }}
         >
           <GroupList groups={groups.data?.result ?? null} />

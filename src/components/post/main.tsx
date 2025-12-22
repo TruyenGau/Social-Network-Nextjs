@@ -218,9 +218,10 @@ const PostList = ({ session, initPostId }: IProps) => {
         <Card
           key={post._id}
           sx={{
-            margin: "24px auto",
-            maxWidth: "100%", // 👈 cho card ăn theo feed
-            borderRadius: 3,
+            margin: { xs: "10px 8px", sm: "18px auto", md: "24px auto" },
+            maxWidth: { xs: "100%", sm: 620, md: 720, lg: 820, xl: 920 },
+            width: "100%",
+            borderRadius: { xs: 1.5, sm: 3 },
             boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
             overflow: "hidden",
             cursor: "pointer",
@@ -237,7 +238,7 @@ const PostList = ({ session, initPostId }: IProps) => {
                       ? post.userId.avatar
                       : "/user/default-user.png"
                   }
-                  sx={{ cursor: "pointer" }} // 👈 THÊM ĐỂ BIẾT LÀ CLICK ĐƯỢC
+                  sx={{ cursor: "pointer", width: { xs: 36, sm: 44 }, height: { xs: 36, sm: 44 } }} // responsive avatar
                 />
               </Link>
             }
@@ -285,9 +286,9 @@ const PostList = ({ session, initPostId }: IProps) => {
             {/* ===== BIRTHDAY CARD ===== */}
             {post.content && (
               <Typography
-                variant="h6"
-                fontWeight="bold"
-                sx={{ mb: 1 }}
+                variant="body1"
+                fontWeight="700"
+                sx={{ mb: 1.25, fontSize: { xs: 14, sm: 16, md: 18 }, lineHeight: 1.45 }}
                 onClick={() => setSelectedPostId(post._id)}
               >
                 {post.content}
@@ -377,18 +378,16 @@ const PostList = ({ session, initPostId }: IProps) => {
                     sx={{
                       position: "relative",
                       width: "100%",
-                      height: isSingle ? 480 : 240, // 👈 MẤU CHỐT
+                      height: isSingle
+                        ? { xs: 220, sm: 320, md: 420 }
+                        : { xs: 120, sm: 180, md: 240 }, // responsive heights for single vs multi
                       overflow: "hidden",
                     }}
                   >
-                    <img
+                    <Box
+                      component="img"
                       src={img}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover", // 👈 giống FB
-                        display: "block",
-                      }}
+                      sx={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                     />
 
                     {/* Overlay +x */}
@@ -402,7 +401,7 @@ const PostList = ({ session, initPostId }: IProps) => {
                           alignItems: "center",
                           justifyContent: "center",
                           color: "#fff",
-                          fontSize: 32,
+                          fontSize: { xs: 18, sm: 26, md: 32 },
                           fontWeight: 700,
                         }}
                       >
@@ -438,26 +437,29 @@ const PostList = ({ session, initPostId }: IProps) => {
             disableSpacing
             sx={{
               display: "flex",
-              justifyContent: "space-around",
+              justifyContent: "space-between",
               borderTop: "1px solid #eee",
-              paddingY: 1,
+              px: { xs: 1, sm: 2 },
+              py: { xs: 0.5, sm: 1 },
+              flexWrap: "wrap",
+              gap: { xs: 1, sm: 0 },
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               <Checkbox
                 icon={<FavoriteBorder />}
                 checkedIcon={<Favorite sx={{ color: "red" }} />}
                 checked={post.isLiked}
                 onClick={() => handleLikes(post._id)}
               />
-              <Typography variant="body2">{post.likesCount} Likes</Typography>
+              <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>{post.likesCount} Likes</Typography>
             </Box>
 
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
-                gap: 1,
+                gap: 0.5,
                 cursor: "pointer",
               }}
               onClick={() =>
@@ -465,40 +467,38 @@ const PostList = ({ session, initPostId }: IProps) => {
               }
             >
               <IconButton size="small">
-                <Comment />
+                <Comment fontSize="small" />
               </IconButton>
-              <Typography variant="body2">
-                {post.commentsCount} Comments
-              </Typography>
+              <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>{post.commentsCount} Comments</Typography>
             </Box>
 
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
-                gap: 1,
+                gap: 0.5,
                 cursor: "pointer",
               }}
               onClick={() => setSharePostId(post._id)}
             >
               <IconButton size="small">
-                <Share />
+                <Share fontSize="small" />
               </IconButton>
-              <Typography variant="body2">Share</Typography>
+              <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>Share</Typography>
             </Box>
           </CardActions>
 
           {/* COMMENT INPUT */}
           {openCommentBox === post._id && (
-            <Box sx={{ px: 2, py: 1 }}>
+            <Box sx={{ px: { xs: 1, sm: 2 }, py: { xs: 0.75, sm: 1 } }}>
               <Divider sx={{ mb: 1 }} />
               <Paper
                 component="form"
                 sx={{
-                  p: "4px 8px",
+                  p: { xs: "6px 8px", sm: "6px 12px" },
                   display: "flex",
                   alignItems: "center",
-                  borderRadius: 4,
+                  borderRadius: 3,
                   border: "1px solid #ccc",
                 }}
                 onSubmit={(e) => e.preventDefault()} // tránh reload trang
@@ -509,13 +509,14 @@ const PostList = ({ session, initPostId }: IProps) => {
                   sx={{ flex: 1 }}
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  InputProps={{ disableUnderline: true }}
+                  InputProps={{ disableUnderline: true, sx: { fontSize: { xs: 13, sm: 14 } } }}
                 />
                 <IconButton
                   color="primary"
+                  size="small"
                   onClick={() => handlePostComment(post._id)}
                 >
-                  <Send />
+                  <Send fontSize="small" />
                 </IconButton>
               </Paper>
             </Box>

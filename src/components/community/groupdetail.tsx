@@ -124,10 +124,10 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
       <Box
         sx={{
           width: "100%",
-          maxWidth: "1500px",
+          maxWidth: { xs: "100%", md: 1200 },
           display: "flex",
           flexDirection: "column",
-          px: 2,
+          px: { xs: 1.5, sm: 2 },
         }}
       >
         <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
@@ -153,7 +153,7 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
         <Box
           sx={{
             width: "100%",
-            height: "300px",
+            height: { xs: 180, sm: 300 },
             borderRadius: "12px",
             overflow: "hidden",
             mb: 2,
@@ -169,20 +169,20 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
           <Avatar
             src={group.avatar}
             sx={{
-              width: 120,
-              height: 120,
+              width: { xs: 80, sm: 120 },
+              height: { xs: 80, sm: 120 },
               border: "4px solid white",
               position: "absolute",
-              top: -60,
-              left: 20,
+              top: { xs: -40, sm: -60 },
+              left: { xs: 12, sm: 20 },
               boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
               borderRadius: 3,
             }}
           />
 
-          <Box sx={{ height: 70 }} />
+          <Box sx={{ height: { xs: 48, sm: 70 } }} />
 
-          <Typography variant="h4" fontWeight={700}>
+          <Typography variant="h4" fontWeight={700} sx={{ fontSize: { xs: 20, sm: 34 } }}>
             {group.name}
           </Typography>
 
@@ -191,24 +191,24 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
           </Typography>
 
           {/* Members preview */}
-          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+          <Box sx={{ display: "flex", gap: 1, mt: 1, flexWrap: "wrap" }}>
             {group.members.slice(0, 10).map((m, i) => (
               <Avatar
                 key={i}
                 src={m.avatar ? m.avatar : "/user/default-user.png"}
-                sx={{ width: 34, height: 34, border: "2px solid white" }}
+                sx={{ width: { xs: 28, sm: 34 }, height: { xs: 28, sm: 34 }, border: "2px solid white", mb: 0.5 }}
               />
             ))}
           </Box>
 
           {/* Buttons */}
-          <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
+          <Box sx={{ display: "flex", gap: 1, mt: 2, flexWrap: { xs: "wrap", sm: "nowrap" } }}>
             {group.isJoined ? (
               <Button
                 variant="outlined"
                 color="error"
                 onClick={handleLeave}
-                sx={{ textTransform: "none", fontWeight: 600 }}
+                sx={{ textTransform: "none", fontWeight: 600, width: { xs: "100%", sm: "auto" } }}
               >
                 Rời nhóm
               </Button>
@@ -216,7 +216,7 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
               <Button
                 variant="contained"
                 onClick={handleJoin}
-                sx={{ textTransform: "none", fontWeight: 600 }}
+                sx={{ textTransform: "none", fontWeight: 600, width: { xs: "100%", sm: "auto" } }}
               >
                 Tham gia nhóm
               </Button>
@@ -224,7 +224,7 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
 
             <Button
               variant="contained"
-              sx={{ ml: 1 }}
+              sx={{ ml: 1, width: { xs: "100%", sm: "auto" } }}
               onClick={() => setOpenInvite(true)}
             >
               + Mời
@@ -234,7 +234,7 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
               <Button
                 variant="outlined"
                 color="error"
-                sx={{ ml: 1, fontWeight: 600 }}
+                sx={{ ml: 1, fontWeight: 600, width: { xs: "100%", sm: "auto" } }}
                 onClick={() => setOpenConfirm(true)}
               >
                 Xóa nhóm
@@ -244,7 +244,7 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
               <Button
                 variant="outlined"
                 color="success"
-                sx={{ ml: 1, fontWeight: 600 }}
+                sx={{ ml: 1, fontWeight: 600, width: { xs: "100%", sm: "auto" } }}
                 onClick={() => setOpenUpdate(true)}
               >
                 Cập nhật thông tin nhóm
@@ -287,8 +287,8 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
           </Box>
         </Box>
         {/* BODY CONTENT */}
-        <Box sx={{ display: "flex", width: "100%", gap: 4 }}>
-          <Box sx={{ width: "750px" }}>
+        <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, width: "100%", gap: { xs: 0, md: 4 } }}>
+          <Box sx={{ flex: 1, maxWidth: { xs: "100%", sm: 720, md: 760, lg: 820 }, minWidth: 0 }}>
             {activeTab === "discussion" && (
               <>
                 <CreatePost

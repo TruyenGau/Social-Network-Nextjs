@@ -27,7 +27,7 @@ const Rightbar = ({ suggesionFriend }: IProps) => {
     <Box
       flex={2}
       sx={{
-        display: { xs: "none", md: "block" },
+        display: { xs: "none", lg: "block" },
         pl: 2,
       }}
     >
@@ -37,7 +37,7 @@ const Rightbar = ({ suggesionFriend }: IProps) => {
           position: "fixed",
           top: 75,
           right: 0,
-          width: 320,
+          width: { lg: 320, xl: 360 },
           height: "calc(100vh - 75px)",
           pr: 2,
           pl: 1,

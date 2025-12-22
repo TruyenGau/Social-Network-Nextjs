@@ -87,7 +87,7 @@ const PostCard = ({ post, session, onLike, onComment, onShare }: Props) => {
           {post.images.slice(0, 4).map((img, idx) => (
             <Box
               key={idx}
-              sx={{ height: post.images.length === 1 ? 480 : 240 }}
+              sx={{ height: post.images.length === 1 ? { xs: 320, sm: 480 } : { xs: 160, sm: 240 } }}
             >
               <img
                 src={img}

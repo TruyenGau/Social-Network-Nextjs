@@ -104,7 +104,7 @@ export default function CreateStoryModal({ onClose, onCreated }: Props) {
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: "90%",
-          maxWidth: 480,
+          maxWidth: { xs: "95%", sm: 480 },
           borderRadius: "18px",
           p: 3,
           zIndex: 9999,

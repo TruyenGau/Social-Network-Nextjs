@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { styled, alpha } from "@mui/material/styles";
+import { styled, alpha, useTheme } from "@mui/material/styles";
 import {
   AppBar,
   Box,
@@ -12,6 +12,14 @@ import {
   MenuItem,
   Menu,
   Avatar,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  useMediaQuery,
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -22,6 +30,16 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import PeopleIcon from "@mui/icons-material/People";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
+import ErrorIcon from "@mui/icons-material/Error";
+
+import ProfileInfomation from "@/components/profile/profile.info";
+import SuggestionsFriend from "@/components/rightbar/friend";
+import BirthdayUser from "@/components/rightbar/birthday";
+import SponsoredAds from "@/components/rightbar/advertisement";
+import MobileSidebar from "@/components/sidebar/mobile.sidebar";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -32,11 +50,12 @@ import { io, Socket } from "socket.io-client";
 
 /* ================= STYLE ================= */
 
-const Search = styled("div")(() => ({
+const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: 999,
   backgroundColor: "#f0f2f5",
-  width: 260,
+  width: "100%",
+  maxWidth: 260,
   height: 40,
   display: "flex",
   alignItems: "center",
@@ -59,9 +78,12 @@ const StyledInputBase = styled(InputBase)({
 
 const CenterIconButton = styled(IconButton, {
   shouldForwardProp: (prop) => prop !== "active",
-})<{ active?: boolean }>(({ active }) => ({
+})<{ active?: boolean }>(({ theme, active }) => ({
   borderRadius: 8,
-  padding: "10px 36px",
+  padding: "10px 24px",
+  [theme.breakpoints.down("sm")]: {
+    padding: "8px 12px",
+  },
   color: active ? "#1877f2" : "#65676b",
   borderBottom: active ? "3px solid #1877f2" : "3px solid transparent",
 }));
@@ -76,6 +98,15 @@ export default function AppHeader() {
   const [anchorNoti, setAnchorNoti] = React.useState<HTMLElement | null>(null);
   const [anchorGroupInvite, setAnchorGroupInvite] =
     React.useState<HTMLElement | null>(null);
+
+  // Mobile drawer state
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  // Mobile right panel state
+  const [mobileRightOpen, setMobileRightOpen] = React.useState(false);
+
+  // responsive helpers
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [notifications, setNotifications] = React.useState<any[]>([]);
   const [unread, setUnread] = React.useState(0);
@@ -216,26 +247,40 @@ export default function AppHeader() {
       <Toolbar sx={{ justifyContent: "space-between" }}>
         {/* ========== LEFT ========== */}
         <Box display="flex" alignItems="center" gap={2}>
+          {/* Mobile menu button */}
+          <IconButton
+            sx={{ display: { xs: "block", md: "none" } }}
+            onClick={() => setMobileOpen(true)}
+            aria-label="menu"
+          >
+            <MenuIcon />
+          </IconButton>
+
           <Typography
             fontWeight={800}
             fontSize={24}
             color="#1877f2"
-            sx={{ cursor: "pointer" }}
+            sx={{ cursor: "pointer", display: { xs: "none", sm: "block" } }}
             onClick={() => router.push("/")}
           >
             MEO
           </Typography>
 
-          <Search>
+          <Search sx={{ display: { xs: "none", sm: "flex" } }}>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase placeholder="Tìm kiếm trên MEO" />
           </Search>
+
+          {/* Mobile search icon (placeholder for future search dialog) */}
+          <IconButton sx={{ display: { xs: "block", sm: "none" } }}>
+            <SearchIcon />
+          </IconButton>
         </Box>
 
         {/* ========== CENTER ========== */}
-        <Box display="flex" alignItems="center">
+        <Box display="flex" alignItems="center" sx={{ display: { xs: "none", sm: "flex" } }}>
           {centerTabs.map((tab) => {
             const isActive =
               tab.path === "/"
@@ -286,6 +331,14 @@ export default function AppHeader() {
               </Badge>
             </IconButton>
 
+            {/* Mobile right panel button */}
+            <IconButton
+              sx={{ display: { xs: "block", md: "none" } }}
+              onClick={() => setMobileRightOpen(true)}
+            >
+              <PeopleIcon />
+            </IconButton>
+
             <Avatar
               src={
                 session?.user?.avatar
@@ -298,6 +351,57 @@ export default function AppHeader() {
           </Box>
         )}
       </Toolbar>
+
+      {/* ========== MOBILE DRAWER ========== */}
+      <Drawer anchor="left" open={mobileOpen} onClose={() => setMobileOpen(false)}>
+        {/* Use MobileSidebar so left Drawer mirrors full desktop Sidebar */}
+        <Box role="presentation">
+          <MobileSidebar onClose={() => setMobileOpen(false)} />
+        </Box>
+      </Drawer>
+
+      {/* ========== MOBILE RIGHT DRAWER ========== */}
+      <Drawer
+        anchor={isXs ? "bottom" : "right"}
+        open={mobileRightOpen}
+        onClose={() => setMobileRightOpen(false)}
+      >
+        <Box
+          sx={{
+            width: { xs: "100%", sm: 340 },
+            height: isXs ? "45vh" : "auto",
+            p: 2,
+          }}
+          role="presentation"
+        >
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+            <Typography fontWeight={700}>Tùy chọn</Typography>
+            <IconButton onClick={() => setMobileRightOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+
+          <Divider sx={{ mb: 1 }} />
+
+          <Box mb={2}>
+            <ProfileInfomation />
+          </Box>
+
+          <Divider sx={{ my: 1 }} />
+
+          <Box mb={2}>
+            <SuggestionsFriend suggesionFriend={null} />
+          </Box>
+
+          <Box mb={2}>
+            <BirthdayUser />
+          </Box>
+
+          <Box mb={2}>
+            <SponsoredAds />
+          </Box>
+        </Box>
+      </Drawer>
 
       {/* ========== NOTIFICATION MENU ========== */}
       <Menu

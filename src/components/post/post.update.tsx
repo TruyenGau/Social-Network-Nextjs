@@ -268,9 +268,9 @@ export default function UpdatePostModal({
       </DialogContent>
 
       {/* ===== ACTIONS ===== */}
-      <DialogActions>
-        <Button onClick={onClose}>Hủy</Button>
-        <Button variant="contained" disabled={loading} onClick={handleSubmit}>
+      <DialogActions sx={{ px: { xs: 2, sm: 0 }, gap: 1, flexDirection: { xs: "column", sm: "row" } }}>
+        <Button onClick={onClose} sx={{ width: { xs: "100%", sm: "auto" } }}>Hủy</Button>
+        <Button variant="contained" disabled={loading} onClick={handleSubmit} sx={{ width: { xs: "100%", sm: "auto" } }}>
           {loading ? "Đang lưu..." : "Lưu"}
         </Button>
       </DialogActions>

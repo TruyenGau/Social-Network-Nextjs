@@ -79,8 +79,9 @@ const ProfileInfomation = () => {
   return (
     <Box
       sx={{
-        p: 2.5,
-        maxWidth: 360,
+        p: { xs: 1.5, sm: 2.5 },
+        maxWidth: { xs: "100%", sm: 360 },
+        width: "100%",
         borderRadius: 3,
         backgroundColor: "#f7f8fa", // 👈 nền xám rất nhẹ
         border: "1px solid #e4e6eb",

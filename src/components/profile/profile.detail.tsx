@@ -14,10 +14,10 @@ interface IProps {
 
 const StatItem = ({ label, value }: { label: string; value: number }) => (
   <Box textAlign="center">
-    <Typography fontWeight={700} fontSize={16}>
+    <Typography sx={{ fontWeight: 700, fontSize: { xs: 16, sm: 18 } }}>
       {value}
     </Typography>
-    <Typography fontSize={13} color="text.secondary">
+    <Typography sx={{ fontSize: { xs: 12, sm: 13 }, color: "text.secondary" }}>
       {label}
     </Typography>
   </Box>
@@ -37,16 +37,16 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
   return (
     <Box
       sx={{
-        maxWidth: 1000,
+        maxWidth: { xs: "100%", sm: 760, md: 1000, lg: 1100, xl: 1200 },
         mx: "auto",
-        px: 2,
-        pb: 6,
+        px: { xs: 2, sm: 3 },
+        pb: { xs: 6, sm: 8 },
       }}
     >
       {/* ================= COVER ================= */}
       <Box
         sx={{
-          height: 320,
+          height: { xs: 180, sm: 320, md: 380, lg: 420 },
           borderRadius: 2,
           position: "relative",
           backgroundColor: "#e4e6eb",
@@ -66,16 +66,16 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
         <Avatar
           src={user.avatar ? user.avatar : "/user/default-user.png"}
           sx={{
-            width: 180, // 👈 TO HƠN
-            height: 180, // 👈 TO HƠN
-            borderRadius: "50%", // 👈 TRÒN TUYỆT ĐỐI
-            border: "6px solid white", // 👈 viền trắng dày như FB
+            width: { xs: 88, sm: 120, md: 160, lg: 180 },
+            height: { xs: 88, sm: 120, md: 160, lg: 180 },
+            borderRadius: "50%",
+            border: { xs: "4px solid white", sm: "6px solid white" },
             position: "absolute",
-            bottom: -90, // 👈 đẩy xuống cho cân
+            bottom: { xs: -44, sm: -60, md: -72, lg: -90 },
             left: "50%",
             transform: "translateX(-50%)",
             backgroundColor: "#fff",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.25)", // 👈 nổi khối
+            boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
             zIndex: 10,
           }}
         />
@@ -83,22 +83,22 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
 
       <Box
         sx={{
-          mt: 11,
+          mt: { xs: 8, sm: 11 },
           textAlign: "center",
         }}
       >
         {/* NAME */}
-        <Typography fontSize={28} fontWeight={700} lineHeight={1.2}>
+        <Typography sx={{ fontSize: { xs: 20, sm: 24, md: 28 }, fontWeight: 700, lineHeight: 1.2 }}>
           {user.name}
         </Typography>
 
         {/* USERNAME */}
-        <Typography fontSize={14} color="text.secondary" sx={{ mt: 0.5 }}>
+        <Typography sx={{ fontSize: { xs: 12, sm: 14 }, color: "text.secondary", mt: 0.5 }}>
           @{user.email.split("@")[0]}
         </Typography>
 
         {/* STATS */}
-        <Stack direction="row" justifyContent="center" spacing={6} mt={3}>
+        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="center" spacing={{ xs: 2.5, sm: 6 }} mt={3}>
           <StatItem label="Bài viết" value={posts?.length || 0} />
           <StatItem label="Người theo dõi" value={user.followersCount || 0} />
           <StatItem label="Đang theo dõi" value={user.followingCount || 0} />
@@ -108,8 +108,8 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
       <Divider sx={{ my: 4 }} />
 
       {/* ================= POSTS FEED ================= */}
-      <Box sx={{ maxWidth: 600, mx: "auto" }}>
-        <Typography fontSize={18} fontWeight={700} mb={2}>
+      <Box sx={{ maxWidth: { xs: "100%", sm: 640, md: 760 }, mx: "auto" }}>
+        <Typography sx={{ fontSize: { xs: 16, sm: 18 }, fontWeight: 700, mb: 2 }}>
           Bài viết
         </Typography>
 
