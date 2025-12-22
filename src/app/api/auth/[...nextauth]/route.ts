@@ -7,6 +7,7 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
+
   providers: [
     CredentialsProvider({
       name: "Tryền nào",
@@ -49,6 +50,9 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      return baseUrl;
+    },
     async jwt({ token, user, account, profile, trigger }) {
       if (trigger === "signIn" && account?.provider !== "credentials") {
         const res = await sendRequest<IBackendRes<JWT>>({
