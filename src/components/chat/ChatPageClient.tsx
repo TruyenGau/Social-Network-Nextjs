@@ -813,11 +813,7 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
             {currentRoom && currentRoom.type === "private" && currentFriend && (
               <>
                 <Avatar
-                  src={
-                    currentFriend.avatar
-                      ? `${BACKEND_URL}/avatar/images/${currentFriend.avatar}`
-                      : undefined
-                  }
+                  src={currentFriend.avatar ? currentFriend.avatar : undefined}
                   sx={{ width: 36, height: 36 }}
                 >
                   {/* {currentFriend.name?.charAt(0).toUpperCase()} */}
@@ -1276,7 +1272,7 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
                     {followings.map((item) => {
                       const friend = item.following;
                       const avatarUrl = friend.avatar
-                        ? `${BACKEND_URL}/avatar/images/${friend.avatar}`
+                        ? friend.avatar
                         : undefined;
 
                       return (
@@ -1476,9 +1472,7 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
                 <List sx={{ py: 0 }}>
                   {pendingRequests.map((req) => {
                     const sender = req.sender;
-                    const avatarUrl = sender.avatar
-                      ? `${BACKEND_URL}/avatar/images/${sender.avatar}`
-                      : undefined;
+                    const avatarUrl = sender.avatar ? sender.avatar : undefined;
 
                     return (
                       <ListItem key={req.roomId} disablePadding>
