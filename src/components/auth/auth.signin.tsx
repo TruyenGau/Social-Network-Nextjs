@@ -143,7 +143,7 @@ export const AuthSignIn = () => {
             <Avatar>
               <Lock />
             </Avatar>
-            <Typography component="h1">Đăng Nhập</Typography>
+            <Typography component="h1">Đăng Nhập Truyền</Typography>
           </Box>
 
           <FormControl sx={{ width: "100%" }} variant="outlined">
