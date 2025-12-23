@@ -146,9 +146,7 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
         <Divider />
         <Box sx={{ p: 2 }}>
           <ProfileInfomation />
-          <Box mt={2}>
-            <JoinedGroupsMock />
-          </Box>
+          <Box mt={2}>{/* <JoinedGroupsMock /> */}</Box>
         </Box>
       </Drawer>
 

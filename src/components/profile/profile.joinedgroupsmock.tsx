@@ -1,6 +1,38 @@
+import { sendRequest } from "@/utils/api";
 import { Box, Typography, Avatar, Stack } from "@mui/material";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const JoinedGroupsMock = () => {
+  const [joinedGroups, setJoinedGroups] = useState<IGroups[]>([]);
+  const [loadingGroups, setLoadingGroups] = useState(true);
+  const { data: session } = useSession();
+  const router = useRouter();
+  useEffect(() => {
+    if (!session?.access_token) return;
+
+    const fetchJoinedGroups = async () => {
+      setLoadingGroups(true);
+
+      const res = await sendRequest<IBackendRes<IModelPaginate<IGroups>>>({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/communities`,
+        method: "GET",
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      const groups = res?.data?.result ?? [];
+
+      // ✅ chỉ lấy nhóm đã tham gia
+      const joined = groups.filter((g) => g.isJoined);
+
+      setJoinedGroups(joined);
+      setLoadingGroups(false);
+    };
+
+    fetchJoinedGroups();
+  }, [session?.access_token]);
+
   return (
     <Box
       sx={{
@@ -17,37 +49,56 @@ const JoinedGroupsMock = () => {
       </Typography>
 
       {/* GROUP LIST */}
-      <Stack spacing={1.5}>
-        {[
-          { name: "Nhóm CNTT", icon: "👨‍💻", members: "1.2K" },
-          { name: "TigerStudy", icon: "🐯", members: "856" },
-          { name: "Học React", icon: "⚛️", members: "432" },
-        ].map((group) => (
-          <Box
-            key={group.name}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1.2,
-              cursor: "pointer",
-              "&:hover": { backgroundColor: "#e4e6eb" },
-              p: 0.8,
-              borderRadius: 2,
-            }}
-          >
-            <Avatar sx={{ width: 34, height: 34 }}>{group.icon}</Avatar>
+      {loadingGroups ? (
+        <Typography fontSize={13} color="#65676B">
+          Đang tải nhóm...
+        </Typography>
+      ) : joinedGroups.length === 0 ? (
+        <Typography fontSize={13} color="#65676B">
+          Chưa tham gia nhóm nào
+        </Typography>
+      ) : (
+        <Stack spacing={1.2}>
+          {joinedGroups.slice(0, 3).map((group) => (
+            <Box
+              key={group._id}
+              display="flex"
+              alignItems="center"
+              gap={1.5}
+              sx={{
+                cursor: "pointer",
+                "&:hover": { bgcolor: "#e4e6eb" },
+                p: 0.8,
+                borderRadius: 2,
+              }}
+              onClick={() => router.push(`/groups/${group._id}`)}
+            >
+              <Avatar src={group.avatar} sx={{ width: 36, height: 36 }} />
 
-            <Box>
-              <Typography fontSize={14} fontWeight={600}>
-                {group.name}
-              </Typography>
-              <Typography fontSize={12} color="text.secondary">
-                {group.members} thành viên
-              </Typography>
+              <Box>
+                <Typography fontSize={14} fontWeight={600}>
+                  {group.name}
+                </Typography>
+                <Typography fontSize={12} color="#65676B">
+                  {group.membersCount} thành viên
+                </Typography>
+              </Box>
             </Box>
-          </Box>
-        ))}
-      </Stack>
+          ))}
+
+          {joinedGroups.length > 3 && (
+            <Typography
+              fontSize={14}
+              color="#1877F2"
+              fontWeight={600}
+              sx={{ cursor: "pointer", mt: 0.5 }}
+              onClick={() => router.push(`/groups?joined=true`)}
+            >
+              Xem tất cả →
+            </Typography>
+          )}
+        </Stack>
+      )}
 
       {/* FOOTER */}
       <Typography

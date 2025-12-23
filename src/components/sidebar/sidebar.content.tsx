@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Avatar,
   Box,
@@ -17,6 +17,8 @@ import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
 import ErrorIcon from "@mui/icons-material/Error";
 import { IUser } from "@/types/next-auth";
+import { sendRequest } from "@/utils/api";
+import { useSession } from "next-auth/react";
 
 interface Props {
   data: IUser | null;
@@ -24,6 +26,29 @@ interface Props {
 }
 
 export default function SidebarContent({ data, onNavigate }: Props) {
+  const [joinedGroups, setJoinedGroups] = useState<IGroups[]>([]);
+  const { data: session } = useSession();
+  useEffect(() => {
+    if (!data) return;
+
+    const fetchJoinedGroups = async () => {
+      const res = await sendRequest<IBackendRes<IModelPaginate<IGroups>>>({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/communities`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
+
+      const groups = res?.data?.result ?? [];
+
+      // ✅ chỉ lấy nhóm đã tham gia
+      setJoinedGroups(groups.filter((g) => g.isJoined));
+    };
+
+    fetchJoinedGroups();
+  }, [data]);
+
   return (
     <Box>
       <List>
@@ -150,37 +175,61 @@ export default function SidebarContent({ data, onNavigate }: Props) {
         </Typography>
 
         <List dense>
-          {[
-            { label: "Nhóm CNTT", icon: "👨‍💻" },
-            { label: "TigerStudy", icon: "🐯" },
-            { label: "Học React", icon: "⚛️" },
-          ].map((item) => (
-            <ListItemButton
-              key={item.label}
-              sx={{
-                borderRadius: "8px",
-                minHeight: 44,
-                px: 1,
-                "&:hover": { bgcolor: "action.hover" },
-                mb: 1,
-              }}
+          <Box mt={2}>
+            <Typography
+              fontSize={15}
+              fontWeight={600}
+              color="text.secondary"
+              sx={{ px: 1, mb: 1 }}
             >
-              <Box
-                sx={{
-                  minWidth: 28,
-                  display: "flex",
-                  justifyContent: "center",
-                  mr: 1,
-                  fontSize: 18,
-                }}
-              >
-                {item.icon}
-              </Box>
-              <Typography fontSize={14} fontWeight={500}>
-                {item.label}
-              </Typography>
-            </ListItemButton>
-          ))}
+              Lối tắt
+            </Typography>
+
+            <List dense>
+              {joinedGroups.length === 0 && (
+                <Typography fontSize={13} color="text.secondary" sx={{ px: 1 }}>
+                  Chưa tham gia nhóm nào
+                </Typography>
+              )}
+
+              {joinedGroups.slice(0, 5).map((group) => (
+                <ListItemButton
+                  key={group._id}
+                  href={`/groups/${group._id}`}
+                  onClick={onNavigate}
+                  sx={{
+                    borderRadius: "8px",
+                    minHeight: 44,
+                    px: 1,
+                    "&:hover": { bgcolor: "action.hover" },
+                    mb: 0.5,
+                  }}
+                >
+                  <Avatar
+                    src={group.avatar}
+                    sx={{ width: 28, height: 28, mr: 1 }}
+                  />
+                  <Typography fontSize={14} fontWeight={500} noWrap>
+                    {group.name}
+                  </Typography>
+                </ListItemButton>
+              ))}
+
+              {joinedGroups.length > 5 && (
+                <Typography
+                  fontSize={14}
+                  color="#1877F2"
+                  fontWeight={600}
+                  sx={{ px: 1, cursor: "pointer", mt: 0.5 }}
+                  onClick={() =>
+                    (window.location.href = "/community?joined=true")
+                  }
+                >
+                  Xem tất cả →
+                </Typography>
+              )}
+            </List>
+          </Box>
         </List>
       </Box>
     </Box>
