@@ -149,7 +149,7 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
             </Button>
           </DialogActions>
         </Dialog>
-        ;{/* COVER */}
+        {/* COVER */}
         <Box
           sx={{
             width: "100%",
@@ -182,7 +182,11 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
 
           <Box sx={{ height: { xs: 48, sm: 70 } }} />
 
-          <Typography variant="h4" fontWeight={700} sx={{ fontSize: { xs: 20, sm: 34 } }}>
+          <Typography
+            variant="h4"
+            fontWeight={700}
+            sx={{ fontSize: { xs: 20, sm: 34 } }}
+          >
             {group.name}
           </Typography>
 
@@ -196,19 +200,35 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
               <Avatar
                 key={i}
                 src={m.avatar ? m.avatar : "/user/default-user.png"}
-                sx={{ width: { xs: 28, sm: 34 }, height: { xs: 28, sm: 34 }, border: "2px solid white", mb: 0.5 }}
+                sx={{
+                  width: { xs: 28, sm: 34 },
+                  height: { xs: 28, sm: 34 },
+                  border: "2px solid white",
+                  mb: 0.5,
+                }}
               />
             ))}
           </Box>
 
           {/* Buttons */}
-          <Box sx={{ display: "flex", gap: 1, mt: 2, flexWrap: { xs: "wrap", sm: "nowrap" } }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              mt: 2,
+              flexWrap: { xs: "wrap", sm: "nowrap" },
+            }}
+          >
             {group.isJoined ? (
               <Button
                 variant="outlined"
                 color="error"
                 onClick={handleLeave}
-                sx={{ textTransform: "none", fontWeight: 600, width: { xs: "100%", sm: "auto" } }}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 600,
+                  width: { xs: "100%", sm: "auto" },
+                }}
               >
                 Rời nhóm
               </Button>
@@ -216,7 +236,11 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
               <Button
                 variant="contained"
                 onClick={handleJoin}
-                sx={{ textTransform: "none", fontWeight: 600, width: { xs: "100%", sm: "auto" } }}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 600,
+                  width: { xs: "100%", sm: "auto" },
+                }}
               >
                 Tham gia nhóm
               </Button>
@@ -234,7 +258,11 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
               <Button
                 variant="outlined"
                 color="error"
-                sx={{ ml: 1, fontWeight: 600, width: { xs: "100%", sm: "auto" } }}
+                sx={{
+                  ml: 1,
+                  fontWeight: 600,
+                  width: { xs: "100%", sm: "auto" },
+                }}
                 onClick={() => setOpenConfirm(true)}
               >
                 Xóa nhóm
@@ -244,7 +272,11 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
               <Button
                 variant="outlined"
                 color="success"
-                sx={{ ml: 1, fontWeight: 600, width: { xs: "100%", sm: "auto" } }}
+                sx={{
+                  ml: 1,
+                  fontWeight: 600,
+                  width: { xs: "100%", sm: "auto" },
+                }}
                 onClick={() => setOpenUpdate(true)}
               >
                 Cập nhật thông tin nhóm
@@ -287,8 +319,21 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
           </Box>
         </Box>
         {/* BODY CONTENT */}
-        <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, width: "100%", gap: { xs: 0, md: 4 } }}>
-          <Box sx={{ flex: 1, maxWidth: { xs: "100%", sm: 720, md: 760, lg: 820 }, minWidth: 0 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            width: "100%",
+            gap: { xs: 0, md: 4 },
+          }}
+        >
+          <Box
+            sx={{
+              flex: 1,
+              maxWidth: { xs: "100%", sm: 720, md: 760, lg: 820 },
+              minWidth: 0,
+            }}
+          >
             {activeTab === "discussion" && (
               <>
                 <CreatePost

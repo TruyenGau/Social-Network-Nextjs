@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Drawer, IconButton, Typography, Button, Fab, Tooltip } from "@mui/material";
+import {
+  Box,
+  Drawer,
+  IconButton,
+  Typography,
+  Button,
+  Fab,
+  Tooltip,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import GroupList from "./grouplist";
@@ -42,7 +50,14 @@ export default function MobileGroupDrawer({ groups }: Props) {
 
       <Drawer anchor="left" open={open} onClose={() => setOpen(false)}>
         <Box sx={{ width: 320, p: 2 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 1,
+            }}
+          >
             <Typography variant="h6">Nhóm</Typography>
             <IconButton onClick={() => setOpen(false)}>
               <CloseIcon />

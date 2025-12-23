@@ -264,7 +264,11 @@ export default function PostDetailModal({
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Avatar
-            sx={{ bgcolor: "#c0c9d3ff", width: { xs: 36, sm: 44 }, height: { xs: 36, sm: 44 } }}
+            sx={{
+              bgcolor: "#c0c9d3ff",
+              width: { xs: 36, sm: 44 },
+              height: { xs: 36, sm: 44 },
+            }}
             src={
               post?.author?.avatar
                 ? post.author.avatar
@@ -272,7 +276,9 @@ export default function PostDetailModal({
             }
           />
 
-          <Typography sx={{ fontWeight: "bold", fontSize: { xs: 16, sm: 18, md: 20 } }}>
+          <Typography
+            sx={{ fontWeight: "bold", fontSize: { xs: 16, sm: 18, md: 20 } }}
+          >
             {post?.author?.name}
           </Typography>
         </Box>
@@ -313,7 +319,10 @@ export default function PostDetailModal({
                   src={img}
                   sx={{
                     width: "100%",
-                    height: post.images.length === 1 ? { xs: 220, sm: 360, md: 480 } : { xs: 120, sm: 200, md: 260 },
+                    height:
+                      post.images.length === 1
+                        ? { xs: 220, sm: 360, md: 480 }
+                        : { xs: 120, sm: 200, md: 260 },
                     objectFit: "cover",
                     borderRadius: 1,
                     display: "block",
@@ -354,10 +363,28 @@ export default function PostDetailModal({
         )}
         {/* ===== Video post ===== */}
         {Array.isArray(post?.videos) && post!.videos!.length > 0 && (
-          <Box component="video" controls src={post?.videos?.[0]} sx={{ width: "100%", maxHeight: { xs: 240, sm: 400, md: 600 }, borderRadius: 1 }} />
+          <Box
+            component="video"
+            controls
+            src={post?.videos?.[0]}
+            sx={{
+              width: "100%",
+              maxHeight: { xs: 240, sm: 400, md: 600 },
+              borderRadius: 1,
+            }}
+          />
         )}
         <Divider sx={{ my: 2 }} />
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2, px: { xs: 1, sm: 2 }, flexWrap: "wrap", gap: { xs: 1, sm: 0 } }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            mb: 2,
+            px: { xs: 1, sm: 2 },
+            flexWrap: "wrap",
+            gap: { xs: 1, sm: 0 },
+          }}
+        >
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <Checkbox
               onClick={handleLikes}
@@ -365,12 +392,16 @@ export default function PostDetailModal({
               checkedIcon={<Favorite sx={{ color: "red" }} />}
               checked={post?.isLiked}
             />
-            <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>{post?.likesCount} Likes</Typography>
+            <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>
+              {post?.likesCount} Likes
+            </Typography>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <Comment />
-            <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>{post?.commentsCount} Comments</Typography>
+            <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>
+              {post?.commentsCount} Comments
+            </Typography>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
@@ -382,16 +413,27 @@ export default function PostDetailModal({
         <Typography sx={{ mb: 1 }} fontWeight="bold">
           Bình luận
         </Typography>
-        <Box sx={{ maxHeight: { xs: "220px", sm: "300px" }, overflowY: "auto" }}>
+        <Box
+          sx={{ maxHeight: { xs: "220px", sm: "300px" }, overflowY: "auto" }}
+        >
           {post?.comments && renderComments(post.comments)}
         </Box>
         <Paper
-          sx={{ mt: 2, display: "flex", alignItems: "center", p: { xs: 0.75, sm: 1 } }}
+          sx={{
+            mt: 2,
+            display: "flex",
+            alignItems: "center",
+            p: { xs: 0.75, sm: 1 },
+          }}
           component="form"
           onSubmit={(e) => e.preventDefault()}
         >
           <Avatar
-            sx={{ mr: 1, width: { xs: 32, sm: 40 }, height: { xs: 32, sm: 40 } }}
+            sx={{
+              mr: 1,
+              width: { xs: 32, sm: 40 },
+              height: { xs: 32, sm: 40 },
+            }}
             src={
               session.user.avatar
                 ? session.user.avatar
@@ -405,7 +447,10 @@ export default function PostDetailModal({
             placeholder="Viết bình luận công khai..."
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
-            InputProps={{ disableUnderline: true, sx: { fontSize: { xs: 13, sm: 14 } } }}
+            InputProps={{
+              disableUnderline: true,
+              sx: { fontSize: { xs: 13, sm: 14 } },
+            }}
           />
 
           <IconButton color="primary" size="small" onClick={handlePostComment}>

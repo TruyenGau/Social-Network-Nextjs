@@ -91,6 +91,8 @@ const CenterIconButton = styled(IconButton, {
 /* ================= COMPONENT ================= */
 
 export default function AppHeader() {
+  const getSender = (n: any) => n.fromUser || n.fromUserId || {};
+
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -123,6 +125,16 @@ export default function AppHeader() {
   const [groupInvites, setGroupInvites] = React.useState<any[]>([]);
   const [groupInviteUnread, setGroupInviteUnread] = React.useState(0);
   const pathname = usePathname();
+
+  const [searchText, setSearchText] = React.useState("");
+  const [searchResult, setSearchResult] = React.useState<{
+    users: any[];
+    posts: any[];
+  }>({ users: [], posts: [] });
+
+  const [searchOpen, setSearchOpen] = React.useState(false);
+  const searchRef = React.useRef<HTMLDivElement | null>(null);
+
   const centerTabs = [
     {
       key: "home",
@@ -226,6 +238,44 @@ export default function AppHeader() {
     };
   }, [session?.access_token]);
 
+  React.useEffect(() => {
+    if (!searchText || searchText.trim().length < 2) {
+      setSearchResult({ users: [], posts: [] });
+      setSearchOpen(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await sendRequest<any>({
+          url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/global/search`,
+          method: "GET",
+          queryParams: { q: searchText },
+        });
+
+        // 🔥 FIX QUAN TRỌNG
+        setSearchResult(res?.data ?? { users: [], posts: [] });
+        setSearchOpen(true);
+      } catch (err) {
+        console.error("Search error", err);
+        setSearchResult({ users: [], posts: [] });
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchText]);
+
+  React.useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   /* ================= MARK READ ================= */
 
   const handleMarkRead = async (id: string) => {
@@ -266,11 +316,99 @@ export default function AppHeader() {
             MEO
           </Typography>
 
-          <Search sx={{ display: { xs: "none", sm: "flex" } }}>
+          <Search sx={{ display: { xs: "none", sm: "flex" } }} ref={searchRef}>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
-            <StyledInputBase placeholder="Tìm kiếm trên MEO" />
+            <StyledInputBase
+              placeholder="Tìm kiếm trên MEO"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onFocus={() => setSearchOpen(true)}
+            />
+            {searchOpen &&
+              (searchResult.users.length > 0 ||
+                searchResult.posts.length > 0) && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 48,
+                    left: 0,
+                    width: "300",
+                    bgcolor: "#fff",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    borderRadius: 2,
+                    zIndex: 2000,
+                    maxHeight: 400,
+                    overflowY: "auto",
+                  }}
+                >
+                  {/* USERS */}
+                  {searchResult.users.length > 0 && (
+                    <>
+                      <Typography px={2} py={1} fontWeight={700} fontSize={13}>
+                        Người dùng
+                      </Typography>
+
+                      {searchResult.users.map((u) => (
+                        <MenuItem
+                          key={u._id}
+                          onClick={() => {
+                            setSearchOpen(false);
+                            setSearchText("");
+                            router.push(`/profile/${u._id}`);
+                          }}
+                        >
+                          <Avatar
+                            src={u.avatar || "/user/default-user.png"}
+                            sx={{ mr: 1 }}
+                          />
+                          {u.name}
+                        </MenuItem>
+                      ))}
+                    </>
+                  )}
+
+                  {/* POSTS */}
+                  {searchResult.posts.length > 0 && (
+                    <>
+                      <Divider />
+                      <Typography px={2} py={1} fontWeight={700} fontSize={13}>
+                        Bài viết
+                      </Typography>
+
+                      {searchResult.posts.map((p) => (
+                        <MenuItem
+                          key={p._id}
+                          onClick={() => {
+                            setSearchOpen(false);
+                            setSearchText("");
+                            // 👉 CÁCH 1: redirect về home kèm postId
+                            router.push(`/?post=${p._id}`);
+                          }}
+                        >
+                          <Avatar
+                            src={p.userId?.avatar || "/user/default-user.png"}
+                            sx={{ mr: 1 }}
+                          />
+                          <Box>
+                            <Typography fontSize={14} fontWeight={600}>
+                              {p.userId?.name}
+                            </Typography>
+                            <Typography
+                              fontSize={13}
+                              color="text.secondary"
+                              noWrap
+                            >
+                              {p.content}
+                            </Typography>
+                          </Box>
+                        </MenuItem>
+                      ))}
+                    </>
+                  )}
+                </Box>
+              )}
           </Search>
 
           {/* Mobile search icon (placeholder for future search dialog) */}
@@ -280,7 +418,11 @@ export default function AppHeader() {
         </Box>
 
         {/* ========== CENTER ========== */}
-        <Box display="flex" alignItems="center" sx={{ display: { xs: "none", sm: "flex" } }}>
+        <Box
+          display="flex"
+          alignItems="center"
+          sx={{ display: { xs: "none", sm: "flex" } }}
+        >
           {centerTabs.map((tab) => {
             const isActive =
               tab.path === "/"
@@ -353,7 +495,11 @@ export default function AppHeader() {
       </Toolbar>
 
       {/* ========== MOBILE DRAWER ========== */}
-      <Drawer anchor="left" open={mobileOpen} onClose={() => setMobileOpen(false)}>
+      <Drawer
+        anchor="left"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+      >
         {/* Use MobileSidebar so left Drawer mirrors full desktop Sidebar */}
         <Box role="presentation">
           <MobileSidebar onClose={() => setMobileOpen(false)} />
@@ -374,7 +520,12 @@ export default function AppHeader() {
           }}
           role="presentation"
         >
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
             <Typography fontWeight={700}>Tùy chọn</Typography>
             <IconButton onClick={() => setMobileRightOpen(false)}>
               <CloseIcon />
@@ -412,24 +563,78 @@ export default function AppHeader() {
       >
         {notifications.length === 0 && <MenuItem>Không có thông báo</MenuItem>}
 
-        {notifications.map((n: any) => (
-          <MenuItem
-            key={n._id}
-            onClick={async () => {
-              setAnchorNoti(null);
-              if (!n.isRead) {
-                await handleMarkRead(n._id);
-                setUnread((u) => Math.max(0, u - 1));
-              }
-              if (n.postId) router.push(`/?post=${n.postId}`);
-            }}
-          >
-            {n.type === "LIKE" && "👍 Đã thích bài viết của bạn"}
-            {n.type === "COMMENT" && "💬 Đã bình luận bài viết của bạn"}
-            {n.type === "CHAT_PRIVATE" && "📩 Tin nhắn mới"}
-            {n.type === "CHAT_GROUP" && "👥 Tin nhắn nhóm"}
-          </MenuItem>
-        ))}
+        {notifications.map((n: any) => {
+          const sender = getSender(n);
+
+          return (
+            <MenuItem
+              key={n._id}
+              onClick={async () => {
+                setAnchorNoti(null);
+
+                if (!n.isRead) {
+                  await handleMarkRead(n._id);
+
+                  // 🔥 UPDATE LOCAL STATE
+                  setNotifications((prev) =>
+                    prev.map((item) =>
+                      item._id === n._id ? { ...item, isRead: true } : item
+                    )
+                  );
+
+                  setUnread((u) => Math.max(0, u - 1));
+                }
+
+                if (n.postId) router.push(`/?post=${n.postId}`);
+              }}
+              sx={{
+                alignItems: "flex-start",
+                gap: 1.5,
+                bgcolor: !n.isRead ? "#e7f3ff" : "transparent",
+                borderRadius: 2,
+                py: 1,
+                "&:hover": {
+                  bgcolor: "#f0f2f5",
+                },
+              }}
+            >
+              {/* AVATAR */}
+              <Avatar
+                src={sender.avatar || "/user/default-user.png"}
+                sx={{ width: 40, height: 40 }}
+              />
+
+              {/* TEXT */}
+              <Box>
+                <Typography fontSize={14} lineHeight={1.4}>
+                  <b>{sender.name || "Ai đó"}</b>{" "}
+                  {n.type === "LIKE" && "đã thích bài viết của bạn"}
+                  {n.type === "COMMENT" && "đã bình luận bài viết của bạn"}
+                  {n.type === "CHAT_PRIVATE" && "đã gửi cho bạn một tin nhắn"}
+                  {n.type === "CHAT_GROUP" && "đã gửi tin nhắn trong nhóm"}
+                </Typography>
+
+                <Typography fontSize={12} color="text.secondary">
+                  Vừa xong
+                </Typography>
+              </Box>
+
+              {/* DOT CHƯA ĐỌC */}
+              {!n.isRead && (
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    bgcolor: "#1877f2",
+                    borderRadius: "50%",
+                    mt: 1,
+                    ml: "auto",
+                  }}
+                />
+              )}
+            </MenuItem>
+          );
+        })}
       </Menu>
 
       {/* ========== GROUP INVITE MENU ========== */}
@@ -448,8 +653,17 @@ export default function AppHeader() {
               setAnchorGroupInvite(null);
               if (!n.isRead) {
                 await handleMarkRead(n._id);
-                setGroupInviteUnread((u) => Math.max(0, u - 1));
+
+                // 🔥 UPDATE LOCAL STATE
+                setNotifications((prev) =>
+                  prev.map((item) =>
+                    item._id === n._id ? { ...item, isRead: true } : item
+                  )
+                );
+
+                setUnread((u) => Math.max(0, u - 1));
               }
+
               router.push("/invite");
             }}
           >

@@ -33,7 +33,9 @@ export default function SharedPostCard({ post }: { post: any }) {
               {post.userId?.name}
             </Typography>
           </Link>
-          <Typography sx={{ fontSize: { xs: 11, sm: 12 }, color: "text.secondary" }}>
+          <Typography
+            sx={{ fontSize: { xs: 11, sm: 12 }, color: "text.secondary" }}
+          >
             {new Date(post.createdAt).toLocaleDateString()}
           </Typography>
         </Box>
@@ -64,7 +66,10 @@ export default function SharedPostCard({ post }: { post: any }) {
                 src={img}
                 sx={{
                   width: "100%",
-                  height: post.images.length === 1 ? { xs: 220, sm: 320 } : { xs: 100, sm: 160 },
+                  height:
+                    post.images.length === 1
+                      ? { xs: 220, sm: 320 }
+                      : { xs: 100, sm: 160 },
                   objectFit: "cover",
                   display: "block",
                 }}
@@ -100,7 +105,11 @@ export default function SharedPostCard({ post }: { post: any }) {
             component="video"
             controls
             src={post.videos[0]}
-            sx={{ width: "100%", borderRadius: 1, maxHeight: { xs: 240, sm: 400 } }}
+            sx={{
+              width: "100%",
+              borderRadius: 1,
+              maxHeight: { xs: 240, sm: 400 },
+            }}
           />
         </Box>
       )}

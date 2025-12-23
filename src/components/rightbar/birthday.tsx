@@ -63,64 +63,55 @@ const BirthdayUser = () => {
       {/* TODAY'S BIRTHDAY */}
       {birthdays.length > 0 ? (
         <Box>
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            sx={{
-              p: 1,
-              borderRadius: 2,
-              "&:hover": { bgcolor: "#f5f6f7" },
-            }}
-          >
-            {/* LEFT */}
-            <Box display="flex" alignItems="center" gap={1.2}>
-              <Avatar
-                src={
-                  birthdays[0].avatar
-                    ? birthdays[0].avatar
-                    : "/user/default-user.png"
-                }
-                sx={{ width: 40, height: 40 }}
-              />
-              <Typography fontWeight={600} fontSize={15}>
-                {birthdays[0].name}
-              </Typography>
-            </Box>
-
-            {/* CELEBRATE */}
-            <Button
-              variant="contained"
-              size="small"
-              sx={{
-                textTransform: "none",
-                borderRadius: 999,
-                px: 2,
-                fontSize: 13,
-                fontWeight: 600,
-                bgcolor: "#1877F2",
-                "&:hover": { bgcolor: "#166FE5" },
-              }}
-            >
-              🎂 Chúc mừng
-            </Button>
-          </Box>
-
-          {/* UPCOMING SECTION */}
-          {birthdays.length > 1 && (
+          {birthdays.map((user) => (
             <Box
-              mt={2}
-              p={1.5}
+              key={user._id}
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
               sx={{
-                bgcolor: "#f5f6f7",
+                p: 1,
                 borderRadius: 2,
+                "&:hover": { bgcolor: "#f5f6f7" },
               }}
             >
-              <Typography fontWeight={600} fontSize={14}>
-                Sinh nhật sắp tới
-              </Typography>
+              {/* LEFT */}
+              <Box display="flex" alignItems="center" gap={1.2}>
+                <Avatar
+                  src={user.avatar || "/user/default-user.png"}
+                  sx={{ width: 40, height: 40 }}
+                />
+                <Typography fontWeight={600} fontSize={15}>
+                  {user.name}
+                </Typography>
+              </Box>
+
+              {/* CHÚC MỪNG */}
+              <Box
+                onClick={() => {
+                  setTargetUser(user); // ✅ ĐÚNG NGƯỜI
+                  setOpenWish(true);
+                }}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  px: 1.5,
+                  height: 32,
+                  borderRadius: "999px",
+                  bgcolor: "#E7F3FF",
+                  color: "#1877F2",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  userSelect: "none",
+                  "&:hover": { bgcolor: "#D8E9FF" },
+                }}
+              >
+                🎂 <span>Chúc mừng</span>
+              </Box>
             </Box>
-          )}
+          ))}
         </Box>
       ) : (
         /* NO BIRTHDAY TODAY */

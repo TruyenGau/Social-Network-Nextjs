@@ -29,6 +29,7 @@ const Rightbar = ({ suggesionFriend }: IProps) => {
       sx={{
         display: { xs: "none", lg: "block" },
         pl: 2,
+        pointerEvents: isCommunityPage ? "none" : "auto", // 🔥 FIX
       }}
     >
       {/* FIXED RIGHT SIDEBAR */}

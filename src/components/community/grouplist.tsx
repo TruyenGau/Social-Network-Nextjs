@@ -3,8 +3,10 @@
 import { Box, Typography, Avatar } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateGroupModal from "./create.community.modal";
+import { sendRequest } from "@/utils/api";
+import { useSession } from "next-auth/react";
 
 interface IProps {
   groups: IGroups[] | null;
@@ -15,9 +17,44 @@ const GroupList = ({ groups, compact = false }: IProps) => {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // --- TÁCH NHÓM ĐÃ THAM GIA & CHƯA THAM GIA ---
+  /* ================= SEARCH STATE ================= */
+  const [searchText, setSearchText] = useState("");
+  const [searchResult, setSearchResult] = useState<IGroups[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  /* ================= GROUP SPLIT (OLD LOGIC) ================= */
   const joinedGroups = groups?.filter((g) => g.isJoined) ?? [];
   const notJoinedGroups = groups?.filter((g) => !g.isJoined) ?? [];
+
+  const { data: session } = useSession();
+  /* ================= SEARCH EFFECT ================= */
+  useEffect(() => {
+    if (!searchText || searchText.trim().length < 2) {
+      setSearchResult([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const res = await sendRequest<IBackendRes<IGroups[]>>({
+          url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/communities/search/by-name`,
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+          method: "GET",
+          queryParams: { q: searchText },
+        });
+        console.log("Search community result:", res);
+        setSearchResult(res?.data ?? []);
+      } catch (err) {
+        console.error("Search community error", err);
+        setSearchResult([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchText]);
 
   return (
     <>
@@ -40,17 +77,23 @@ const GroupList = ({ groups, compact = false }: IProps) => {
           },
         }}
       >
-        <Typography variant="h5" fontWeight={700} mb={2} sx={{ display: { xs: "none", sm: "block" } }}>
+        {/* ================= HEADER ================= */}
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          mb={2}
+          sx={{ display: { xs: "none", sm: "block" } }}
+        >
           Nhóm
         </Typography>
-        {/* on compact drawer view we show a small header so users know what this panel is */}
+
         {compact && (
-          <Typography variant="subtitle1" fontWeight={700} mb={1} sx={{ display: { xs: "block", sm: "none" } }}>
+          <Typography variant="subtitle1" fontWeight={700} mb={1}>
             Nhóm của bạn
           </Typography>
         )}
 
-        {/* Search */}
+        {/* ================= SEARCH BOX ================= */}
         <Box
           sx={{
             display: "flex",
@@ -65,6 +108,8 @@ const GroupList = ({ groups, compact = false }: IProps) => {
           <SearchIcon fontSize="small" sx={{ color: "#65676b" }} />
           <input
             placeholder="Tìm kiếm nhóm"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
             style={{
               border: "none",
               outline: "none",
@@ -75,69 +120,100 @@ const GroupList = ({ groups, compact = false }: IProps) => {
           />
         </Box>
 
-        {/* CREATE GROUP BUTTON */}
-        <Box
-          sx={{
-            background: "#e7f3ff",
-            color: "#1877f2",
-            padding: "10px",
-            borderRadius: "10px",
-            textAlign: "center",
-            fontWeight: 600,
-            cursor: "pointer",
-            mb: 3,
-            "&:hover": { background: "#d8e9ff" },
-          }}
-          onClick={() => setIsModalOpen(true)}
-        >
-          + Tạo nhóm mới
-        </Box>
-
-        {/* ============================
-            NHÓM ĐÃ THAM GIA
-        ============================ */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-          <Typography variant="subtitle1" fontWeight={600}>
-            Nhóm bạn đã tham gia
-          </Typography>
-          <Typography
-            sx={{ color: "#1877f2", fontSize: "14px", cursor: "pointer" }}
+        {/* ================= CREATE GROUP ================= */}
+        <Box sx={{ mb: 3 }}>
+          <Box
+            component="button"
+            onClick={() => setIsModalOpen(true)}
+            sx={{
+              width: "100%",
+              background: "#e7f3ff",
+              color: "#1877f2",
+              padding: "10px",
+              borderRadius: "10px",
+              border: "none",
+              fontWeight: 600,
+              cursor: "pointer",
+              "&:hover": { background: "#d8e9ff" },
+            }}
           >
-            Xem tất cả
-          </Typography>
+            + Tạo nhóm mới
+          </Box>
         </Box>
 
-        {joinedGroups.length === 0 && (
-          <Typography sx={{ fontSize: "14px", color: "gray", mb: 2 }}>
-            Bạn chưa tham gia nhóm nào.
-          </Typography>
+        {/* ================= SEARCH RESULT ================= */}
+        {searchText.trim().length >= 2 && (
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle1" fontWeight={600} mb={1}>
+              Kết quả tìm kiếm
+            </Typography>
+
+            {loading && (
+              <Typography fontSize="14px" color="text.secondary">
+                Đang tìm kiếm...
+              </Typography>
+            )}
+
+            {!loading && searchResult.length === 0 && (
+              <Typography fontSize="14px" color="gray">
+                Không tìm thấy nhóm phù hợp
+              </Typography>
+            )}
+
+            {searchResult.map((g) => (
+              <GroupItem key={g._id} g={g} router={router} />
+            ))}
+          </Box>
         )}
 
-        {joinedGroups.map((g) => (
-          <GroupItem key={g._id} g={g} router={router} />
-        ))}
+        {/* ================= OLD UI (ONLY WHEN NOT SEARCHING) ================= */}
+        {searchText.trim().length < 2 && (
+          <>
+            {/* JOINED GROUPS */}
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+            >
+              <Typography variant="subtitle1" fontWeight={600}>
+                Nhóm bạn đã tham gia
+              </Typography>
+            </Box>
 
-        {/* ============================
-            NHÓM CHƯA THAM GIA
-        ============================ */}
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mt: 3, mb: 1 }}>
-          Gợi ý nhóm cho bạn
-        </Typography>
+            {joinedGroups.length === 0 && (
+              <Typography fontSize="14px" color="gray" mb={2}>
+                Bạn chưa tham gia nhóm nào.
+              </Typography>
+            )}
 
-        {notJoinedGroups.length === 0 && (
-          <Typography sx={{ fontSize: "14px", color: "gray", mb: 2 }}>
-            Không còn nhóm nào để tham gia.
-          </Typography>
+            {joinedGroups.map((g) => (
+              <GroupItem key={g._id} g={g} router={router} />
+            ))}
+
+            {/* SUGGEST GROUPS */}
+            <Typography
+              variant="subtitle1"
+              fontWeight={600}
+              sx={{ mt: 3, mb: 1 }}
+            >
+              Gợi ý nhóm cho bạn
+            </Typography>
+
+            {notJoinedGroups.length === 0 && (
+              <Typography fontSize="14px" color="gray" mb={2}>
+                Không còn nhóm nào để tham gia.
+              </Typography>
+            )}
+
+            {notJoinedGroups.map((g) => (
+              <GroupItem key={g._id} g={g} router={router} />
+            ))}
+          </>
         )}
-
-        {notJoinedGroups.map((g) => (
-          <GroupItem key={g._id} g={g} router={router} />
-        ))}
       </Box>
     </>
   );
 };
 
+/* ================= GROUP ITEM ================= */
 const GroupItem = ({ g, router }: any) => (
   <Box
     onClick={() => router.push(`/community/${g._id}`)}
@@ -160,7 +236,7 @@ const GroupItem = ({ g, router }: any) => (
     <Box>
       <Typography fontWeight={600}>{g.name}</Typography>
       <Typography fontSize="13px" color="text.secondary">
-        Mô tả: {g.description}
+        {g.description || "Không có mô tả"}
       </Typography>
     </Box>
   </Box>

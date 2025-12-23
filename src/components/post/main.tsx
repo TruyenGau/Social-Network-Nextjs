@@ -238,7 +238,11 @@ const PostList = ({ session, initPostId }: IProps) => {
                       ? post.userId.avatar
                       : "/user/default-user.png"
                   }
-                  sx={{ cursor: "pointer", width: { xs: 36, sm: 44 }, height: { xs: 36, sm: 44 } }} // responsive avatar
+                  sx={{
+                    cursor: "pointer",
+                    width: { xs: 36, sm: 44 },
+                    height: { xs: 36, sm: 44 },
+                  }} // responsive avatar
                 />
               </Link>
             }
@@ -288,7 +292,11 @@ const PostList = ({ session, initPostId }: IProps) => {
               <Typography
                 variant="body1"
                 fontWeight="700"
-                sx={{ mb: 1.25, fontSize: { xs: 14, sm: 16, md: 18 }, lineHeight: 1.45 }}
+                sx={{
+                  mb: 1.25,
+                  fontSize: { xs: 14, sm: 16, md: 18 },
+                  lineHeight: 1.45,
+                }}
                 onClick={() => setSelectedPostId(post._id)}
               >
                 {post.content}
@@ -387,7 +395,12 @@ const PostList = ({ session, initPostId }: IProps) => {
                     <Box
                       component="img"
                       src={img}
-                      sx={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                      sx={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
                     />
 
                     {/* Overlay +x */}
@@ -452,7 +465,9 @@ const PostList = ({ session, initPostId }: IProps) => {
                 checked={post.isLiked}
                 onClick={() => handleLikes(post._id)}
               />
-              <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>{post.likesCount} Likes</Typography>
+              <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>
+                {post.likesCount} Likes
+              </Typography>
             </Box>
 
             <Box
@@ -469,7 +484,9 @@ const PostList = ({ session, initPostId }: IProps) => {
               <IconButton size="small">
                 <Comment fontSize="small" />
               </IconButton>
-              <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>{post.commentsCount} Comments</Typography>
+              <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>
+                {post.commentsCount} Comments
+              </Typography>
             </Box>
 
             <Box
@@ -484,7 +501,9 @@ const PostList = ({ session, initPostId }: IProps) => {
               <IconButton size="small">
                 <Share fontSize="small" />
               </IconButton>
-              <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>Share</Typography>
+              <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>
+                Share
+              </Typography>
             </Box>
           </CardActions>
 
@@ -509,7 +528,10 @@ const PostList = ({ session, initPostId }: IProps) => {
                   sx={{ flex: 1 }}
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  InputProps={{ disableUnderline: true, sx: { fontSize: { xs: 13, sm: 14 } } }}
+                  InputProps={{
+                    disableUnderline: true,
+                    sx: { fontSize: { xs: 13, sm: 14 } },
+                  }}
                 />
                 <IconButton
                   color="primary"

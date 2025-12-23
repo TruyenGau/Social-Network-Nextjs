@@ -280,7 +280,10 @@ const PostListMock = ({
                         ? post.userId.avatar
                         : "/user/default-user.png"
                     }
-                    sx={{ width: { xs: 36, sm: 44 }, height: { xs: 36, sm: 44 } }}
+                    sx={{
+                      width: { xs: 36, sm: 44 },
+                      height: { xs: 36, sm: 44 },
+                    }}
                   />
                 </Link>
               }
@@ -301,7 +304,10 @@ const PostListMock = ({
                   </Link>
 
                   {post.isPinned && (
-                    <Typography sx={{ fontSize: { xs: 12, sm: 13 } }} color="primary">
+                    <Typography
+                      sx={{ fontSize: { xs: 12, sm: 13 } }}
+                      color="primary"
+                    >
                       📌 Đã ghim
                     </Typography>
                   )}
@@ -359,7 +365,10 @@ const PostListMock = ({
                         post.images.length === 1
                           ? { xs: 220, sm: 320, md: 420 }
                           : { xs: 120, sm: 160, md: 220 },
-                      maxHeight: post.images.length === 1 ? { xs: '40vh', md: '60vh' } : { md: 320 },
+                      maxHeight:
+                        post.images.length === 1
+                          ? { xs: "40vh", md: "60vh" }
+                          : { md: 320 },
                       objectFit: "cover",
                       borderRadius: 1,
                     }}
@@ -386,7 +395,9 @@ const PostListMock = ({
                   checked={post.isLiked}
                   onClick={() => handleLikes(post._id)}
                 />
-                <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>{post.likesCount} Likes</Typography>
+                <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>
+                  {post.likesCount} Likes
+                </Typography>
               </Box>
 
               <Box
@@ -398,7 +409,9 @@ const PostListMock = ({
                 }
               >
                 <Comment />
-                <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>{post.commentsCount} Comments</Typography>
+                <Typography sx={{ fontSize: { xs: 13, sm: 14 } }}>
+                  {post.commentsCount} Comments
+                </Typography>
               </Box>
 
               <IconButton onClick={() => handleSavePost(post._id)}>
@@ -421,7 +434,10 @@ const PostListMock = ({
                     sx={{ flex: 1 }}
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    InputProps={{ disableUnderline: true, sx: { fontSize: { xs: 13, sm: 14 } } }}
+                    InputProps={{
+                      disableUnderline: true,
+                      sx: { fontSize: { xs: 13, sm: 14 } },
+                    }}
                   />
                   <IconButton size="small">
                     <Send fontSize="small" />

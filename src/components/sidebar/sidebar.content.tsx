@@ -49,7 +49,11 @@ export default function SidebarContent({ data, onNavigate }: Props) {
 
         {/* ================= MENU ================= */}
         <ListItem disablePadding>
-          <ListItemButton href="/" sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }} onClick={onNavigate}>
+          <ListItemButton
+            href="/"
+            sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }}
+            onClick={onNavigate}
+          >
             <ListItemIcon sx={{ minWidth: 28 }}>
               <HomeIcon sx={{ color: "#1877F2", fontSize: 22 }} />
             </ListItemIcon>
@@ -58,7 +62,10 @@ export default function SidebarContent({ data, onNavigate }: Props) {
         </ListItem>
 
         <ListItem disablePadding>
-          <ListItemButton sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }} onClick={onNavigate}>
+          <ListItemButton
+            sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }}
+            onClick={onNavigate}
+          >
             <ListItemIcon sx={{ minWidth: 28 }}>
               <ArticleIcon sx={{ color: "#f02849", fontSize: 22 }} />
             </ListItemIcon>
@@ -67,7 +74,11 @@ export default function SidebarContent({ data, onNavigate }: Props) {
         </ListItem>
 
         <ListItem disablePadding>
-          <ListItemButton href="/community" sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }} onClick={onNavigate}>
+          <ListItemButton
+            href="/community"
+            sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }}
+            onClick={onNavigate}
+          >
             <ListItemIcon sx={{ minWidth: 28 }}>
               <GroupsIcon sx={{ color: "#42b72a", fontSize: 22 }} />
             </ListItemIcon>
@@ -76,7 +87,11 @@ export default function SidebarContent({ data, onNavigate }: Props) {
         </ListItem>
 
         <ListItem disablePadding>
-          <ListItemButton href="/chat" sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }} onClick={onNavigate}>
+          <ListItemButton
+            href="/chat"
+            sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }}
+            onClick={onNavigate}
+          >
             <ListItemIcon sx={{ minWidth: 28 }}>
               <PeopleIcon sx={{ color: "#1877F2", fontSize: 22 }} />
             </ListItemIcon>
@@ -85,7 +100,11 @@ export default function SidebarContent({ data, onNavigate }: Props) {
         </ListItem>
 
         <ListItem disablePadding>
-          <ListItemButton href="/invite" sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }} onClick={onNavigate}>
+          <ListItemButton
+            href="/invite"
+            sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }}
+            onClick={onNavigate}
+          >
             <ListItemIcon sx={{ minWidth: 28 }}>
               <GroupAddIcon sx={{ color: "#8b6be8", fontSize: 22 }} />
             </ListItemIcon>
@@ -94,7 +113,11 @@ export default function SidebarContent({ data, onNavigate }: Props) {
         </ListItem>
 
         <ListItem disablePadding>
-          <ListItemButton href="/music" sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }} onClick={onNavigate}>
+          <ListItemButton
+            href="/music"
+            sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }}
+            onClick={onNavigate}
+          >
             <ListItemIcon sx={{ minWidth: 28 }}>
               <OndemandVideoIcon sx={{ color: "#f5533d", fontSize: 22 }} />
             </ListItemIcon>
@@ -103,7 +126,11 @@ export default function SidebarContent({ data, onNavigate }: Props) {
         </ListItem>
 
         <ListItem disablePadding>
-          <ListItemButton href="/spam" sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }} onClick={onNavigate}>
+          <ListItemButton
+            href="/spam"
+            sx={{ borderRadius: "8px", py: 1.25, minHeight: 44, px: 1 }}
+            onClick={onNavigate}
+          >
             <ListItemIcon sx={{ minWidth: 28 }}>
               <ErrorIcon sx={{ color: "#f5533d", fontSize: 22 }} />
             </ListItemIcon>
@@ -113,15 +140,45 @@ export default function SidebarContent({ data, onNavigate }: Props) {
       </List>
 
       <Box mt={2}>
-        <Typography fontSize={15} fontWeight={600} color="text.secondary" sx={{ px: 1, mb: 1 }}>
+        <Typography
+          fontSize={15}
+          fontWeight={600}
+          color="text.secondary"
+          sx={{ px: 1, mb: 1 }}
+        >
           Lối tắt
         </Typography>
 
         <List dense>
-          {[{ label: "Nhóm CNTT", icon: "👨‍💻" }, { label: "TigerStudy", icon: "🐯" }, { label: "Học React", icon: "⚛️" }].map((item) => (
-            <ListItemButton key={item.label} sx={{ borderRadius: "8px", minHeight: 44, px: 1, "&:hover": { bgcolor: "action.hover" }, mb: 1 }}>
-              <Box sx={{ minWidth: 28, display: "flex", justifyContent: "center", mr: 1, fontSize: 18 }}>{item.icon}</Box>
-              <Typography fontSize={14} fontWeight={500}>{item.label}</Typography>
+          {[
+            { label: "Nhóm CNTT", icon: "👨‍💻" },
+            { label: "TigerStudy", icon: "🐯" },
+            { label: "Học React", icon: "⚛️" },
+          ].map((item) => (
+            <ListItemButton
+              key={item.label}
+              sx={{
+                borderRadius: "8px",
+                minHeight: 44,
+                px: 1,
+                "&:hover": { bgcolor: "action.hover" },
+                mb: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  minWidth: 28,
+                  display: "flex",
+                  justifyContent: "center",
+                  mr: 1,
+                  fontSize: 18,
+                }}
+              >
+                {item.icon}
+              </Box>
+              <Typography fontSize={14} fontWeight={500}>
+                {item.label}
+              </Typography>
             </ListItemButton>
           ))}
         </List>

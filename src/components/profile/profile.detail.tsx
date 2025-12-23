@@ -1,10 +1,23 @@
 "use client";
 
-import { useContext, useEffect } from "react";
-import { Avatar, Box, Typography, Divider, Paper, Stack } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
+import {
+  Avatar,
+  Box,
+  Typography,
+  Divider,
+  Paper,
+  Stack,
+  Drawer,
+  IconButton,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import MenuIcon from "@mui/icons-material/Menu";
 import { IUser } from "@/types/next-auth";
 import { UserContext } from "@/lib/track.wrapper";
 import PostCard from "./profile.post";
+import ProfileInfomation from "@/components/profile/profile.info";
+import JoinedGroupsMock from "@/components/profile/profile.joinedgroupsmock";
 
 interface IProps {
   userId: string;
@@ -25,6 +38,7 @@ const StatItem = ({ label, value }: { label: string; value: number }) => (
 
 const ProfileDetail = ({ userId, users, posts }: IProps) => {
   const { setUserInfoId } = useContext(UserContext) as IContext;
+  const [openMobileInfo, setOpenMobileInfo] = useState(false);
 
   useEffect(() => {
     setUserInfoId(userId);
@@ -81,6 +95,63 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
         />
       </Box>
 
+      {/* Mobile: floating icon to open profile info */}
+      <Box
+        sx={{
+          position: "fixed",
+          top: 88,
+          right: 12,
+          zIndex: 1400,
+          display: { xs: "block", sm: "none" },
+        }}
+      >
+        <IconButton
+          aria-label="Thông tin"
+          onClick={() => setOpenMobileInfo(true)}
+          size="small"
+          sx={{
+            bgcolor: "background.paper",
+            boxShadow: 3,
+            width: 40,
+            height: 40,
+            p: 0.6,
+            borderRadius: 1,
+          }}
+        >
+          <MenuIcon fontSize="small" />
+        </IconButton>
+      </Box>
+
+      <Drawer
+        open={openMobileInfo}
+        onClose={() => setOpenMobileInfo(false)}
+        anchor="right"
+        PaperProps={{ sx: { width: { xs: "100%", sm: 340 } } }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            p: 2,
+          }}
+        >
+          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+            Thông tin
+          </Typography>
+          <IconButton onClick={() => setOpenMobileInfo(false)}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <Divider />
+        <Box sx={{ p: 2 }}>
+          <ProfileInfomation />
+          <Box mt={2}>
+            <JoinedGroupsMock />
+          </Box>
+        </Box>
+      </Drawer>
+
       <Box
         sx={{
           mt: { xs: 8, sm: 11 },
@@ -88,17 +159,34 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
         }}
       >
         {/* NAME */}
-        <Typography sx={{ fontSize: { xs: 20, sm: 24, md: 28 }, fontWeight: 700, lineHeight: 1.2 }}>
+        <Typography
+          sx={{
+            fontSize: { xs: 20, sm: 24, md: 28 },
+            fontWeight: 700,
+            lineHeight: 1.2,
+          }}
+        >
           {user.name}
         </Typography>
 
         {/* USERNAME */}
-        <Typography sx={{ fontSize: { xs: 12, sm: 14 }, color: "text.secondary", mt: 0.5 }}>
+        <Typography
+          sx={{
+            fontSize: { xs: 12, sm: 14 },
+            color: "text.secondary",
+            mt: 0.5,
+          }}
+        >
           @{user.email.split("@")[0]}
         </Typography>
 
         {/* STATS */}
-        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="center" spacing={{ xs: 2.5, sm: 6 }} mt={3}>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          justifyContent="center"
+          spacing={{ xs: 2.5, sm: 6 }}
+          mt={3}
+        >
           <StatItem label="Bài viết" value={posts?.length || 0} />
           <StatItem label="Người theo dõi" value={user.followersCount || 0} />
           <StatItem label="Đang theo dõi" value={user.followingCount || 0} />
@@ -109,7 +197,9 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
 
       {/* ================= POSTS FEED ================= */}
       <Box sx={{ maxWidth: { xs: "100%", sm: 640, md: 760 }, mx: "auto" }}>
-        <Typography sx={{ fontSize: { xs: 16, sm: 18 }, fontWeight: 700, mb: 2 }}>
+        <Typography
+          sx={{ fontSize: { xs: 16, sm: 18 }, fontWeight: 700, mb: 2 }}
+        >
           Bài viết
         </Typography>
 

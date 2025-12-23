@@ -234,12 +234,18 @@ const PostList = () => {
               component="video"
               controls
               src={post.videos[0]}
-              sx={{ width: "100%", maxHeight: { xs: "40vh", md: "60vh" }, borderRadius: 2 }}
+              sx={{
+                width: "100%",
+                maxHeight: { xs: "40vh", md: "60vh" },
+                borderRadius: 2,
+              }}
             />
           )}
 
           {/* ---------------- ACTIONS ---------------- */}
-          <CardActions sx={{ justifyContent: "space-around", flexWrap: "wrap", gap: 1 }}>
+          <CardActions
+            sx={{ justifyContent: "space-around", flexWrap: "wrap", gap: 1 }}
+          >
             <Box>
               <Checkbox
                 checked={post.isLiked}
