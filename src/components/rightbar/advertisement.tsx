@@ -2,57 +2,74 @@
 
 import { Box, Typography, Paper, Avatar, Button } from "@mui/material";
 
-const SponsoredAds = () => {
+/* =======================
+ * REUSABLE AD CARD
+ * ======================= */
+interface AdProps {
+  image: string;
+  avatar: string;
+  title: string;
+  subtitle?: string;
+  description: string;
+  buttonText: string;
+}
+
+const SponsoredAdCard = ({
+  image,
+  avatar,
+  title,
+  subtitle,
+  description,
+  buttonText,
+}: AdProps) => {
   return (
     <Paper
       elevation={1}
       sx={{
         p: 2,
-        borderRadius: 3, // ~12px
+        borderRadius: 3,
         backgroundColor: "#fff",
         boxShadow: "none",
         border: "1px solid #e4e6eb",
       }}
     >
       {/* TITLE */}
-      <Typography
-        fontSize={13}
-        fontWeight={600}
-        color="#65676B"
-        sx={{ mb: 1 }} // 👈 thêm khoảng cách
-      >
+      <Typography fontSize={13} fontWeight={600} color="#65676B" sx={{ mb: 1 }}>
         Quảng cáo được tài trợ
       </Typography>
 
-      {/* ADS IMAGE */}
+      {/* IMAGE */}
       <Box
         component="img"
-        src="https://images.unsplash.com/photo-1600891964092-4316c288032e"
+        src={image}
         alt="ads"
         sx={{
           width: "100%",
           height: 180,
           objectFit: "cover",
           borderRadius: 2,
-          mb: 1.2, // 👈 cách avatar giống FB
+          mb: 1.2,
         }}
       />
 
       {/* PAGE INFO */}
       <Box display="flex" alignItems="center" gap={1} mb={1}>
-        <Avatar
-          src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe"
-          sx={{ width: 35, height: 35 }}
-        />
-        <Typography fontWeight={600} fontSize={14}>
-          BigChef Lounge
-        </Typography>
+        <Avatar src={avatar} sx={{ width: 35, height: 35 }} />
+        <Box>
+          <Typography fontWeight={600} fontSize={14}>
+            {title}
+          </Typography>
+          {subtitle && (
+            <Typography fontSize={12} color="text.secondary">
+              {subtitle}
+            </Typography>
+          )}
+        </Box>
       </Box>
 
-      {/* ADS TEXT */}
+      {/* DESCRIPTION */}
       <Typography fontSize={13} color="text.secondary" mb={2}>
-        Thèm món ngon và một không gian thư giãn? BigChef Lounge mang đến ẩm
-        thực cao cấp trong môi trường thoải mái và tinh tế.
+        {description}
       </Typography>
 
       {/* BUTTON */}
@@ -68,10 +85,39 @@ const SponsoredAds = () => {
           "&:hover": { bgcolor: "#d8dadd" },
         }}
       >
-        Tìm hiểu thêm
+        {buttonText}
       </Button>
     </Paper>
   );
 };
 
-export default SponsoredAds;
+/* =======================
+ * GROUP COMPONENT
+ * ======================= */
+const SponsoredAdsGroup = () => {
+  return (
+    <Box display="flex" flexDirection="column" gap={2}>
+      {/* TRAVEL AD */}
+      <SponsoredAdCard
+        image="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
+        avatar="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
+        title="GoTrip Vietnam"
+        subtitle="gotrip.vn"
+        description="Khám phá những điểm đến tuyệt đẹp khắp Việt Nam với các tour trọn gói, giá ưu đãi và trải nghiệm đáng nhớ."
+        buttonText="Đặt tour ngay"
+      />
+
+      {/* TECH / EDUCATION AD */}
+      <SponsoredAdCard
+        image="https://images.unsplash.com/photo-1519389950473-47ba0277781c"
+        avatar="https://images.unsplash.com/photo-1611162617213-7c1c35c8c1b2"
+        title="TigerStudy Academy"
+        subtitle="tigerstudy.vn"
+        description="Học lập trình, AI và công nghệ hiện đại với lộ trình rõ ràng, dự án thực tế và mentor hỗ trợ 1–1."
+        buttonText="Xem khóa học"
+      />
+    </Box>
+  );
+};
+
+export default SponsoredAdsGroup;

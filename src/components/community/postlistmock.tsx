@@ -376,7 +376,22 @@ const PostListMock = ({
                 ))}
               </Box>
             )}
-
+            {post.videos?.length > 0 && (
+              <Box
+                sx={{ width: "100%", bgcolor: "#000" }}
+                onClick={() => setSelectedPostId(post._id)}
+              >
+                <video
+                  controls
+                  style={{
+                    width: "100%",
+                    maxHeight: "600px",
+                    borderRadius: "8px",
+                  }}
+                  src={post.videos[0]}
+                />
+              </Box>
+            )}
             {/* ACTIONS */}
             <CardActions
               sx={{

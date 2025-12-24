@@ -44,10 +44,11 @@ export default function SidebarContent({ data, onNavigate }: Props) {
 
       // ✅ chỉ lấy nhóm đã tham gia
       setJoinedGroups(groups.filter((g) => g.isJoined));
+      console.log("Fetched groups for sidebar:", res);
     };
 
     fetchJoinedGroups();
-  }, [data]);
+  }, [data, session?.access_token]);
 
   return (
     <Box>
@@ -164,74 +165,63 @@ export default function SidebarContent({ data, onNavigate }: Props) {
         </ListItem>
       </List>
 
-      <Box mt={2}>
-        <Typography
-          fontSize={15}
-          fontWeight={600}
-          color="text.secondary"
-          sx={{ px: 1, mb: 1 }}
-        >
-          Lối tắt
-        </Typography>
+      <List dense>
+        <Box mt={2}>
+          <Typography
+            fontSize={15}
+            fontWeight={600}
+            color="text.secondary"
+            sx={{ px: 1, mb: 1 }}
+          >
+            Lối tắt
+          </Typography>
 
-        <List dense>
-          <Box mt={2}>
-            <Typography
-              fontSize={15}
-              fontWeight={600}
-              color="text.secondary"
-              sx={{ px: 1, mb: 1 }}
-            >
-              Lối tắt
-            </Typography>
+          <List dense>
+            {joinedGroups.length === 0 && (
+              <Typography fontSize={13} color="text.secondary" sx={{ px: 1 }}>
+                Chưa tham gia nhóm nào
+              </Typography>
+            )}
 
-            <List dense>
-              {joinedGroups.length === 0 && (
-                <Typography fontSize={13} color="text.secondary" sx={{ px: 1 }}>
-                  Chưa tham gia nhóm nào
+            {joinedGroups.slice(0, 5).map((group) => (
+              <ListItemButton
+                key={group._id}
+                href={`/groups/${group._id}`}
+                onClick={onNavigate}
+                sx={{
+                  borderRadius: "8px",
+                  minHeight: 44,
+                  px: 1,
+                  "&:hover": { bgcolor: "action.hover" },
+                  mb: 0.5,
+                }}
+              >
+                <Avatar
+                  src={group.avatar}
+                  sx={{ width: 28, height: 28, mr: 1 }}
+                />
+                <Typography fontSize={14} fontWeight={500} noWrap>
+                  {group.name}
                 </Typography>
-              )}
+              </ListItemButton>
+            ))}
 
-              {joinedGroups.slice(0, 5).map((group) => (
-                <ListItemButton
-                  key={group._id}
-                  href={`/groups/${group._id}`}
-                  onClick={onNavigate}
-                  sx={{
-                    borderRadius: "8px",
-                    minHeight: 44,
-                    px: 1,
-                    "&:hover": { bgcolor: "action.hover" },
-                    mb: 0.5,
-                  }}
-                >
-                  <Avatar
-                    src={group.avatar}
-                    sx={{ width: 28, height: 28, mr: 1 }}
-                  />
-                  <Typography fontSize={14} fontWeight={500} noWrap>
-                    {group.name}
-                  </Typography>
-                </ListItemButton>
-              ))}
-
-              {joinedGroups.length > 5 && (
-                <Typography
-                  fontSize={14}
-                  color="#1877F2"
-                  fontWeight={600}
-                  sx={{ px: 1, cursor: "pointer", mt: 0.5 }}
-                  onClick={() =>
-                    (window.location.href = "/community?joined=true")
-                  }
-                >
-                  Xem tất cả →
-                </Typography>
-              )}
-            </List>
-          </Box>
-        </List>
-      </Box>
+            {joinedGroups.length > 5 && (
+              <Typography
+                fontSize={14}
+                color="#1877F2"
+                fontWeight={600}
+                sx={{ px: 1, cursor: "pointer", mt: 0.5 }}
+                onClick={() =>
+                  (window.location.href = "/community?joined=true")
+                }
+              >
+                Xem tất cả →
+              </Typography>
+            )}
+          </List>
+        </Box>
+      </List>
     </Box>
   );
 }

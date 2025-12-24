@@ -202,13 +202,7 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
         </Typography>
 
         {posts && posts.length > 0 ? (
-          posts.map((post) => (
-            <PostCard
-              key={post._id}
-              post={post}
-              session={null} // profile xem công khai
-            />
-          ))
+          posts.map((post) => <PostCard key={post._id} post={post} />)
         ) : (
           <Typography color="text.secondary">
             Bạn chưa có bài viết nào.
