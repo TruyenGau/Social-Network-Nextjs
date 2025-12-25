@@ -144,7 +144,11 @@ export default function ProfileUpdateModal({
         <Box mt={2}>
           <Typography fontWeight={600}>Ảnh Cover</Typography>
           <img
-            src={coverFile ? URL.createObjectURL(coverFile) : user.coverPhoto}
+            src={
+              coverFile
+                ? URL.createObjectURL(coverFile)
+                : `${process.env.NEXT_PUBLIC_BACKEND_URL}/${user.coverPhoto}`
+            }
             style={{
               width: "100%",
               height: 180,
@@ -168,7 +172,11 @@ export default function ProfileUpdateModal({
         {/* AVATAR */}
         <Stack alignItems="center">
           <Avatar
-            src={avatarFile ? URL.createObjectURL(avatarFile) : user.avatar}
+            src={
+              avatarFile
+                ? URL.createObjectURL(avatarFile)
+                : `${process.env.NEXT_PUBLIC_BACKEND_URL}/${user.avatar}`
+            }
             sx={{ width: 90, height: 90 }}
           />
           <Button component="label" sx={{ mt: 1 }}>

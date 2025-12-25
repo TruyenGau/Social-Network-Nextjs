@@ -175,7 +175,7 @@ export default function CreateStoryModal({ onClose, onCreated }: Props) {
           <>
             <Box position="relative" mt={1}>
               <img
-                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${preview}`}
+                src={preview}
                 style={{
                   width: "100%",
                   borderRadius: 12,
