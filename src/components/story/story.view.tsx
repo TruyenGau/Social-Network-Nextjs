@@ -91,7 +91,7 @@ export default function StoryViewer({ story, onClose }: StoryViewerProps) {
         <img
           src={
             story.image
-              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${story.image}`
+              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${story.image}`
               : "/user/default-user.png"
           }
           alt="story"
