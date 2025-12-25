@@ -172,6 +172,7 @@ declare global {
     isJoined: boolean;
     visibility: "PUBLIC" | "PRIVATE";
   }
+
   interface IStory {
     _id: string;
     userId: string;
@@ -188,5 +189,42 @@ declare global {
     membersCount: number;
   }
 
-  // ===== TARGET =====
+  interface IPollOption {
+    _id: string;
+    text: string;
+    votes: number;
+    voters: string[]; // ObjectId dạng string
+    isDeleted: boolean;
+    deletedAt: string | null;
+  }
+
+  interface IPoll {
+    _id: string;
+    question: string;
+    options: IPollOption[];
+
+    communityId: string;
+    createdBy: string;
+
+    isActive: boolean;
+    expiredAt: string | null;
+
+    isDeleted: boolean;
+    deletedAt: string | null;
+    createdAt: string;
+  }
+
+  export interface IPollOptionPublic {
+    text: string;
+    votes: number;
+  }
+
+  export interface IPollPublic {
+    _id: string;
+    question: string;
+    options: IPollOptionPublic[];
+    isActive: boolean;
+    expiredAt: string | null;
+    createdAt?: string;
+  }
 }

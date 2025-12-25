@@ -119,7 +119,7 @@ export default function UpdatePostModal({
         newVideos = uploadRes.data?.data?.videos || [];
       }
 
-      await sendRequest({
+      const res = await sendRequest({
         url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/${postId}`,
         method: "PATCH",
         headers: { Authorization: `Bearer ${session.access_token}` },
@@ -129,7 +129,7 @@ export default function UpdatePostModal({
           videos: [...existingVideos, ...newVideos],
         },
       });
-
+      console.log("check update", res);
       toast.success("Cập nhật bài viết thành công");
       onClose();
       onUpdated();

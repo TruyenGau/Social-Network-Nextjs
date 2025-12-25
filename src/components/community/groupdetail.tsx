@@ -25,6 +25,8 @@ import { useToast } from "@/utils/toast";
 import SavedPostList from "./community.saved.post";
 import InviteFriendsDialog from "./community.invite.friend";
 import UpdateGroupModal from "./update.community";
+import PollCreate from "../poll/poll.create";
+import PollList from "../poll/poll.list";
 
 interface IProps {
   groupId: string;
@@ -111,6 +113,8 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
       toast.error("Có lỗi nãy ra");
     }
   };
+  const isAdmin =
+    !!session && group.admins.some((admin) => admin._id === session.user._id);
 
   return (
     <Box
@@ -357,6 +361,22 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
             {activeTab === "members" && <GroupMembersList groupId={groupId} />}
             {activeTab === "saved" && (
               <SavedPostList adminId={group.admins[0]._id} />
+            )}
+            {activeTab === "events" && (
+              <>
+                {isAdmin ? (
+                  <PollCreate groupId={groupId} onCreated={fetchGroup} />
+                ) : (
+                  <Typography
+                    color="text.secondary"
+                    sx={{ mb: 2, fontStyle: "italic" }}
+                  >
+                    Chỉ quản trị viên nhóm mới có thể tạo bình chọn.
+                  </Typography>
+                )}
+
+                <PollList groupId={groupId} />
+              </>
             )}
           </Box>
         </Box>
