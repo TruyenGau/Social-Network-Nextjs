@@ -54,7 +54,7 @@ export default function CreateStoryModal({ onClose, onCreated }: Props) {
           headers: {
             Authorization: `Bearer ${session?.access_token}`,
             "Content-Type": "multipart/form-data",
-            folder_type: "story",
+            folder_type: "stories",
           },
         }
       );
