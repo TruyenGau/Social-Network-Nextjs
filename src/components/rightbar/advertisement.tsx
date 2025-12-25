@@ -41,7 +41,7 @@ const SponsoredAdCard = ({
       {/* IMAGE */}
       <Box
         component="img"
-        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${image}`}
+        src={image}
         alt="ads"
         sx={{
           width: "100%",
@@ -54,10 +54,7 @@ const SponsoredAdCard = ({
 
       {/* PAGE INFO */}
       <Box display="flex" alignItems="center" gap={1} mb={1}>
-        <Avatar
-          src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${avatar}`}
-          sx={{ width: 35, height: 35 }}
-        />
+        <Avatar src={avatar} sx={{ width: 35, height: 35 }} />
         <Box>
           <Typography fontWeight={600} fontSize={14}>
             {title}
