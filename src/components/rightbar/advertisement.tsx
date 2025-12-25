@@ -110,7 +110,7 @@ const SponsoredAdsGroup = () => {
       {/* TECH / EDUCATION AD */}
       <SponsoredAdCard
         image="https://images.unsplash.com/photo-1519389950473-47ba0277781c"
-        avatar="https://images.unsplash.com/photo-1611162617213-7c1c35c8c1b2"
+        avatar="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
         title="TigerStudy Academy"
         subtitle="tigerstudy.vn"
         description="Học lập trình, AI và công nghệ hiện đại với lộ trình rõ ràng, dự án thực tế và mentor hỗ trợ 1–1."

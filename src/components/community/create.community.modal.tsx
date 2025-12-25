@@ -146,11 +146,6 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
       toast.error("Lỗi khi tạo nhóm!");
     }
   };
-  const getImageSrc = (url?: string | null) => {
-    if (!url) return "";
-    if (url.startsWith("blob:")) return url; // preview local
-    return `${process.env.NEXT_PUBLIC_BACKEND_URL}/${url}`; // backend
-  };
 
   return (
     <Dialog
@@ -170,7 +165,7 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
       >
         {coverPreview ? (
           <img
-            src={getImageSrc(coverPreview)}
+            src={coverPreview}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
@@ -211,7 +206,7 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
         <Box sx={{ position: "absolute", left: 32, bottom: -45 }}>
           <Box sx={{ position: "relative" }}>
             <Avatar
-              src={getImageSrc(avatarPreview)}
+              src={avatarPreview || ""}
               sx={{
                 width: 90,
                 height: 90,
