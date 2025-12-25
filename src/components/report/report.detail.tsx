@@ -37,7 +37,12 @@ export default function ReportTargetDrawer({
         <Descriptions bordered column={1} size="middle">
           <Descriptions.Item label="Avatar">
             {(data as IUser).avatar ? (
-              <Image width={80} src={(data as IUser).avatar} />
+              <Image
+                width={80}
+                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${
+                  (data as IUser).avatar
+                }`}
+              />
             ) : (
               <Tag>No Avatar</Tag>
             )}
@@ -87,7 +92,12 @@ export default function ReportTargetDrawer({
 
           {(data as IPostDetail).images?.length > 0 && (
             <Descriptions.Item label="Ảnh">
-              <Image width={200} src={(data as IPostDetail).images[0]} />
+              <Image
+                width={200}
+                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${
+                  (data as IPostDetail).images[0]
+                }`}
+              />
             </Descriptions.Item>
           )}
         </Descriptions>

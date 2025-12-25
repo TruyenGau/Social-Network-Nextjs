@@ -4,9 +4,10 @@ import { Box, Typography, Avatar } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import CreateGroupModal from "./create.community.modal";
+
 import { sendRequest } from "@/utils/api";
 import { useSession } from "next-auth/react";
+import CreateGroupModal from "./create.community.modal";
 
 interface IProps {
   groups: IGroups[] | null;
