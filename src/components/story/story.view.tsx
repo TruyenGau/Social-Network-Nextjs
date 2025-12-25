@@ -89,7 +89,11 @@ export default function StoryViewer({ story, onClose }: StoryViewerProps) {
       {/* Ảnh Story */}
       <Box sx={{ width: "90%", maxWidth: "400px", textAlign: "center" }}>
         <img
-          src={story.image ? story.image : "/user/default-user.png"}
+          src={
+            story.image
+              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${story.image}`
+              : "/user/default-user.png"
+          }
           alt="story"
           style={{
             width: "100%",
