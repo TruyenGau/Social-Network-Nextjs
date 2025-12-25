@@ -145,7 +145,11 @@ export default function PostDetailModal({
         <Box sx={{ display: "flex", alignItems: "flex-start" }}>
           <Avatar
             sx={{ mr: 2, width: 34, height: 34 }}
-            src={c.user.avatar ? c.user.avatar : "/user/default-user.png"}
+            src={
+              c.user.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${c.user.avatar}`
+                : "/user/default-user.png"
+            }
           />
 
           <Box sx={{ flex: 1 }}>
@@ -271,7 +275,7 @@ export default function PostDetailModal({
             }}
             src={
               post?.author?.avatar
-                ? post.author.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${post?.author?.avatar}`
                 : "/user/default-user.png"
             }
           />
@@ -316,7 +320,7 @@ export default function PostDetailModal({
               >
                 <Box
                   component="img"
-                  src={img}
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${img}`}
                   sx={{
                     width: "100%",
                     height:
@@ -366,7 +370,7 @@ export default function PostDetailModal({
           <Box
             component="video"
             controls
-            src={post?.videos?.[0]}
+            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${post?.videos[0]}`}
             sx={{
               width: "100%",
               maxHeight: { xs: 240, sm: 400, md: 600 },
@@ -436,7 +440,7 @@ export default function PostDetailModal({
             }}
             src={
               session.user.avatar
-                ? session.user.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${session.user.avatar}`
                 : "/user/default-user.png"
             }
           />

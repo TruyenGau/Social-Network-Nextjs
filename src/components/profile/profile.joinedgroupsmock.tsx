@@ -73,7 +73,10 @@ const JoinedGroupsMock = () => {
               }}
               onClick={() => router.push(`/groups/${group._id}`)}
             >
-              <Avatar src={group.avatar} sx={{ width: 36, height: 36 }} />
+              <Avatar
+                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${group.avatar}`}
+                sx={{ width: 36, height: 36 }}
+              />
 
               <Box>
                 <Typography fontSize={14} fontWeight={600}>

@@ -136,7 +136,7 @@ const PostList = () => {
                 <Avatar
                   src={
                     post.userId.avatar
-                      ? post.userId.avatar
+                      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${post.userId.avatar}`
                       : "/user/default-user.png"
                   }
                   sx={{ cursor: "pointer" }}
@@ -159,7 +159,7 @@ const PostList = () => {
                 {post.communityId && (
                   <Box sx={{ display: "flex", alignItems: "center", mt: 0.3 }}>
                     <Avatar
-                      src={post.communityId.avatar}
+                      src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${post.communityId.avatar}`}
                       sx={{ width: 22, height: 22, mr: 1 }}
                     />
 
@@ -193,7 +193,7 @@ const PostList = () => {
                 <Box key={index} sx={{ position: "relative" }}>
                   <Box
                     component="img"
-                    src={img}
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${img}`}
                     sx={{
                       width: "100%",
                       // Prevent extremely tall images from breaking layout
@@ -233,7 +233,7 @@ const PostList = () => {
             <Box
               component="video"
               controls
-              src={post.videos[0]}
+              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${post.videos[0]}`}
               sx={{
                 width: "100%",
                 maxHeight: { xs: "40vh", md: "60vh" },

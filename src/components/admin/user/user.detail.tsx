@@ -26,7 +26,11 @@ export default function UserDetail({ open, setOpen, user }: IUserDetailProps) {
           {user.avatar ? (
             <Image
               width={80}
-              src={user?.avatar ? user?.avatar : "/user/default-user.png"}
+              src={
+                user?.avatar
+                  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${user?.avatar}`
+                  : "/user/default-user.png"
+              }
             />
           ) : (
             <Tag>No Avatar</Tag>

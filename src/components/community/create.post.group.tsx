@@ -72,7 +72,7 @@ export default function CreatePostGroup({
             headers: {
               Authorization: `Bearer ${session?.access_token}`,
               "Content-Type": "multipart/form-data",
-              folder_type: "post",
+              folder_type: "posts",
             },
           }
         );
@@ -136,7 +136,13 @@ export default function CreatePostGroup({
     >
       {/* INPUT */}
       <Box display="flex" gap={2} alignItems="flex-start">
-        <Avatar src={user?.avatar ? user.avatar : "/user/default-user.png"} />
+        <Avatar
+          src={
+            user?.avatar
+              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${user.avatar}`
+              : "/user/default-user.png"
+          }
+        />
 
         <TextField
           placeholder="Bạn đang nghĩ gì?"

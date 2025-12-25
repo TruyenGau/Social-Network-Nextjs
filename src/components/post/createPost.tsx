@@ -73,7 +73,7 @@ export default function PostForm({ data }: IProps) {
             headers: {
               Authorization: `Bearer ${session?.access_token}`,
               "Content-Type": "multipart/form-data",
-              folder_type: "post",
+              folder_type: "posts",
             },
           }
         );
@@ -140,7 +140,13 @@ export default function PostForm({ data }: IProps) {
       }}
     >
       <Box display="flex" gap={2}>
-        <Avatar src={user?.avatar ? user.avatar : ""} />
+        <Avatar
+          src={
+            user?.avatar
+              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${user.avatar}`
+              : ""
+          }
+        />
         <TextField
           placeholder="Bạn đang nghĩ gì?"
           multiline

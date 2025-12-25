@@ -113,7 +113,9 @@ export default function CommunityPage() {
     {
       title: "Avatar",
       dataIndex: "avatar",
-      render: (img: string) => <Avatar src={img} />,
+      render: (img: string) => (
+        <Avatar src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${img}`} />
+      ),
     },
 
     {

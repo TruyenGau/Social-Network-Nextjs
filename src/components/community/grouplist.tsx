@@ -230,7 +230,7 @@ const GroupItem = ({ g, router }: any) => (
   >
     <Avatar
       variant="rounded"
-      src={g.avatar}
+      src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${g.avatar}`}
       sx={{ width: 45, height: 45, borderRadius: "8px" }}
     />
     <Box>

@@ -110,7 +110,7 @@ export default function UpdatePostModal({
             headers: {
               Authorization: `Bearer ${session.access_token}`,
               "Content-Type": "multipart/form-data",
-              folder_type: "post",
+              folder_type: "posts",
             },
           }
         );
@@ -156,7 +156,7 @@ export default function UpdatePostModal({
           <Avatar
             src={
               session?.user?.avatar
-                ? session.user.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${session.user.avatar}`
                 : "/user/default-user.png"
             }
           />
@@ -173,7 +173,10 @@ export default function UpdatePostModal({
         <Stack gap={1}>
           {existingImages.map((img, i) => (
             <Box key={i} position="relative">
-              <img src={img} style={{ width: "100%", borderRadius: 8 }} />
+              <img
+                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${img}`}
+                style={{ width: "100%", borderRadius: 8 }}
+              />
               <IconButton
                 onClick={() => removeExistingImage(i)}
                 sx={{
@@ -192,7 +195,7 @@ export default function UpdatePostModal({
             <Box key={i} position="relative">
               <video
                 controls
-                src={vid}
+                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${vid}`}
                 style={{ width: "100%", borderRadius: 8 }}
               />
               <IconButton

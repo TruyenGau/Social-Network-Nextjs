@@ -94,7 +94,7 @@ export default function UpdateGroupModal({
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
           "Content-Type": "multipart/form-data",
-          folder_type: "group",
+          folder_type: "groups",
         },
       }
     );
@@ -142,7 +142,7 @@ export default function UpdateGroupModal({
       <Box sx={{ height: 140, position: "relative" }}>
         {coverPreview ? (
           <img
-            src={coverPreview}
+            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${coverPreview}`}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
@@ -180,7 +180,12 @@ export default function UpdateGroupModal({
         {/* AVATAR */}
         <Box sx={{ position: "absolute", left: 24, bottom: -40 }}>
           <Box position="relative">
-            <Avatar src={avatarPreview || ""} sx={{ width: 90, height: 90 }}>
+            <Avatar
+              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${
+                avatarPreview || ""
+              }`}
+              sx={{ width: 90, height: 90 }}
+            >
               {!avatarPreview && <GroupIcon />}
             </Avatar>
 

@@ -78,7 +78,9 @@ const BirthdayUser = () => {
               {/* LEFT */}
               <Box display="flex" alignItems="center" gap={1.2}>
                 <Avatar
-                  src={user.avatar || "/user/default-user.png"}
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${
+                    user.avatar || "/user/default-user.png"
+                  }`}
                   sx={{ width: 40, height: 40 }}
                 />
                 <Typography fontWeight={600} fontSize={15}>

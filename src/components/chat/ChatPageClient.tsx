@@ -690,7 +690,7 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
     setInput("");
   };
 
-  const folderType = "post";
+  const folderType = "posts";
 
   const handleSelectMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!socket || !currentRoom) return;
@@ -819,7 +819,11 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
             {currentRoom && currentRoom.type === "private" && currentFriend && (
               <>
                 <Avatar
-                  src={currentFriend.avatar ? currentFriend.avatar : undefined}
+                  src={
+                    currentFriend.avatar
+                      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${currentFriend.avatar}`
+                      : undefined
+                  }
                   sx={{ width: 36, height: 36 }}
                 >
                   {/* {currentFriend.name?.charAt(0).toUpperCase()} */}
@@ -1039,7 +1043,7 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
                         {msg.type === "image" ? (
                           <Box
                             component="img"
-                            src={msg.content}
+                            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${msg.content}`}
                             sx={{
                               maxWidth: 260,
                               maxHeight: 260,
@@ -1050,7 +1054,7 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
                         ) : msg.type === "video" ? (
                           <Box
                             component="video"
-                            src={msg.content}
+                            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${msg.content}`}
                             controls
                             sx={{
                               maxWidth: 260,
@@ -1305,7 +1309,9 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
                                   display: "inline-block",
                                 }}
                               >
-                                <Avatar src={avatarUrl}>
+                                <Avatar
+                                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${avatarUrl}`}
+                                >
                                   {friend.name?.charAt(0).toUpperCase()}
                                 </Avatar>
                                 {friend.online && (
@@ -1491,7 +1497,9 @@ const ChatPageClient: React.FC<ChatPageClientProps> = ({
                           }}
                         >
                           <ListItemAvatar>
-                            <Avatar src={avatarUrl}>
+                            <Avatar
+                              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${avatarUrl}`}
+                            >
                               {sender.name?.charAt(0).toUpperCase()}
                             </Avatar>
                           </ListItemAvatar>

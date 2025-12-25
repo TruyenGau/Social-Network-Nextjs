@@ -160,14 +160,14 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
           }}
         >
           <img
-            src={group.coverPhoto}
+            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${group.coverPhoto}`}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </Box>
         {/* HEADER */}
         <Box sx={{ width: "100%", mb: 3, position: "relative" }}>
           <Avatar
-            src={group.avatar}
+            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${group.avatar}`}
             sx={{
               width: { xs: 80, sm: 120 },
               height: { xs: 80, sm: 120 },
@@ -199,7 +199,11 @@ const GroupDetailPage = ({ groupId, user }: IProps) => {
             {group.members.slice(0, 10).map((m, i) => (
               <Avatar
                 key={i}
-                src={m.avatar ? m.avatar : "/user/default-user.png"}
+                src={
+                  m.avatar
+                    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${m.avatar}`
+                    : "/user/default-user.png"
+                }
                 sx={{
                   width: { xs: 28, sm: 34 },
                   height: { xs: 28, sm: 34 },

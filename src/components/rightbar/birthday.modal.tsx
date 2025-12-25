@@ -83,7 +83,13 @@ export default function BirthdayWishModal({
       <DialogContent>
         {/* USER */}
         <Box display="flex" alignItems="center" gap={1.5} mb={2}>
-          <Avatar src={user.avatar ? user.avatar : "/user/default-user.png"} />
+          <Avatar
+            src={
+              user.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${user.avatar}`
+                : "/user/default-user.png"
+            }
+          />
           <Typography fontWeight={600}>{user.name}</Typography>
         </Box>
 

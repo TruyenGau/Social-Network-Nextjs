@@ -156,7 +156,9 @@ export default function MobileChatDrawer({
                         }}
                       >
                         <ListItemAvatar>
-                          <Avatar src={item.following.avatar} />
+                          <Avatar
+                            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${item.following.avatar}`}
+                          />
                         </ListItemAvatar>
                         <ListItemText primary={item.following.name} />
                       </ListItemButton>

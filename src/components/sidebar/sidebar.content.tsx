@@ -62,7 +62,11 @@ export default function SidebarContent({ data, onNavigate }: Props) {
               onClick={onNavigate}
             >
               <Avatar
-                src={data.avatar ? data.avatar : "/user/default-user.png"}
+                src={
+                  data.avatar
+                    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.avatar}`
+                    : "/user/default-user.png"
+                }
                 sx={{ width: 36, height: 36, mr: 1.5 }}
               />
               <ListItemText
@@ -197,7 +201,7 @@ export default function SidebarContent({ data, onNavigate }: Props) {
                 }}
               >
                 <Avatar
-                  src={group.avatar}
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${group.avatar}`}
                   sx={{ width: 28, height: 28, mr: 1 }}
                 />
                 <Typography fontSize={14} fontWeight={500} noWrap>

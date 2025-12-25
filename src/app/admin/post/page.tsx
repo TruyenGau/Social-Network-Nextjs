@@ -103,7 +103,13 @@ export default function PostPage() {
       dataIndex: "userId",
       render: (u) => (
         <Space>
-          <Avatar src={u.avatar ? u.avatar : "/user/default-user.png"} />
+          <Avatar
+            src={
+              u.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${u.avatar}`
+                : "/user/default-user.png"
+            }
+          />
           {u.name}
         </Space>
       ),

@@ -82,7 +82,7 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
           "Content-Type": "multipart/form-data",
-          folder_type: "group",
+          folder_type: "groups",
         },
       }
     );
@@ -165,7 +165,7 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
       >
         {coverPreview ? (
           <img
-            src={coverPreview}
+            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${coverPreview}`}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
@@ -206,7 +206,9 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
         <Box sx={{ position: "absolute", left: 32, bottom: -45 }}>
           <Box sx={{ position: "relative" }}>
             <Avatar
-              src={avatarPreview || ""}
+              src={
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/${avatarPreview}` || ""
+              }
               sx={{
                 width: 90,
                 height: 90,

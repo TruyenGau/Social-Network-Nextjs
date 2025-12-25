@@ -58,7 +58,11 @@ const GroupRightPanelMock = () => {
 
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
           {mockMembers.map((src, i) => (
-            <Avatar key={i} src={src} sx={{ width: 40, height: 40 }} />
+            <Avatar
+              key={i}
+              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${src}`}
+              sx={{ width: 40, height: 40 }}
+            />
           ))}
         </Box>
 

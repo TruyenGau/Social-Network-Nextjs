@@ -124,7 +124,11 @@ const PostCard = ({ post }: Props) => {
         <CardHeader
           avatar={
             <Link href={`/profile/${post.userId._id}`}>
-              <Avatar src={post.userId.avatar || "/user/default-user.png"} />
+              <Avatar
+                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${
+                  post.userId.avatar || "/user/default-user.png"
+                }`}
+              />
             </Link>
           }
           title={
@@ -178,7 +182,7 @@ const PostCard = ({ post }: Props) => {
                 }}
               >
                 <img
-                  src={img}
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${img}`}
                   style={{
                     width: "100%",
                     height: "100%",
@@ -201,7 +205,7 @@ const PostCard = ({ post }: Props) => {
                 maxHeight: "600px",
                 borderRadius: "8px",
               }}
-              src={post.videos[0]}
+              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${post.videos[0]}`}
             />
           </Box>
         )}

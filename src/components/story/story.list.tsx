@@ -170,7 +170,11 @@ export default function StoryList() {
               onClick={() => handleOpenStory(story)}
             >
               <Avatar
-                src={story.image ? story.image : "/user/default-user.png"}
+                src={
+                  story.image
+                    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${story.image}`
+                    : "/user/default-user.png"
+                }
                 sx={{
                   width: 65,
                   height: 65,

@@ -67,7 +67,11 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
         }}
       >
         <img
-          src={user.coverPhoto ? user.coverPhoto : "/default-cover.jpg"}
+          src={
+            user.coverPhoto
+              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${user.coverPhoto}`
+              : "/default-cover.jpg"
+          }
           alt="cover"
           style={{
             width: "100%",
@@ -78,7 +82,11 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
 
         {/* AVATAR */}
         <Avatar
-          src={user.avatar ? user.avatar : "/user/default-user.png"}
+          src={
+            user.avatar
+              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${user.avatar}`
+              : "/user/default-user.png"
+          }
           sx={{
             width: { xs: 88, sm: 120, md: 160, lg: 180 },
             height: { xs: 88, sm: 120, md: 160, lg: 180 },

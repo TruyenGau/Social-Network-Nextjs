@@ -360,7 +360,9 @@ export default function AppHeader() {
                           }}
                         >
                           <Avatar
-                            src={u.avatar || "/user/default-user.png"}
+                            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${
+                              u.avatar || "/user/default-user.png"
+                            }`}
                             sx={{ mr: 1 }}
                           />
                           {u.name}
@@ -388,7 +390,10 @@ export default function AppHeader() {
                           }}
                         >
                           <Avatar
-                            src={p.userId?.avatar || "/user/default-user.png"}
+                            src={
+                              `${process.env.NEXT_PUBLIC_BACKEND_URL}/${p.userId?.avatar}` ||
+                              "/user/default-user.png"
+                            }
                             sx={{ mr: 1 }}
                           />
                           <Box>
@@ -484,7 +489,7 @@ export default function AppHeader() {
             <Avatar
               src={
                 session?.user?.avatar
-                  ? session?.user?.avatar
+                  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${session.user.avatar}`
                   : "/user/default-user.png"
               }
               sx={{ cursor: "pointer" }}
@@ -600,7 +605,9 @@ export default function AppHeader() {
             >
               {/* AVATAR */}
               <Avatar
-                src={sender.avatar || "/user/default-user.png"}
+                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${
+                  sender.avatar || "/user/default-user.png"
+                }`}
                 sx={{ width: 40, height: 40 }}
               />
 
@@ -670,7 +677,7 @@ export default function AppHeader() {
             <Avatar
               src={
                 n.fromUserId?.avatar
-                  ? n.fromUserId.avatar
+                  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${n.fromUserId?.avatar}`
                   : "/user/default-user.png"
               }
               sx={{ mr: 1 }}

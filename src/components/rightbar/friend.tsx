@@ -91,7 +91,11 @@ const SuggestionsFriend = ({ suggesionFriend }: IProps) => {
             {/* Avatar + Name */}
             <Box display="flex" alignItems="center" gap={1.2}>
               <Avatar
-                src={user?.avatar ? user.avatar : "/user/default-user.png"}
+                src={
+                  user?.avatar
+                    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${user.avatar}`
+                    : "/user/default-user.png"
+                }
                 sx={{ width: 38, height: 38 }}
               />
               <Typography fontSize={14} fontWeight={600}>

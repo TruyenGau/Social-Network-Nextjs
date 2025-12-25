@@ -277,7 +277,7 @@ const PostListMock = ({
                   <Avatar
                     src={
                       post.userId.avatar
-                        ? post.userId.avatar
+                        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${post.userId.avatar}`
                         : "/user/default-user.png"
                     }
                     sx={{
@@ -358,7 +358,7 @@ const PostListMock = ({
                   <Box
                     key={idx}
                     component="img"
-                    src={img}
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${img}`}
                     sx={{
                       width: "100%",
                       height:
@@ -388,7 +388,7 @@ const PostListMock = ({
                     maxHeight: "600px",
                     borderRadius: "8px",
                   }}
-                  src={post.videos[0]}
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${post.videos[0]}`}
                 />
               </Box>
             )}

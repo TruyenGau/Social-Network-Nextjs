@@ -235,7 +235,7 @@ const PostList = ({ session, initPostId }: IProps) => {
                 <Avatar
                   src={
                     post.userId.avatar
-                      ? post.userId.avatar
+                      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${post.userId.avatar}`
                       : "/user/default-user.png"
                   }
                   sx={{
@@ -320,7 +320,7 @@ const PostList = ({ session, initPostId }: IProps) => {
                   <Avatar
                     src={
                       post.taggedUserIds[0].avatar
-                        ? post.taggedUserIds[0].avatar
+                        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${post.taggedUserIds[0].avatar}`
                         : "/user/default-user.png"
                     }
                     sx={{
@@ -394,7 +394,7 @@ const PostList = ({ session, initPostId }: IProps) => {
                   >
                     <Box
                       component="img"
-                      src={img}
+                      src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${img}`}
                       sx={{
                         width: "100%",
                         height: "100%",
@@ -440,7 +440,7 @@ const PostList = ({ session, initPostId }: IProps) => {
                   maxHeight: "600px",
                   borderRadius: "8px",
                 }}
-                src={post.videos[0]}
+                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${post.videos[0]}`}
               />
             </Box>
           )}

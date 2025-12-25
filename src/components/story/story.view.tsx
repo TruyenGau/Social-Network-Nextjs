@@ -78,7 +78,11 @@ export default function StoryViewer({ story, onClose }: StoryViewerProps) {
         }}
       >
         <Avatar
-          src={story.avatar ? story.avatar : "/user/default-user.png"}
+          src={
+            story.avatar
+              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${story.avatar}`
+              : "/user/default-user.png"
+          }
           sx={{ width: 36, height: 36, border: "2px solid white" }}
         />
         <Typography sx={{ color: "white", fontSize: 16, fontWeight: 600 }}>

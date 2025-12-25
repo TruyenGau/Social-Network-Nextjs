@@ -101,7 +101,7 @@ export default function SharePostModal({
           <Avatar
             src={
               session?.user?.avatar
-                ? session.user.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${session.user.avatar}`
                 : "/user/default-user.png"
             }
           />

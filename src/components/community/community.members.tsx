@@ -108,7 +108,11 @@ const GroupMembersList = ({ groupId }: { groupId: string }) => {
           }}
         >
           <Avatar
-            src={m.avatar ? m.avatar : "/user/default-user.png"}
+            src={
+              m.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${m.avatar}`
+                : "/user/default-user.png"
+            }
             sx={{ width: 50, height: 50 }}
           />
           <Box sx={{ flexGrow: 1 }}>
@@ -144,7 +148,11 @@ const GroupMembersList = ({ groupId }: { groupId: string }) => {
           }}
         >
           <Avatar
-            src={m.avatar ? m.avatar : "/user/default-user.png"}
+            src={
+              m.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${m.avatar}`
+                : "/user/default-user.png"
+            }
             sx={{ width: 50, height: 50 }}
           />
 

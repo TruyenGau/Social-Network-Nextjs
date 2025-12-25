@@ -141,7 +141,11 @@ export default function CommunityPostDetailModal({
         <Box sx={{ display: "flex", alignItems: "flex-start" }}>
           <Avatar
             sx={{ mr: 2, width: 34, height: 34 }}
-            src={c.user.avatar ? c.user.avatar : "/user/default-user.png"}
+            src={
+              c.user.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${c.user.avatar}`
+                : "/user/default-user.png"
+            }
           />
 
           <Box sx={{ flex: 1 }}>
@@ -258,7 +262,7 @@ export default function CommunityPostDetailModal({
             sx={{ bgcolor: "#c0c9d3ff" }}
             src={
               post?.author?.avatar
-                ? post.author.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${post?.author?.avatar}`
                 : "/user/default-user.png"
             }
           />
@@ -297,7 +301,7 @@ export default function CommunityPostDetailModal({
                 }}
               >
                 <img
-                  src={img}
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${img}`}
                   style={{
                     width: "100%",
                     height: post.images.length === 1 ? "auto" : "260px",
@@ -342,7 +346,7 @@ export default function CommunityPostDetailModal({
         {Array.isArray(post?.videos) && post!.videos!.length > 0 && (
           <video
             controls
-            src={post?.videos?.[0]}
+            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${post!.videos![0]}`}
             style={{ width: "100%", maxHeight: "600px", borderRadius: "8px" }}
           />
         )}
@@ -388,7 +392,7 @@ export default function CommunityPostDetailModal({
             sx={{ mr: 1 }}
             src={
               session.user.avatar
-                ? session.user.avatar
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${session.user.avatar}`
                 : "/user/default-user.png"
             }
           />
