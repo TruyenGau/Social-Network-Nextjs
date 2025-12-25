@@ -126,9 +126,7 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
       );
 
       onClose();
-      setGroupName("");
-      setDescription("");
-      setVisibility("PUBLIC");
+      resetForm();
 
       await sendRequest({
         url: "/api/revalidate",
@@ -145,6 +143,20 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
       console.error(err);
       toast.error("Lỗi khi tạo nhóm!");
     }
+  };
+  const resetForm = () => {
+    setGroupName("");
+    setDescription("");
+    setVisibility("PUBLIC");
+
+    setAvatarFile(null);
+    setCoverFile(null);
+    setAvatarPreview(null);
+    setCoverPreview(null);
+
+    // reset input file (quan trọng)
+    if (avatarRef.current) avatarRef.current.value = "";
+    if (coverRef.current) coverRef.current.value = "";
   };
 
   return (
@@ -189,7 +201,10 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
 
         <IconButton
           sx={{ position: "absolute", top: 10, right: 10, bgcolor: "white" }}
-          onClick={onClose}
+          onClick={() => {
+            resetForm();
+            onClose();
+          }}
         >
           <CloseIcon />
         </IconButton>
@@ -288,9 +303,17 @@ export default function CreateGroupModal({ open, onClose }: IProps) {
 
       {/* ACTIONS */}
       <DialogActions sx={{ px: 3, pb: 3 }}>
-        <Button variant="outlined" fullWidth onClick={onClose}>
+        <Button
+          variant="outlined"
+          fullWidth
+          onClick={() => {
+            resetForm();
+            onClose();
+          }}
+        >
           Hủy
         </Button>
+
         <Button
           variant="contained"
           fullWidth
