@@ -26,9 +26,9 @@ export const authOptions: AuthOptions = {
         const res = await sendRequest<IBackendRes<JWT>>({
           url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/login`,
           method: "POST",
-          body: formData,
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+          body: {
+            username: credentials?.username,
+            password: credentials?.password,
           },
         });
 
