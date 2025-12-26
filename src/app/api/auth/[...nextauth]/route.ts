@@ -20,13 +20,15 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials, req) {
         // Add logic here to look up the user from the credentials supplied
-
+        const formData = new URLSearchParams();
+        formData.append("username", credentials?.username ?? "");
+        formData.append("password", credentials?.password ?? "");
         const res = await sendRequest<IBackendRes<JWT>>({
           url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/login`,
           method: "POST",
-          body: {
-            username: credentials?.username,
-            password: credentials?.password,
+          body: formData,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
           },
         });
 
