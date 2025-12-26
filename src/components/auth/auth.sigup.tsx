@@ -203,211 +203,291 @@ export const AuthSignUp = () => {
 
   return (
     <form>
-      <Grid
-        container
+      <Box
         sx={{
-          height: "100vh",
-          justifyContent: "center",
+          minHeight: "100vh",
+          backgroundImage: `url("/auth/signin-bg.jpg")`,
+          backgroundSize: { xs: "cover", md: "100%" },
+          backgroundPosition: { xs: "center", md: "left center" },
+          backgroundRepeat: "no-repeat",
+          position: "relative",
+          display: "flex",
           alignItems: "center",
+          justifyContent: { xs: "center", md: "flex-end" },
+          px: { xs: 2, md: 8 },
+          // ✅ vào trong giống signin
+          py: { xs: 2, md: 0 },
         }}
       >
-        <Grid
-          item
+        {/* overlay nhẹ */}
+        <Box
           sx={{
-            width: "500px", // 🔥 nhỏ lại gọn gàng
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "14px", // khoảng cách nhỏ hơn
-            boxShadow: "rgba(149, 157, 165, 0.15) 0px 6px 18px",
-            padding: "20px 24px", // giảm padding
-            borderRadius: "12px",
-            background: "#fff",
-            position: "relative",
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(90deg, rgba(15,23,42,0.10) 0%, rgba(15,23,42,0.04) 45%, rgba(255,255,255,0.00) 70%)",
+            pointerEvents: "none",
           }}
+        />
+
+        {/* Khung SignUp nổi lên */}
+        <Box
           onKeyDown={handleKeyDown}
+          sx={{
+            width: "100%",
+            maxWidth: 460,
+            position: "relative",
+            borderRadius: 5,
+            border: "1px solid rgba(15, 23, 42, 0.10)",
+            bgcolor: "rgba(255,255,255,0.92)",
+            backdropFilter: "blur(8px)",
+            boxShadow: `
+            0 22px 60px rgba(2, 6, 23, 0.18),
+            0 8px 18px rgba(2, 6, 23, 0.10)
+          `,
+            transition: "transform 200ms ease, box-shadow 200ms ease",
+            "&:hover": {
+              transform: "translateY(-2px)",
+              boxShadow: `
+              0 28px 70px rgba(2, 6, 23, 0.22),
+              0 10px 22px rgba(2, 6, 23, 0.12)
+            `,
+            },
+            mr: { xs: 0, md: 12 },
+            overflow: "hidden",
+          }}
         >
-          <Box sx={{ alignSelf: "flex-start", ml: 1 }}>
-            <Link href={"/auth/signin"}>
-              <ArrowBack />
-            </Link>
+          {/* Header card */}
+          <Box sx={{ p: { xs: 2.5, sm: 3 }, pb: 1.5 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+              <Link href={"/auth/signin"} style={{ display: "inline-flex" }}>
+                <IconButton size="small" aria-label="Back">
+                  <ArrowBack />
+                </IconButton>
+              </Link>
+              <Box sx={{ flex: 1 }} />
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 1,
+              }}
+            >
+              <Avatar sx={{ bgcolor: "primary.main", mb: 1 }}>
+                <Lock />
+              </Avatar>
+              <Typography component="h1" variant="h6" sx={{ fontWeight: 800 }}>
+                Đăng Ký
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: "text.secondary", mt: 0.5 }}
+              >
+                Tạo tài khoản mới để bắt đầu ✨
+              </Typography>
+            </Box>
           </Box>
 
+          {/* Body card - scroll nếu dài */}
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
+              px: { xs: 2.5, sm: 3 },
+              pb: { xs: 2.5, sm: 3 },
+              pt: 1,
+              maxHeight: {
+                xs: "calc(100vh - 120px)",
+                md: "calc(100vh - 160px)",
+              },
+              overflowY: "auto",
             }}
           >
-            <Avatar>
-              <Lock />
-            </Avatar>
-            <Typography component="h1">Đăng Ký</Typography>
-          </Box>
+            {/* Name */}
+            <FormControl sx={{ width: "100%", mb: 1.4 }} variant="outlined">
+              <TextField
+                size="small"
+                required
+                label="Tên hiển thị"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                error={isErrorName}
+                helperText={errorName}
+              />
+            </FormControl>
 
-          {/* Name */}
-          <FormControl sx={{ width: "100%" }} variant="outlined">
-            <TextField
-              required
-              label="Tên hiển thị"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              error={isErrorName}
-              helperText={errorName}
-            />
-          </FormControl>
+            {/* Email */}
+            <FormControl sx={{ width: "100%", mb: 1.4 }} variant="outlined">
+              <TextField
+                size="small"
+                required
+                label="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                error={isErrorEmail}
+                helperText={errorEmail}
+              />
+            </FormControl>
 
-          {/* Email */}
-          <FormControl sx={{ width: "100%" }} variant="outlined">
-            <TextField
-              required
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              error={isErrorEmail}
-              helperText={errorEmail}
-            />
-          </FormControl>
+            {/* Password */}
+            <FormControl sx={{ width: "100%", mb: 1.4 }} variant="outlined">
+              <TextField
+                size="small"
+                required
+                label="Mật khẩu"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={isErrorPassword}
+                helperText={errorPassword}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label={
+                          showPassword
+                            ? "hide the password"
+                            : "display the password"
+                        }
+                        onClick={handleClickShowPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </FormControl>
 
-          {/* Password */}
-          <FormControl sx={{ width: "100%" }} variant="outlined">
-            <TextField
-              required
-              label="Mật khẩu"
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              error={isErrorPassword}
-              helperText={errorPassword}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label={
-                        showPassword
-                          ? "hide the password"
-                          : "display the password"
-                      }
-                      onClick={handleClickShowPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
+            {/* Confirm Password */}
+            <FormControl sx={{ width: "100%", mb: 1.4 }} variant="outlined">
+              <TextField
+                size="small"
+                required
+                label="Nhập lại mật khẩu"
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                error={isErrorConfirmPassword}
+                helperText={errorConfirmPassword}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label={
+                          showConfirmPassword
+                            ? "hide the password"
+                            : "display the password"
+                        }
+                        onClick={handleClickShowConfirmPassword}
+                        edge="end"
+                      >
+                        {showConfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </FormControl>
+
+            {/* Age */}
+            <FormControl sx={{ width: "100%", mb: 1.4 }} variant="outlined">
+              <TextField
+                size="small"
+                required
+                label="Tuổi"
+                type="number"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                error={isErrorAge}
+                helperText={errorAge}
+              />
+            </FormControl>
+
+            {/* Gender */}
+            <FormControl sx={{ width: "100%", mb: 1.4 }} variant="outlined">
+              <TextField
+                size="small"
+                select
+                required
+                label="Giới tính"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                error={isErrorGender}
+                helperText={errorGender}
+              >
+                <MenuItem value="male">Nam</MenuItem>
+                <MenuItem value="female">Nữ</MenuItem>
+                <MenuItem value="other">Khác</MenuItem>
+              </TextField>
+            </FormControl>
+
+            {/* Address */}
+            <FormControl sx={{ width: "100%", mb: 1.4 }} variant="outlined">
+              <TextField
+                size="small"
+                required
+                label="Địa chỉ"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                error={isErrorAddress}
+                helperText={errorAddress}
+              />
+            </FormControl>
+
+            <Button
+              variant="contained"
+              sx={{
+                width: "100%",
+                mt: 1,
+                py: 0.9,
+                fontSize: "0.9rem",
+                borderRadius: 3,
+                fontWeight: 800,
               }}
-            />
-          </FormControl>
-
-          {/* Confirm Password */}
-          <FormControl sx={{ width: "100%" }} variant="outlined">
-            <TextField
-              required
-              label="Nhập lại mật khẩu"
-              type={showConfirmPassword ? "text" : "password"}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              error={isErrorConfirmPassword}
-              helperText={errorConfirmPassword}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label={
-                        showConfirmPassword
-                          ? "hide the password"
-                          : "display the password"
-                      }
-                      onClick={handleClickShowConfirmPassword}
-                      edge="end"
-                    >
-                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </FormControl>
-
-          {/* Age */}
-          <FormControl sx={{ width: "100%" }} variant="outlined">
-            <TextField
-              required
-              label="Tuổi"
-              type="number"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              error={isErrorAge}
-              helperText={errorAge}
-            />
-          </FormControl>
-
-          {/* Gender */}
-          <FormControl sx={{ width: "100%" }} variant="outlined">
-            <TextField
-              select
-              required
-              label="Giới tính"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-              error={isErrorGender}
-              helperText={errorGender}
+              onClick={handleSubmit}
             >
-              <MenuItem value="male">Nam</MenuItem>
-              <MenuItem value="female">Nữ</MenuItem>
-              <MenuItem value="other">Khác</MenuItem>
-            </TextField>
-          </FormControl>
+              ĐĂNG KÝ
+            </Button>
 
-          {/* Address */}
-          <FormControl sx={{ width: "100%" }} variant="outlined">
-            <TextField
-              required
-              label="Địa chỉ"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              error={isErrorAddress}
-              helperText={errorAddress}
-            />
-          </FormControl>
+            <Divider sx={{ width: "100%", mt: 2, mb: 2 }} />
 
-          <Button
-            variant="contained"
-            sx={{ width: "100%", mt: 1 }}
-            onClick={handleSubmit}
-          >
-            ĐĂNG KÝ
-          </Button>
+            <Typography variant="body2" sx={{ textAlign: "center" }}>
+              Đã có tài khoản?{" "}
+              <Link
+                href="/auth/signin"
+                style={{ color: "#1976d2", fontWeight: 700 }}
+              >
+                Đăng nhập ngay
+              </Link>
+            </Typography>
+          </Box>
+        </Box>
 
-          <Divider sx={{ width: "100%", mt: 1, mb: 1 }} />
-
-          <Typography variant="body2">
-            Đã có tài khoản?{" "}
-            <Link href="/auth/signin" style={{ color: "#1976d2" }}>
-              Đăng nhập ngay
-            </Link>
-          </Typography>
-        </Grid>
-      </Grid>
-
-      <Snackbar
-        open={openMessage}
-        autoHideDuration={5000}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        onClose={() => setOpenMessage(false)}
-      >
-        <Alert
-          severity={messageType}
-          variant="filled"
-          sx={{ width: "100%" }}
+        <Snackbar
+          open={openMessage}
+          autoHideDuration={5000}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
           onClose={() => setOpenMessage(false)}
         >
-          {resMessage}
-        </Alert>
-      </Snackbar>
+          <Alert
+            severity={messageType}
+            variant="filled"
+            sx={{ width: "100%" }}
+            onClose={() => setOpenMessage(false)}
+          >
+            {resMessage}
+          </Alert>
+        </Snackbar>
+      </Box>
     </form>
   );
 };

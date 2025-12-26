@@ -15,16 +15,16 @@ import {
   Button,
   Divider,
   FormControl,
-  Grid,
   IconButton,
   InputAdornment,
   Snackbar,
   TextField,
   Typography,
+  Paper,
 } from "@mui/material";
 import { getSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export const AuthSignIn = () => {
@@ -41,6 +41,7 @@ export const AuthSignIn = () => {
   const [openMessage, setOpenMessage] = useState<boolean>(false);
   const [resMessage, setResMessage] = useState<string>("");
   const route = useRouter();
+
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleMouseDownPassword = (
@@ -79,11 +80,11 @@ export const AuthSignIn = () => {
       redirect: false,
     });
 
-    // ✅ LẤY SESSION SAU KHI LOGIN
+    // ✅ LẤY SESSION SAU KHI LOGIN THÀNH CÔNG
     const session = await getSession();
 
     // 🚫 TÀI KHOẢN BỊ BLOCK
-    if (session?.user?.block) {
+    if ((session?.user as any)?.block) {
       setOpenMessage(true);
       setResMessage("Tài khoản của bạn đã bị chặn");
 
@@ -91,9 +92,9 @@ export const AuthSignIn = () => {
       await signOut({ redirect: false });
       return;
     }
+
     if (!res?.error) {
-      //redirect to home
-      route.refresh();
+      // route.refresh();
       router.push("/");
     } else {
       setOpenMessage(true);
@@ -102,51 +103,102 @@ export const AuthSignIn = () => {
   };
 
   return (
-    <form>
-      <Grid
-        container
+    <Box
+      sx={{
+        minHeight: "100vh",
+        // ✅ Ảnh nền (đặt file vào public/auth/signin-bg.jpg)
+        backgroundImage: `url("/auth/signin-bg.jpg")`,
+        backgroundSize: { xs: "cover", md: "100%" }, // ✅ thu nhỏ ảnh ở màn hình lớn
+        backgroundPosition: { xs: "center", md: "left center" }, // ✅ canh trái để phần trắng bên phải rộng hơn
+        backgroundRepeat: "no-repeat",
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: { xs: "center", md: "flex-end" }, // ✅ form nằm vùng trắng bên phải
+        px: { xs: 2, md: 8 },
+        pr: { xs: 2, md: 7 }, // ✅ khung vào trong
+      }}
+    >
+      {/* lớp phủ nhẹ để chữ/form nổi hơn (tuỳ thích) */}
+      <Box
         sx={{
-          height: "100vh",
-          justifyContent: "center",
-          alignItems: "center",
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(90deg, rgba(15,23,42,0.10) 0%, rgba(15,23,42,0.04) 45%, rgba(255,255,255,0.00) 70%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ✅ Khung Sign In nằm ở vùng trắng */}
+      <Paper
+        elevation={0}
+        sx={{
+          width: "100%",
+          maxWidth: 520,
+          position: "relative",
+
+          // ✅ bo tròn hơn chút
+          borderRadius: 5,
+
+          p: { xs: 3, sm: 4 },
+
+          // ✅ viền rất mỏng để card “tách” khỏi nền
+          border: "1px solid rgba(15, 23, 42, 0.10)",
+
+          // ✅ nền hơi trong + blur nhẹ (giữ như bạn đang dùng)
+          bgcolor: "rgba(255,255,255,0.92)",
+          backdropFilter: "blur(8px)",
+
+          // ✅ shadow mềm, nhìn nổi hẳn lên (không gắt)
+          boxShadow: `
+        0 22px 60px rgba(2, 6, 23, 0.18),
+        0 8px 18px rgba(2, 6, 23, 0.10)
+        `,
+
+          // ✅ (tuỳ chọn) nổi lên nhẹ khi hover
+          transition: "transform 200ms ease, box-shadow 200ms ease",
+          "&:hover": {
+            transform: "translateY(-2px)",
+            boxShadow: `
+        0 28px 70px rgba(2, 6, 23, 0.22),
+        0 10px 22px rgba(2, 6, 23, 0.12)
+        `,
+          },
+
+          mr: { xs: 0, md: 12 },
         }}
       >
-        <Grid
-          item
-          xs={12}
-          sm={8}
-          md={5}
-          lg={4}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+          <Link href={"/"} style={{ display: "inline-flex" }}>
+            <IconButton size="small" aria-label="Back">
+              <ArrowBack />
+            </IconButton>
+          </Link>
+          <Box sx={{ flex: 1 }} />
+        </Box>
+
+        <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "24px",
-            boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
-            padding: "24px",
-            position: "relative", // BẮT BUỘC CÓ
+            mb: 3,
           }}
         >
-          <Box sx={{ alignSelf: "flex-start", ml: 1 }}>
-            <Link href={"/"}>
-              <ArrowBack />
-            </Link>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Avatar>
-              <Lock />
-            </Avatar>
-            <Typography component="h1">Đăng Nhập</Typography>
-          </Box>
+          <Avatar sx={{ bgcolor: "primary.main", mb: 1 }}>
+            <Lock />
+          </Avatar>
+          <Typography component="h1" variant="h6" sx={{ fontWeight: 800 }}>
+            Đăng Nhập
+          </Typography>
+          <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+            Chào mừng bạn quay lại 👋
+          </Typography>
+        </Box>
 
-          <FormControl sx={{ width: "100%" }} variant="outlined">
+        <Box component="form" onSubmit={(e) => e.preventDefault()}>
+          <FormControl sx={{ width: "100%", mb: 2 }} variant="outlined">
             <TextField
               required
               id="outlined-adornment-username"
@@ -159,7 +211,7 @@ export const AuthSignIn = () => {
             />
           </FormControl>
 
-          <FormControl sx={{ width: "100%" }} variant="outlined">
+          <FormControl sx={{ width: "100%", mb: 2 }} variant="outlined">
             <TextField
               required
               id="outlined-adornment-password"
@@ -188,52 +240,55 @@ export const AuthSignIn = () => {
               error={isErrorPassword}
               helperText={errorPassword}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSubmit();
-                }
+                if (e.key === "Enter") handleSubmit();
               }}
             />
           </FormControl>
 
           <Button
             variant="contained"
-            sx={{ width: "100%" }}
+            sx={{
+              width: "100%",
+              py: 1.2,
+              borderRadius: 3,
+              fontWeight: 800,
+            }}
             onClick={handleSubmit}
           >
             ĐĂNG NHẬP
           </Button>
 
-          <Divider sx={{ width: "100%" }}>Khác</Divider>
+          <Divider sx={{ width: "100%", my: 2 }}>Khác</Divider>
 
-          <Grid
-            item
-            sx={{
-              display: "flex",
-              gap: "12px",
-            }}
+          <Box
+            sx={{ display: "flex", gap: 1.5, justifyContent: "center", mb: 1 }}
           >
             <Avatar
-              sx={{ cursor: "pointer", bgcolor: "orange" }}
+              sx={{ cursor: "pointer", bgcolor: "#111827" }}
               onClick={() => signIn("github")}
             >
-              <GitHub titleAccess="Đăng nhập vói Github" />
+              <GitHub titleAccess="Đăng nhập với Github" />
             </Avatar>
             <Avatar
-              sx={{ cursor: "pointer", background: "orange" }}
+              sx={{ cursor: "pointer", bgcolor: "#F59E0B" }}
               onClick={() => signIn("google")}
             >
-              <Google titleAccess="Đăng nhập vói Google" />
+              <Google titleAccess="Đăng nhập với Google" />
             </Avatar>
-          </Grid>
+          </Box>
 
-          <Typography variant="body2" sx={{ mt: 1 }}>
+          <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
             Nếu bạn chưa có tài khoản?{" "}
-            <Link href="/auth/signup" style={{ color: "#1976d2" }}>
+            <Link
+              href="/auth/signup"
+              style={{ color: "#1976d2", fontWeight: 700 }}
+            >
               Đăng ký ngay
             </Link>
           </Typography>
-        </Grid>
-      </Grid>
+        </Box>
+      </Paper>
+
       <Snackbar
         open={openMessage}
         autoHideDuration={5000}
@@ -243,13 +298,11 @@ export const AuthSignIn = () => {
           severity="error"
           variant="filled"
           sx={{ width: "100%" }}
-          onClose={() => {
-            setOpenMessage(false);
-          }}
+          onClose={() => setOpenMessage(false)}
         >
           {resMessage}
         </Alert>
       </Snackbar>
-    </form>
+    </Box>
   );
 };

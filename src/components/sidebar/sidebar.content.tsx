@@ -216,9 +216,9 @@ export default function SidebarContent({ data, onNavigate }: Props) {
                 color="#1877F2"
                 fontWeight={600}
                 sx={{ px: 1, cursor: "pointer", mt: 0.5 }}
-                onClick={() =>
-                  (window.location.href = "/community?joined=true")
-                }
+                // onClick={() =>
+                //   (window.location.href = "/community?joined=true")
+                // }
               >
                 Xem tất cả →
               </Typography>
