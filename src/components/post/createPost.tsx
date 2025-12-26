@@ -32,6 +32,8 @@ export default function PostForm({ data }: IProps) {
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [imageAiFlag, setImageAiFlag] = useState(false);
+  const [imageAiReason, setImageAiReason] = useState<string | null>(null);
 
   // 📌 Chọn MEDIA (ảnh hoặc video)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +61,11 @@ export default function PostForm({ data }: IProps) {
       let uploadedImages: string[] = [];
       let uploadedVideos: string[] = [];
 
-      // 🟦 Có media → upload lên server
+      // 🔑 BIẾN LOCAL (QUAN TRỌNG)
+      let localImageAiFlag = false;
+      let localImageAiReason: string | null = null;
+
+      // 🟦 Upload media
       if (files.length > 0) {
         const formData = new FormData();
         files.forEach((file) => {
@@ -80,17 +86,21 @@ export default function PostForm({ data }: IProps) {
 
         const uploadData = uploadRes.data?.data;
 
-        if (uploadData?.success === false) {
-          toast.error(uploadData.message || "Ảnh/video không hợp lệ");
-          setIsLoading(false);
-          return; // ⛔ DỪNG TẠI ĐÂY
-        }
+        uploadedImages = uploadData?.images || [];
+        uploadedVideos = uploadData?.videos || [];
 
-        uploadedImages = uploadRes.data?.data?.images || [];
-        uploadedVideos = uploadRes.data?.data?.videos || [];
+        // ⚠️ ẢNH BỊ AI FLAG
+        if (uploadData?.aiFlag) {
+          localImageAiFlag = true;
+          localImageAiReason = uploadData.aiReason || "Ảnh bị AI đánh dấu";
+
+          toast.warning(
+            "Ảnh có dấu hiệu vi phạm, bài viết sẽ được admin kiểm duyệt"
+          );
+        }
       }
 
-      // 🟩 Tạo POST
+      // 🟩 TẠO POST
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts`,
         {
@@ -98,20 +108,31 @@ export default function PostForm({ data }: IProps) {
           images: uploadedImages,
           videos: uploadedVideos,
           userId: session?.user?._id,
+
+          // 🔥 GỬI BIẾN LOCAL (CHUẨN)
+          aiFlag: localImageAiFlag,
+          aiReason: localImageAiReason,
         },
         {
           headers: { Authorization: `Bearer ${session?.access_token}` },
         }
       );
+
       if (res.data.data.success === true) {
-        toast.success("Tạo bài viết thành công");
-      }
-      if (res.data.data.success === false) {
+        if (res.data.data.message === "Đăng bài thành công") {
+          toast.success("Đăng bài thành công!");
+        } else {
+          toast.warning(res.data.data.message);
+        }
+      } else {
         toast.error(res.data.data.message);
       }
+
       // reset form
       setContent("");
       setFiles([]);
+      setImageAiFlag(false);
+      setImageAiReason(null);
       router.refresh();
     } catch (err) {
       console.log(err);

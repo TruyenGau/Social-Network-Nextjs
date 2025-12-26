@@ -28,6 +28,7 @@ export default function AdminSidebar() {
     { key: "/admin/role", label: "Role", icon: <TeamOutlined /> },
     { key: "/admin/report", label: "Report", icon: <ReportOffOutlined /> },
     { key: "/admin/spam", label: "Spam", icon: <StopOutlined /> },
+    { key: "/admin/pending", label: "Pending", icon: <StopOutlined /> },
   ];
 
   return (

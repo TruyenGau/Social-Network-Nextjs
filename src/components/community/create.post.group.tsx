@@ -37,7 +37,8 @@ export default function CreatePostGroup({
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [imageAiFlag, setImageAiFlag] = useState(false);
+  const [imageAiReason, setImageAiReason] = useState<string | null>(null);
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
     if (!fileList) return;
@@ -59,7 +60,8 @@ export default function CreatePostGroup({
     try {
       let uploadedImages: string[] = [];
       let uploadedVideos: string[] = [];
-
+      let localImageAiFlag = false;
+      let localImageAiReason: string | null = null;
       // 🟦 Upload media nếu có
       if (files.length > 0) {
         const formData = new FormData();
@@ -79,15 +81,18 @@ export default function CreatePostGroup({
 
         const uploadData = uploadRes.data?.data;
 
-        // ❌ MEDIA BỊ CHẶN
-        if (uploadData?.success === false) {
-          toast.error(uploadData.message || "Ảnh/video không hợp lệ");
-          setIsLoading(false);
-          return;
-        }
-
         uploadedImages = uploadRes.data?.data?.images || [];
         uploadedVideos = uploadRes.data?.data?.videos || [];
+
+        // ❌ MEDIA BỊ CHẶN
+        if (uploadData?.aiFlag) {
+          localImageAiFlag = true;
+          localImageAiReason = uploadData.aiReason || "Ảnh bị AI đánh dấu";
+
+          toast.warning(
+            "Ảnh có dấu hiệu vi phạm, bài viết sẽ được admin kiểm duyệt"
+          );
+        }
       }
 
       // 🟩 Tạo bài viết GROUP
@@ -99,15 +104,21 @@ export default function CreatePostGroup({
           videos: uploadedVideos,
           userId: session?.user?._id,
           communityId: groupId,
+
+          aiFlag: localImageAiFlag,
+          aiReason: localImageAiReason,
         },
         {
           headers: { Authorization: `Bearer ${session?.access_token}` },
         }
       );
       if (res.data.data.success === true) {
-        toast.success("Tạo bài viết thành công");
-      }
-      if (res.data.data.success === false) {
+        if (res.data.data.message === "Đăng bài thành công") {
+          toast.success("Đăng bài thành công!");
+        } else {
+          toast.warning(res.data.data.message);
+        }
+      } else {
         toast.error(res.data.data.message);
       }
       // Reset form
