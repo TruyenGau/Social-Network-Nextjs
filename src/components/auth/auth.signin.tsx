@@ -247,6 +247,7 @@ export const AuthSignIn = () => {
 
           <Button
             variant="contained"
+            type="button"
             sx={{
               width: "100%",
               py: 1.2,
