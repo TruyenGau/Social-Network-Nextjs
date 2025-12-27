@@ -10,39 +10,33 @@ export const authOptions: AuthOptions = {
 
   providers: [
     CredentialsProvider({
-      name: "Truyền nào",
+      name: "Tryền nào",
       credentials: {
-        username: { label: "Tên đăng nhập", type: "text" },
+        username: {
+          label: "Tên đăng nhập",
+          type: "text",
+        },
         password: { label: "Mật khẩu", type: "password" },
       },
-      async authorize(credentials) {
-        try {
-          const res = await sendRequest<IBackendRes<any>>({
-            url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/login`,
-            method: "POST",
-            body: {
-              username: credentials?.username,
-              password: credentials?.password,
-            },
-          });
+      async authorize(credentials, req) {
+        // Add logic here to look up the user from the credentials supplied
 
-          // ❗ LOGIN FAIL
-          if (!res || !res.data) {
-            return null;
-          }
+        const res = await sendRequest<IBackendRes<JWT>>({
+          url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/login`,
+          method: "POST",
+          body: {
+            username: credentials?.username,
+            password: credentials?.password,
+          },
+        });
 
-          // ❗ CHỈ TRẢ VỀ USER OBJECT
-          return {
-            id: res.data.user._id,
-            name: res.data.user.name,
-            email: res.data.user.email,
-            access_token: res.data.access_token,
-            refresh_token: res.data.refresh_token,
-            user: res.data.user,
-          };
-        } catch (error) {
-          console.error("Authorize error:", error);
-          return null; // ❗ TUYỆT ĐỐI không throw
+        if (res && res.data) {
+          return res.data as any;
+        } else {
+          // If you return null then an error will be displayed advising the user to check their details.
+          throw new Error(res?.message as string);
+
+          // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
         }
       },
     }),
