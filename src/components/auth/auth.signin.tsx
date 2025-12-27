@@ -94,7 +94,7 @@ export const AuthSignIn = () => {
     }
 
     if (!res?.error) {
-      // route.refresh();
+      route.refresh();
       router.push("/");
     } else {
       setOpenMessage(true);
