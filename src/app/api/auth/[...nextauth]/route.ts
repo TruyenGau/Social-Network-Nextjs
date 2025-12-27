@@ -19,7 +19,8 @@ export const authOptions: AuthOptions = {
         password: { label: "Mật khẩu", type: "password" },
       },
       async authorize(credentials, req) {
-        // Add logic here to look up the user from the credentials supplied
+        // Add logic here to look up the user from the credentials suppliedss
+        //abc
 
         const res = await sendRequest<IBackendRes<JWT>>({
           url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/login`,
