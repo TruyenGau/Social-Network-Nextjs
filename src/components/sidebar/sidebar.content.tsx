@@ -190,7 +190,7 @@ export default function SidebarContent({ data, onNavigate }: Props) {
             {joinedGroups.slice(0, 5).map((group) => (
               <ListItemButton
                 key={group._id}
-                href={`/groups/${group._id}`}
+                href={`/community/${group._id}`}
                 onClick={onNavigate}
                 sx={{
                   borderRadius: "8px",
@@ -207,6 +207,9 @@ export default function SidebarContent({ data, onNavigate }: Props) {
                 <Typography fontSize={14} fontWeight={500} noWrap>
                   {group.name}
                 </Typography>
+                <Typography fontSize={12} fontWeight={300} noWrap>
+                  {group.membersCount}
+                </Typography>
               </ListItemButton>
             ))}
 
@@ -216,9 +219,9 @@ export default function SidebarContent({ data, onNavigate }: Props) {
                 color="#1877F2"
                 fontWeight={600}
                 sx={{ px: 1, cursor: "pointer", mt: 0.5 }}
-                // onClick={() =>
-                //   (window.location.href = "/community?joined=true")
-                // }
+                onClick={() =>
+                  (window.location.href = "/community?joined=true")
+                }
               >
                 Xem tất cả →
               </Typography>

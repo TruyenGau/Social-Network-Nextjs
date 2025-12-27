@@ -287,6 +287,14 @@ export const AuthSignIn = () => {
               Đăng ký ngay
             </Link>
           </Typography>
+          <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
+            <Link
+              href="/auth/forget-password"
+              style={{ color: "#1976d2", fontWeight: 700 }}
+            >
+              Quên mật khẩu
+            </Link>
+          </Typography>
         </Box>
       </Paper>
 
