@@ -1,66 +1,62 @@
-// "use client";
+"use client";
 
-// import { Card, Row, Col } from "antd";
-// import {
-//   BarChart,
-//   Bar,
-//   XAxis,
-//   YAxis,
-//   CartesianGrid,
-//   Tooltip,
-//   ResponsiveContainer,
-// } from "recharts";
+import { Card, Row, Col } from "antd";
+import { Column } from "@ant-design/charts";
 
-// interface IProps {
-//   usersByMonth: { month: string; count: number }[];
-//   postsByMonth: { month: string; count: number }[];
-// }
+interface IProps {
+  usersByMonth: { month: string; count: number }[];
+  postsByMonth: { month: string; count: number }[];
+}
 
-// export default function DashboardBarChart({
-//   usersByMonth,
-//   postsByMonth,
-// }: IProps) {
-//   return (
-//     <Row gutter={[20, 20]}>
-//       {/* ========================== */}
-//       {/* BIỂU ĐỒ USERS THEO THÁNG */}
-//       {/* ========================== */}
-//       <Col xs={24} md={12}>
-//         <Card title="Biểu đồ số lượng User theo tháng">
-//           <ResponsiveContainer width="100%" height={350}>
-//             <BarChart
-//               data={usersByMonth}
-//               margin={{ top: 20, right: 20, bottom: 5 }}
-//             >
-//               <CartesianGrid strokeDasharray="3 3" />
-//               <XAxis dataKey="month" />
-//               <YAxis allowDecimals={false} />
-//               <Tooltip />
-//               <Bar dataKey="count" fill="#1677ff" name="Users" />
-//             </BarChart>
-//           </ResponsiveContainer>
-//         </Card>
-//       </Col>
+export default function DashboardBarChart({
+  usersByMonth,
+  postsByMonth,
+}: IProps) {
+  const userConfig = {
+    data: usersByMonth,
+    xField: "month",
+    yField: "count",
+    height: 350,
+    color: ({ month }: any) => {
+      const colors: Record<string, string> = {
+        Jan: "#1677ff",
+        Feb: "#69b1ff",
+        Mar: "#91caff",
+        Dec: "#0958d9",
+      };
+      return colors[month] || "#1677ff";
+    },
+  };
 
-//       {/* ========================== */}
-//       {/* BIỂU ĐỒ POSTS THEO THÁNG */}
-//       {/* ========================== */}
-//       <Col xs={24} md={12}>
-//         <Card title="Biểu đồ số lượng Post theo tháng">
-//           <ResponsiveContainer width="100%" height={350}>
-//             <BarChart
-//               data={postsByMonth}
-//               margin={{ top: 20, right: 20, bottom: 5 }}
-//             >
-//               <CartesianGrid strokeDasharray="3 3" />
-//               <XAxis dataKey="month" />
-//               <YAxis allowDecimals={false} />
-//               <Tooltip />
-//               <Bar dataKey="count" fill="#52c41a" name="Posts" />
-//             </BarChart>
-//           </ResponsiveContainer>
-//         </Card>
-//       </Col>
-//     </Row>
-//   );
-// }
+  const postConfig = {
+    data: postsByMonth,
+    xField: "month",
+    yField: "count",
+    height: 350,
+    color: ({ month }: any) => {
+      const colors: Record<string, string> = {
+        Jan: "#52c41a",
+        Feb: "#95de64",
+        Mar: "#b7eb8f",
+        Dec: "#389e0d",
+      };
+      return colors[month] || "#52c41a";
+    },
+  };
+
+  return (
+    <Row gutter={[20, 20]}>
+      <Col xs={24} md={12}>
+        <Card title="Biểu đồ số lượng User theo tháng">
+          <Column {...userConfig} />
+        </Card>
+      </Col>
+
+      <Col xs={24} md={12}>
+        <Card title="Biểu đồ số lượng Post theo tháng">
+          <Column {...postConfig} />
+        </Card>
+      </Col>
+    </Row>
+  );
+}
