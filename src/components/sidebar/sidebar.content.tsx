@@ -207,9 +207,6 @@ export default function SidebarContent({ data, onNavigate }: Props) {
                 <Typography fontSize={14} fontWeight={500} noWrap>
                   {group.name}
                 </Typography>
-                <Typography fontSize={12} fontWeight={300} noWrap>
-                  {group.membersCount}
-                </Typography>
               </ListItemButton>
             ))}
 
