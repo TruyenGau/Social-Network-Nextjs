@@ -59,7 +59,7 @@ const ImageViewer = ({ images, index, onClose }: any) => {
 
         {/* IMAGE */}
         <img
-          src={images[current]}
+          src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${images[current]}`}
           style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 8 }}
         />
 
