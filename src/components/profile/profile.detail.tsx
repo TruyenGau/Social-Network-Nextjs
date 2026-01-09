@@ -10,6 +10,9 @@ import {
   Stack,
   Drawer,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -18,6 +21,7 @@ import { UserContext } from "@/lib/track.wrapper";
 import PostCard from "./profile.post";
 import ProfileInfomation from "@/components/profile/profile.info";
 import JoinedGroupsMock from "@/components/profile/profile.joinedgroupsmock";
+import { sendRequest } from "@/utils/api";
 
 interface IProps {
   userId: string;
@@ -39,6 +43,11 @@ const StatItem = ({ label, value }: { label: string; value: number }) => (
 const ProfileDetail = ({ userId, users, posts }: IProps) => {
   const { setUserInfoId } = useContext(UserContext) as IContext;
   const [openMobileInfo, setOpenMobileInfo] = useState(false);
+  const [openFollow, setOpenFollow] = useState(false);
+  const [followType, setFollowType] = useState<"followers" | "following">(
+    "followers"
+  );
+  const [followList, setFollowList] = useState<any[]>([]);
 
   useEffect(() => {
     setUserInfoId(userId);
@@ -47,6 +56,29 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
   if (!users) return null;
 
   const user = users;
+  const fetchFollowers = async () => {
+    const res = await sendRequest<IBackendRes<any[]>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/follow/followers/${userId}`,
+      method: "GET",
+    });
+
+    setFollowList(res?.data ?? []);
+    setFollowType("followers");
+    setOpenFollow(true);
+    console.log("followers:", res);
+  };
+
+  const fetchFollowing = async () => {
+    const res = await sendRequest<IBackendRes<any[]>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/follow/following/${userId}`,
+      method: "GET",
+    });
+
+    setFollowList(res?.data ?? []);
+    setFollowType("following");
+    setOpenFollow(true);
+    console.log("fetchFollowing:", res);
+  };
 
   return (
     <Box
@@ -194,8 +226,13 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
           mt={3}
         >
           <StatItem label="Bài viết" value={posts?.length || 0} />
-          <StatItem label="Người theo dõi" value={user.followersCount || 0} />
-          <StatItem label="Đang theo dõi" value={user.followingCount || 0} />
+          <Box onClick={fetchFollowers} sx={{ cursor: "pointer" }}>
+            <StatItem label="Người theo dõi" value={user.followersCount || 0} />
+          </Box>
+
+          <Box onClick={fetchFollowing} sx={{ cursor: "pointer" }}>
+            <StatItem label="Đang theo dõi" value={user.followingCount || 0} />
+          </Box>
         </Stack>
       </Box>
 
@@ -217,6 +254,65 @@ const ProfileDetail = ({ userId, users, posts }: IProps) => {
           </Typography>
         )}
       </Box>
+      <Dialog
+        open={openFollow}
+        onClose={() => setOpenFollow(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle
+          sx={{
+            fontWeight: 700,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          {followType === "followers" ? "Người theo dõi" : "Đang theo dõi"}
+          <IconButton onClick={() => setOpenFollow(false)} size="small">
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent dividers>
+          {followList.map((item) => {
+            const u =
+              followType === "followers" ? item.follower : item.following;
+
+            if (!u) return null;
+
+            return (
+              <Box
+                key={u._id}
+                display="flex"
+                alignItems="center"
+                gap={1.5}
+                sx={{
+                  py: 1,
+                  cursor: "pointer",
+                  "&:hover": { backgroundColor: "#f0f2f5" },
+                }}
+                // onClick={() => route.push(`/profile/${u._id}`)}
+              >
+                <Avatar
+                  src={
+                    u.avatar
+                      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${u.avatar}`
+                      : "/user/default-user.png"
+                  }
+                />
+                <Typography fontWeight={600}>{u.name}</Typography>
+              </Box>
+            );
+          })}
+
+          {followList.length === 0 && (
+            <Typography color="text.secondary" textAlign="center">
+              Chưa có dữ liệu
+            </Typography>
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

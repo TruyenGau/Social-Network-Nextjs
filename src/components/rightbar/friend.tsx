@@ -50,6 +50,9 @@ const SuggestionsFriend = ({ suggesionFriend }: IProps) => {
   const handleRemove = (id: string) => {
     setList((prev) => prev.filter((u) => u._id !== id));
   };
+  const goProfile = (id: string) => {
+    route.push(`/profile/${id}`);
+  };
 
   return (
     <Paper
@@ -86,10 +89,15 @@ const SuggestionsFriend = ({ suggesionFriend }: IProps) => {
             display="flex"
             alignItems="center"
             justifyContent="space-between"
-            sx={{ py: 1 }}
+            sx={{ py: 1, cursor: "pointer" }}
           >
             {/* Avatar + Name */}
-            <Box display="flex" alignItems="center" gap={1.2}>
+            <Box
+              display="flex"
+              alignItems="center"
+              gap={1.2}
+              onClick={() => goProfile(user._id)}
+            >
               <Avatar
                 src={
                   user?.avatar
