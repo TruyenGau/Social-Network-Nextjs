@@ -171,7 +171,7 @@ export const AuthSignUp = () => {
           age: parseInt(age, 10),
           gender,
           address,
-          role: "693d249213cc7e4a184854d8",
+          role: "694eb534f948a1da0a85cbb4",
         }),
       });
 

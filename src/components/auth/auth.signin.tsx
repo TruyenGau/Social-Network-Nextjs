@@ -265,12 +265,6 @@ export const AuthSignIn = () => {
             sx={{ display: "flex", gap: 1.5, justifyContent: "center", mb: 1 }}
           >
             <Avatar
-              sx={{ cursor: "pointer", bgcolor: "#111827" }}
-              onClick={() => signIn("github")}
-            >
-              <GitHub titleAccess="Đăng nhập với Github" />
-            </Avatar>
-            <Avatar
               sx={{ cursor: "pointer", bgcolor: "#F59E0B" }}
               onClick={() => signIn("google")}
             >
