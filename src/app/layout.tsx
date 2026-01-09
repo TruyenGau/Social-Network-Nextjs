@@ -12,7 +12,7 @@ import StyledComponentsRegistry from "@/components/theme-registry/antd-registry"
 import "./globals.css";
 import { ThemeModeProvider } from "@/lib/theme.mode.context";
 export const metadata: Metadata = {
-  title: "tiêu đề cho cả website nè",
+  title: "Social Network",
   description: "truyền đẹop trai",
 };
 export default function RootLayout({
