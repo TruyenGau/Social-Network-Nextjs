@@ -268,6 +268,20 @@ export default function AdminPendingPostsPage() {
    * ========================= */
   return (
     <>
+      {/* ===== TABLE ===== */}
+      <Card
+        title="Duyệt bài viết AI"
+        extra={<Button icon={<ReloadOutlined />} onClick={fetchPendingPosts} />}
+      >
+        <Table
+          rowKey="_id"
+          columns={columns}
+          dataSource={posts}
+          loading={loading}
+          pagination={{ pageSize: 10 }}
+        />
+      </Card>
+
       {/* ===== DASHBOARD ===== */}
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={16}>
@@ -282,20 +296,6 @@ export default function AdminPendingPostsPage() {
           </Card>
         </Col>
       </Row>
-
-      {/* ===== TABLE ===== */}
-      <Card
-        title="Duyệt bài viết AI"
-        extra={<Button icon={<ReloadOutlined />} onClick={fetchPendingPosts} />}
-      >
-        <Table
-          rowKey="_id"
-          columns={columns}
-          dataSource={posts}
-          loading={loading}
-          pagination={{ pageSize: 10 }}
-        />
-      </Card>
     </>
   );
 }
